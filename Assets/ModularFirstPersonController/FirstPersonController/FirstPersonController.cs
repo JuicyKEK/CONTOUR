@@ -163,7 +163,7 @@ public class FirstPersonController : MonoBehaviour
         }
         else
         {
-            crosshairObject.gameObject.SetActive(false);
+            //crosshairObject.gameObject.SetActive(false);
         }
 
         #region Sprint Bar
@@ -191,8 +191,8 @@ public class FirstPersonController : MonoBehaviour
         }
         else
         {
-            sprintBarBG.gameObject.SetActive(false);
-            sprintBar.gameObject.SetActive(false);
+            // sprintBarBG.gameObject.SetActive(false);
+            // sprintBar.gameObject.SetActive(false);
         }
 
         #endregion
