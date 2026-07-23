@@ -207,16 +207,16 @@ public class FirstPersonController : MonoBehaviour
         // Control camera movement
         if(cameraCanMove)
         {
-            yaw = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * mouseSensitivity;
+            yaw = transform.localEulerAngles.y + Input.GetAxisRaw("Mouse X") * mouseSensitivity;
 
             if (!invertCamera)
             {
-                pitch -= mouseSensitivity * Input.GetAxis("Mouse Y");
+                pitch -= mouseSensitivity * Input.GetAxisRaw("Mouse Y");
             }
             else
             {
                 // Inverted Y
-                pitch += mouseSensitivity * Input.GetAxis("Mouse Y");
+                pitch += mouseSensitivity * Input.GetAxisRaw("Mouse Y");
             }
 
             // Clamp pitch between lookAngle
@@ -387,7 +387,7 @@ public class FirstPersonController : MonoBehaviour
             // All movement calculations shile sprint is active
             if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
             {
-                targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
+                targetVelocity = transform.TransformDirection(targetVelocity).normalized * sprintSpeed;
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.linearVelocity;
@@ -425,7 +425,7 @@ public class FirstPersonController : MonoBehaviour
                     sprintBarCG.alpha -= 3 * Time.deltaTime;
                 }
 
-                targetVelocity = transform.TransformDirection(targetVelocity) * walkSpeed;
+                targetVelocity = transform.TransformDirection(targetVelocity).normalized * walkSpeed;
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.linearVelocity;
@@ -435,6 +435,7 @@ public class FirstPersonController : MonoBehaviour
                 velocityChange.y = 0;
 
                 rb.AddForce(velocityChange, ForceMode.VelocityChange);
+                //rb.velocity = velocityChange;
             }
         }
 

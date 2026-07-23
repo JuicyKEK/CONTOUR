@@ -25,7 +25,10 @@ namespace Game.Scripts.Game.GameStarter
 
         private void Update()
         {
-            m_GameUpdateSequenceController.UpdateSequence();
+            if (m_UpdateSequence.Count > 0)
+            {
+                m_GameUpdateSequenceController.UpdateSequence();
+            }
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Game.Scripts.InputController
                 if (Physics.Raycast(ray, out var hit, m_RaycastDistance) &&
                     hit.collider.TryGetComponent(out IInteraction interactable) )
                 {
-                    if (!m_IsRayHitObject)
+                    if (!m_IsRayHitObject || m_CurrentInteractable != interactable)
                     {
                         m_CurrentInteractable = interactable;
                         m_IsRayHitObject = true;
