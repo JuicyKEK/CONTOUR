@@ -1,0 +1,4 @@
+{
+	"name": "InfectionZone",
+	"references":[ "GUID:7ec930ae407aeda4aa067367f8997d96", "GUID:221f55a0086f9f649a4bedccb2432729" ]
+}

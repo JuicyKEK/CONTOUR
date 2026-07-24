@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game.Scripts.Inventory.External
 {
     [JDIMonoController]
-    public class TestInteraction : MonoBehaviour, IInteraction, IInventoryObject
+    public class InventoryInteraction : MonoBehaviour, IInteraction, IInventoryObject
     {
         [Inject] private IInventoryAdd m_Inventory; //? надо придумать как нормально инжектить
         

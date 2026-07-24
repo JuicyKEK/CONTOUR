@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Game.Scripts.Inventory.External
 {
     [JDIMonoController]
-    public class TestDoor : MonoBehaviour, IInteraction
+    public class UseInventoryObject : MonoBehaviour, IInteraction
     {
         [SerializeField] private string m_ObjectKeyKey = "TestInteraction2";
         

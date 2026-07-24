@@ -62,7 +62,7 @@ Material:
     - _RippleAmount: 0.005
     - _RippleFrequency: 0.001
     - _RippleSpeed: 1
-    - _Smoothness: 0.609
+    - _Smoothness: 1
     - _TwistAmount: 6.82
     - _TwistCenter: 1
     - _TwistSpeed: 0
@@ -73,7 +73,7 @@ Material:
     - _WindStrength: 0.01
     - _WindTurbulence: 70.3
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     - _BendDirection: {r: 1, g: 0, b: 0, a: 0}
     - _RippleCenter: {r: 0, g: 0, b: 0, a: 0}
     - _WaveDirection: {r: 1, g: 0, b: 0, a: 0}
