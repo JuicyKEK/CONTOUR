@@ -29,6 +29,7 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         [SerializeField] private float m_DecreaseAmount = 10f;
 
         [Inject] private IInventoryGetObject m_Inventory;
+        [Inject] private IInfectionLevelHud m_Hud;
 
         private IInfectionZone m_Zone;
 
@@ -59,7 +60,16 @@ namespace Game.Scripts.InfectionZone.External.Controllers
             }
 
             m_Inventory.DeleteSelectedInventoryObject();
+
+            // Игрок своим действием (очисткой) уменьшает заражение зоны, в которой он
+            // сейчас физически находится (аномалия расположена в этой же зоне) - поэтому
+            // сразу показываем HUD с анимированным переходом от старого значения к новому,
+            // не полагаясь на отдельный триггер-волюм зоны на сцене.
+            float levelBefore = m_Zone.InfectionLevel.CurrentValue;
             m_Zone.DecreaseInfection(m_DecreaseAmount);
+            float levelAfter = m_Zone.InfectionLevel.CurrentValue;
+            m_Hud?.ShowLevelChange(m_Zone.DisplayName, levelBefore, levelAfter);
+
             gameObject.SetActive(false);
         }
     }

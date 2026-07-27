@@ -20,6 +20,9 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         [Tooltip("Уникальный идентификатор зоны. Используется сюжетными событиями для поиска зоны через реестр.")]
         [SerializeField] private string m_ZoneId;
 
+        [Tooltip("Отображаемое имя зоны для UI (например 'Общежития'). Если не заполнено - в UI используется ZoneId.")]
+        [SerializeField] private string m_DisplayName;
+
         [Tooltip("Стартовая степень заражения зоны (0..100%).")]
         [Range(0f, 100f)]
         [SerializeField] private float m_StartInfectionLevel;
@@ -29,6 +32,7 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         private readonly ReactiveProperty<float> m_InfectionLevel = new(0f);
 
         public string ZoneId => m_ZoneId;
+        public string DisplayName => string.IsNullOrEmpty(m_DisplayName) ? m_ZoneId : m_DisplayName;
         public ReadOnlyReactiveProperty<float> InfectionLevel => m_InfectionLevel;
 
         public void MethodInit()

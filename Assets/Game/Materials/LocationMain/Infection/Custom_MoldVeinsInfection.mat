@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_MoldInfection
-  m_Shader: {fileID: 4800000, guid: bd9ce041c2c948b3a60acd131d667838, type: 3}
+  m_Name: Custom_MoldVeinsInfection
+  m_Shader: {fileID: 4800000, guid: 2f9c6448d9834689ace1ef5042157506, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -33,19 +33,29 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmbientContribution: 0
-    - _CrawlAmount: 1.7
-    - _CrawlSpeed: 0.64
-    - _EdgeWidth: 0.386
-    - _InfectionAmount: 0.732
-    - _NoiseOctaves: 1.96
-    - _NoiseScale: 10.9
-    - _PatternWarp: 0
-    - _PulseSpeed: 3.38
-    - _PulseStrength: 0.799
-    - _Roughness: 0.242
+    - _AmbientContribution: 1
+    - _BulgeAmount: 0.03
+    - _BulgeNormalStrength: 1.5
+    - _BulgeScale: 5
+    - _BulgeWidth: 0.35
+    - _CrawlAmount: 0.35
+    - _CrawlSpeed: 0.15
+    - _EdgeWidth: 0.167
+    - _FlowBulgeAmount: 0.02
+    - _FlowFrequency: 6
+    - _FlowSharpness: 3
+    - _FlowSpeed: 1.31
+    - _InfectionAmount: 0.526
+    - _NoiseOctaves: 3.13
+    - _NoiseScale: 40
+    - _PatternWarp: 0.77
+    - _PulseSpeed: 1.91
+    - _PulseStrength: 0.25
+    - _VeinBranchWarp: 0.5
+    - _VeinCellScale: 10
+    - _VeinWidth: 0.6
     m_Colors:
-    - _MoldColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MoldEdgeColor: {r: 0, g: 0, b: 0, a: 1}
+    - _VeinColor: {r: 0, g: 0, b: 0, a: 1}
+    - _VeinPulseColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

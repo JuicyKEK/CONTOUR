@@ -22,6 +22,7 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         [SerializeField] private float m_InfectionAmount = 20f;
 
         [Inject] private IInfectionZoneRegistry m_Registry;
+        [Inject] private IInfectionLevelHud m_Hud;
 
         /// <summary>
         /// Вызывается сюжетным/квестовым событием (например из UnityEvent в таймлайне,
@@ -37,7 +38,14 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                 return;
             }
 
+            // Сюжетное заражение обычно происходит там, где сейчас находится игрок
+            // (кат-сцена/диалог в текущей локации) - сразу показываем HUD с анимированным
+            // переходом от старого значения к новому, не полагаясь на отдельный
+            // триггер-волюм зоны на сцене.
+            float levelBefore = zone.InfectionLevel.CurrentValue;
             zone.IncreaseInfection(m_InfectionAmount);
+            float levelAfter = zone.InfectionLevel.CurrentValue;
+            m_Hud?.ShowLevelChange(zone.DisplayName, levelBefore, levelAfter);
         }
     }
 }
