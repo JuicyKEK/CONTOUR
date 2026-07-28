@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81f61e9f9f094899aa78d2c9b5af340c, type: 3}
+  m_Name: AudioTapeSection_T1
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Data.AudioTapeSectionDefinition
+  m_DisplayName: "\u041F\u0440\u043E \u043A\u0430\u043A\u0443\u043B\u0438"
+  m_Tapes:
+  - {fileID: 11400000, guid: 776a466655b81f64eb723fc12341b6ea, type: 2}
+  - {fileID: 11400000, guid: 74b8f7f739c4e4d478cd2cd1291d5aa6, type: 2}

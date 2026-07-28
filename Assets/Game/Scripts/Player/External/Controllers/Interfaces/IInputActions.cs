@@ -7,6 +7,7 @@ namespace Game.Scripts.InputController
         void AddPressingButtonFAction(Action action);
         void AddPressingButtonRAction(Action action);
         void AddPressingButtonEAction(Action action);
+        void AddPressingButtonTabAction(Action action);
         void AddPressingMouseLeftButtonDownAction(Action action);
         void AddPressingMouseLeftButtonUpAction(Action action);
     }
