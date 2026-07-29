@@ -5,6 +5,7 @@ using DG.Tweening;
 using Game.Scripts.InteractionObjects.Interfaces;
 using R3;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Game.Scripts.InteractionObjects.Controllers
 {
@@ -12,6 +13,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
     {
         private readonly CompositeDisposable _disposables = new();
 
+        [SerializeField] private UnityEvent _onOpen;
         [Header("Open Settings")]
         [SerializeField] private Vector3 _openAngle = new Vector3(0f, 90f, 0f);
         [SerializeField] private float _duration = 0.5f;
@@ -65,9 +67,10 @@ namespace Game.Scripts.InteractionObjects.Controllers
             Quaternion targetRotation = isOpen
                 ? _openRotation
                 : _closedRotation;
-
+            Debug.Log(this.name + ": SetDoorStateAsync called");
             _currentTween = transform
                 .DOLocalRotateQuaternion(targetRotation, _duration)
+                .OnComplete(() => _onOpen?.Invoke())
                 .SetEase(_openCurve);
 
             try

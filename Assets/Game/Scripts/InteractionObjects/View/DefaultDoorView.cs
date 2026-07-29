@@ -6,7 +6,7 @@ using DG.Tweening;
 using System.Threading;
 using Game.Scripts.InteractionObjects.Interfaces;
 using R3;
-using Unit = Unity.Android.Gradle.Manifest.Unit;
+using UnityEngine.Events;
 
 public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
 {
@@ -18,7 +18,8 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
     [SerializeField] private float _lockedShakeDuration = 0.15f;
     [SerializeField] private int _lockedShakecount = 2;
     [SerializeField] private int _lockedShakeDirection = -1;
-
+    [SerializeField] private UnityEvent _onOpen;
+    
     private Tween _currentTween;
     private Quaternion _closedRotation;
     private Quaternion _openRotation;
@@ -65,6 +66,7 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
 
         _currentTween = transform
             .DOLocalRotateQuaternion(targetRotation, _duration)
+            .OnComplete(() => _onOpen?.Invoke())
             .SetEase(Ease.OutCubic);
 
         try
@@ -100,7 +102,6 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
                     .SetEase(Ease.InQuad)
             );
         }
-
 
         _currentTween = seq;
     }
