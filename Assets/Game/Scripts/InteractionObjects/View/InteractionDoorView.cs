@@ -45,7 +45,8 @@ namespace Game.Scripts.InteractionObjects.Controllers
             if (_door != null)
             {
                 _collider = GetComponent<Collider>();
-                _door.IsOpen.Subscribe(ChangeState)
+                _door.IsOpen.Skip(1)
+                    .Subscribe(ChangeState)
                     .AddTo(_disposables);
                 _door.IsTryingOpenLockedDoor.Subscribe(_ => TryOpenDoor())
                     .AddTo(_disposables);
@@ -67,10 +68,12 @@ namespace Game.Scripts.InteractionObjects.Controllers
             Quaternion targetRotation = isOpen
                 ? _openRotation
                 : _closedRotation;
-            Debug.Log(this.name + ": SetDoorStateAsync called");
             _currentTween = transform
                 .DOLocalRotateQuaternion(targetRotation, _duration)
-                .OnComplete(() => _onOpen?.Invoke())
+                .OnComplete(() =>
+                {
+                    _onOpen?.Invoke();
+                })
                 .SetEase(_openCurve);
 
             try

@@ -1,6 +1,7 @@
 ﻿using Game.Scripts.Inventory;
 using Game.Scripts.Player.View;
 using Game.Scripts.Player.Runtime.Services;
+using Game.Scripts.Story;
 using JuicyDI;
 using JuicyDI.Attributes;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace Game.Scripts.InputController
 {
     [JDIMonoController]
     [SequenceParticipant(110)]
-    public class PlayerInteractiveController : MonoBehaviour, ISequence, IUpdateSequence
+    public class PlayerInteractiveController : MonoBehaviour, ISequence, IUpdateSequence, IPlayerControlHandle
     {
         private const float m_RaycastDistance = 2f;
         
@@ -22,6 +23,7 @@ namespace Game.Scripts.InputController
         private bool m_IsRayHitObject;
         private bool m_IsCanTryInteracting;
         private bool m_IsInteractingAvailable;
+        private bool m_IsControlEnabled = true;
         
         public void MethodInit()
         {
@@ -33,9 +35,27 @@ namespace Game.Scripts.InputController
             m_InteractionTrigger.SubscribeToInteractionChanged(OnInteractionNumberChanged);
             m_InputActions.AddPressingButtonEAction(TryInteraction);
         }
+
+        public void SetControlEnabled(bool isEnabled)
+        {
+            m_IsControlEnabled = isEnabled;
+
+            if (!m_IsControlEnabled)
+            {
+                m_IsRayHitObject = false;
+                m_CurrentInteractable = null;
+                m_IsInteractingAvailable = false;
+                m_PlayerInteractiveView.ShowInteractiveImage(false);
+            }
+        }
         
         public void CustomUpdate()
         {
+            if (!m_IsControlEnabled)
+            {
+                return;
+            }
+
             if (m_IsCanTryInteracting)
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -87,7 +107,7 @@ namespace Game.Scripts.InputController
 
         private void TryInteraction()
         {
-            if (m_IsInteractingAvailable)
+            if (m_IsControlEnabled && m_IsInteractingAvailable)
             {
                 m_CurrentInteractable.Interact();
             }

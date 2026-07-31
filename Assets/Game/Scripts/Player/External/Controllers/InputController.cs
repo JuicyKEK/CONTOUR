@@ -18,6 +18,8 @@ namespace Game.Scripts.InputController
         private Action<float> m_ScrollMouse;
         private Action<int> m_PressKeyboardNumbersDown;
 
+        private bool m_IsControlEnabled = true;
+
         public void MethodInit()
         {
 
@@ -28,8 +30,18 @@ namespace Game.Scripts.InputController
             
         }
 
+        public void SetControlEnabled(bool isEnabled)
+        {
+            m_IsControlEnabled = isEnabled;
+        }
+
         public void CustomUpdate()
         {
+            if (!m_IsControlEnabled)
+            {
+                return;
+            }
+
             if (Input.GetKeyDown(KeyCode.F))
             {
                 m_PressingButtonF?.Invoke();
