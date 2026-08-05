@@ -8,6 +8,16 @@ namespace Game.Scripts.Story.StoryLineActions.Alpha
 
         public void Spawn()
         {
+            Spawner(true);
+        }
+
+        public void Despawn()
+        {
+            Spawner(false);
+        }
+
+        private void Spawner(bool isSpawning)
+        {
             if (m_Objects == null || m_Objects.Length == 0)
             {
                 return;
@@ -15,7 +25,7 @@ namespace Game.Scripts.Story.StoryLineActions.Alpha
             
             for (int i = 0; i < m_Objects.Length; i++)
             {
-                m_Objects[i].SetActive(true);
+                m_Objects[i].SetActive(isSpawning);
             }
         }
     }

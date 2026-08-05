@@ -25,6 +25,11 @@ namespace Game.Scripts.InteractionObjects.Controllers
                 _isOpen.Value = !_isOpen.Value;
             }
         }
+        
+        public void DoorLocked()
+        {
+            _isLocked = !_isLocked;
+        }
 
     }
 }

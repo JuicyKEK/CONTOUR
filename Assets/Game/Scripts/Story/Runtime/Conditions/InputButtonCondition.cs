@@ -13,7 +13,8 @@ namespace Game.Scripts.Story
         R,
         Tab,
         MouseLeftDown,
-        MouseLeftUp
+        MouseLeftUp,
+        ESC
     }
 
     /// <summary>
@@ -76,6 +77,9 @@ namespace Game.Scripts.Story
                     break;
                 case StoryInputButton.MouseLeftUp:
                     inputActions.AddPressingMouseLeftButtonUpAction(handler);
+                    break;
+                case StoryInputButton.ESC:
+                    inputActions.AddPressingMouseESCAction(handler);
                     break;
             }
         }

@@ -15,4 +15,4 @@ MonoBehaviour:
   m_TapeId: T2.2
   m_DisplayName: "\u0414\u0432\u0438\u0436 \u043F\u0430\u0440\u0438\u0436"
   m_Clip: {fileID: 8300000, guid: bf9a9cf0ed669944c80ca94570234ecb, type: 3}
-  m_OnStart: 1
+  m_OnStart: 0

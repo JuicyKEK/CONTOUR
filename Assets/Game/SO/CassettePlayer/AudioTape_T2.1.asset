@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: AudioTape_T2.1
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Data.AudioTapeDefinition
   m_TapeId: T2.1
-  m_DisplayName: "\u0414\u0432\u0438\u0436\u0435\u043D\u0438\u0435"
-  m_Clip: {fileID: 8300000, guid: 94194bd6a798b4c41b671abe147a16d7, type: 3}
-  m_OnStart: 0
+  m_DisplayName: "\u041F\u043E\u0434\u0430\u0442\u044C \u043F\u0438\u0442\u0430\u043D\u0438\u0435"
+  m_Clip: {fileID: 8300000, guid: b4bb9a52a29eba441aee63197e41265e, type: 3}
+  m_OnStart: 1

@@ -33,6 +33,7 @@ public class FirstPersonController : MonoBehaviour
     public bool crosshair = true;
     public Sprite crosshairImage;
     public Color crosshairColor = Color.white;
+    public bool isCanControlling = true;
 
     // Internal Variables
     private float yaw = 0.0f;
@@ -131,6 +132,13 @@ public class FirstPersonController : MonoBehaviour
 
     #endregion
 
+    public void SetMouseState(bool isSetMouseState)
+    {
+        cameraCanMove = !isSetMouseState;
+        Cursor.visible = isSetMouseState;
+        Cursor.lockState = isSetMouseState ? CursorLockMode.None : CursorLockMode.Locked;
+    }
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -149,6 +157,11 @@ public class FirstPersonController : MonoBehaviour
         }
     }
 
+    public void SetControlEnabled(bool isEnabled)
+    {
+        isCanControlling = isEnabled;
+    }
+    
     void Start()
     {
         if(lockCursor)
@@ -202,6 +215,11 @@ public class FirstPersonController : MonoBehaviour
 
     private void Update()
     {
+        if (!isCanControlling)
+        {
+            return;
+        }
+        
         #region Camera
 
         // Control camera movement
@@ -366,6 +384,11 @@ public class FirstPersonController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!isCanControlling)
+        {
+            return;
+        }
+        
         #region Movement
 
         if (playerCanMove)

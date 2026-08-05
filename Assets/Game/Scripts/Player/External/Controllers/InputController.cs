@@ -15,6 +15,7 @@ namespace Game.Scripts.InputController
         private Action m_PressingButtonTab;
         private Action m_PressingMouseLeftButtonDown;
         private Action m_PressingMouseLeftButtonUp;
+        private Action m_PressingButtonESC;
         private Action<float> m_ScrollMouse;
         private Action<int> m_PressKeyboardNumbersDown;
 
@@ -60,6 +61,11 @@ namespace Game.Scripts.InputController
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 m_PressingButtonTab?.Invoke();
+            }
+            
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                m_PressingButtonESC?.Invoke();
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -108,6 +114,11 @@ namespace Game.Scripts.InputController
         public void AddPressingMouseLeftButtonUpAction(Action action)
         {
             m_PressingMouseLeftButtonUp += action;
+        }
+
+        public void AddPressingMouseESCAction(Action action)
+        {
+            m_PressingButtonESC += action;
         }
 
         public void AddScrollMouseAction(Action<float> action)

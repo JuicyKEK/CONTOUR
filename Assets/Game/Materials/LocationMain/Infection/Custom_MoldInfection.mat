@@ -38,7 +38,7 @@ Material:
     - _CrawlSpeed: 0.64
     - _EdgeWidth: 0.386
     - _InfectionAmount: 0.732
-    - _NoiseOctaves: 1.96
+    - _NoiseOctaves: 1.83
     - _NoiseScale: 10.9
     - _PatternWarp: 0
     - _PulseSpeed: 3.38

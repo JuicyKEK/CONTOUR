@@ -18,7 +18,7 @@ namespace Game.Scripts.Story
     /// </summary>
     public class StoryEventChannelListener : MonoBehaviour
     {
-        [SerializeField] private StoryEventChannelSO m_Channel;
+        [SerializeField] private UnityEventAction m_Channel;
         [SerializeField] private UnityEvent m_OnRaised;
 
         private void OnEnable()

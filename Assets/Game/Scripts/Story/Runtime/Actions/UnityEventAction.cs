@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
@@ -13,12 +14,27 @@ namespace Game.Scripts.Story
     [CreateAssetMenu(menuName = "Story/Actions/Unity Event", fileName = "UnityEventAction")]
     public class UnityEventAction : StoryAction
     {
-        [SerializeField] private UnityEvent m_Event;
+        private event Action m_OnRaised;
 
         public override UniTask ExecuteAsync(StoryContext context, CancellationToken token)
         {
-            m_Event?.Invoke();
+            m_OnRaised?.Invoke();
             return UniTask.CompletedTask;
+        }
+        
+        public void Subscribe(Action handler)
+        {
+            m_OnRaised += handler;
+        }
+
+        public void Unsubscribe(Action handler)
+        {
+            m_OnRaised -= handler;
+        }
+        
+        public void UnsubscribeAll()
+        {
+            m_OnRaised = null;
         }
     }
 }

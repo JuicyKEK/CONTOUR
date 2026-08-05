@@ -78203,7 +78203,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 1347
+  m_VersionIndex: 1353
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -83531,8 +83531,8 @@ ParticleSystem:
     startColor:
       serializedVersion: 2
       minMaxState: 2
-      minColor: {r: 0.35607034, g: 0.41509432, b: 0.24083303, a: 0.05}
-      maxColor: {r: 0.31132078, g: 0.31132078, b: 0.31132078, a: 0.12}
+      minColor: {r: 0.35607034, g: 0.41509432, b: 0.24083303, a: 0.02745098}
+      maxColor: {r: 0.31132078, g: 0.31132078, b: 0.31132078, a: 0.039215688}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -88125,7 +88125,7 @@ ParticleSystemRenderer:
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 1
-  m_MinParticleSize: 0.3
+  m_MinParticleSize: 0.25
   m_MaxParticleSize: 0.5
   m_CameraVelocityScale: 0
   m_VelocityScale: 0

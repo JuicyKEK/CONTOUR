@@ -14,10 +14,18 @@ namespace Game.Scripts.InteractionObjects.Controllers
         private readonly CompositeDisposable _disposables = new();
 
         [SerializeField] private UnityEvent _onOpen;
+        [SerializeField] private UnityEvent _onClose;
         [Header("Open Settings")]
         [SerializeField] private Vector3 _openAngle = new Vector3(0f, 90f, 0f);
         [SerializeField] private float _duration = 0.5f;
         [SerializeField] private AnimationCurve _openCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [Header("Monster Open Settings")]
+        [Tooltip("Когда дверь открывает монстр (IInteractionDoor.LastOpener == Monster) - используется отдельная, обычно более резкая анимация вместо обычной Open Settings.")]
+        [SerializeField] private bool _useMonsterOpenAnimation = true;
+        [SerializeField] private Vector3 _monsterOpenAngle = new Vector3(0f, 120f, 0f);
+        [SerializeField] private float _monsterDuration = 0.2f;
+        [SerializeField] private AnimationCurve _monsterOpenCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] private UnityEvent _onOpenByMonster;
         [Header("Locked Shake Settings")]
         [SerializeField] private float _lockedShakeAngle = 5f;
         [SerializeField] private float _lockedShakeDuration = 0.15f;
@@ -26,7 +34,6 @@ namespace Game.Scripts.InteractionObjects.Controllers
 
         private Tween _currentTween;
         private Quaternion _closedRotation;
-        private Quaternion _openRotation;
 
         private CancellationTokenSource _cts;
         private IInteractionDoor _door;
@@ -35,7 +42,6 @@ namespace Game.Scripts.InteractionObjects.Controllers
         private void Awake()
         {
             _closedRotation = transform.localRotation;
-            _openRotation = Quaternion.Euler(_openAngle.x, _openAngle.y, _openAngle.z);
         }
 
         private void Start()
@@ -65,16 +71,37 @@ namespace Game.Scripts.InteractionObjects.Controllers
             _collider.enabled = false;
             _currentTween?.Kill();
 
+            bool isMonster = isOpen
+                && _useMonsterOpenAnimation
+                && _door.LastOpener.CurrentValue == DoorOpenerKind.Monster;
+
             Quaternion targetRotation = isOpen
-                ? _openRotation
+                ? Quaternion.Euler(isMonster ? _monsterOpenAngle : _openAngle)
                 : _closedRotation;
+            float duration = isMonster ? _monsterDuration : _duration;
+            AnimationCurve curve = isMonster ? _monsterOpenCurve : _openCurve;
+
             _currentTween = transform
-                .DOLocalRotateQuaternion(targetRotation, _duration)
+                .DOLocalRotateQuaternion(targetRotation, duration)
                 .OnComplete(() =>
                 {
-                    _onOpen?.Invoke();
+                    if (isOpen)
+                    {
+                        if (isMonster)
+                        {
+                            _onOpenByMonster?.Invoke();
+                        }
+                        else
+                        {
+                            _onOpen?.Invoke();
+                        }
+                    }
+                    else
+                    {
+                        _onClose?.Invoke();
+                    }
                 })
-                .SetEase(_openCurve);
+                .SetEase(curve);
 
             try
             {

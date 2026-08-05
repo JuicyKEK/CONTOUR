@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3145147798e24a75b6ea6c82855dfb1f, type: 3}
   m_Name: RaiseEventChannelAction_1.4
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Story.RaiseEventChannelAction
-  m_Channel: {fileID: 0}
+  m_Channel: {fileID: 11400000, guid: dfe3681bde1421049bc0a4c0f9f1bf75, type: 2}

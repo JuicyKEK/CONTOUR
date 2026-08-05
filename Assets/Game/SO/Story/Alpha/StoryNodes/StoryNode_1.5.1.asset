@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1befe661846e4aafb597914b4522a1ca, type: 3}
+  m_Name: StoryNode_1.5.1
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Story.StoryNodeSO
+  m_NodeName: TestStart2
+  m_OnEnterActions:
+  - {fileID: 11400000, guid: ca0e9200912551d46a2ceb1f4177ed9e, type: 2}
+  m_Branches:
+  - m_BranchName: "\u0418\u0433\u0440\u043E\u043A\u0443 \u0432\u0442\u0430\u0449\u0438\u043B\u0438"
+    m_Condition: {fileID: 11400000, guid: 73bf4d1e043036d4bba15536029020ee, type: 2}
+    m_NextNode: {fileID: 11400000, guid: fce8d24bf4fee4d4e954914a9c8bdb0f, type: 2}

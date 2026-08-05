@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81f61e9f9f094899aa78d2c9b5af340c, type: 3}
   m_Name: AudioTapeSection_T2
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Data.AudioTapeSectionDefinition
-  m_DisplayName: "\u041F\u0440\u043E \u0414\u0432\u0438\u0436"
+  m_DisplayName: "\u0417\u0430\u0434\u0430\u0447\u0438 \u043D\u0430 \u0441\u043C\u0435\u043D\u0443"
   m_Tapes:
   - {fileID: 11400000, guid: 4a4148fe406ed404cbb03d34259a98ed, type: 2}
   - {fileID: 11400000, guid: bafe3fa5f8b7baa4083ef907e097784d, type: 2}

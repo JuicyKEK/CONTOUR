@@ -17,5 +17,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 094b7deea3a5b674a8fb8084c467e368, type: 2}
   m_Branches:
   - m_BranchName: "\u0412\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435 \u0441\u0432\u0435\u0442\u0430"
-    m_Condition: {fileID: 0}
+    m_Condition: {fileID: 11400000, guid: 6d6090e784835ee478c0889b328941f3, type: 2}
     m_NextNode: {fileID: 11400000, guid: 36e90c58927dc2548a9d582217ec42eb, type: 2}
