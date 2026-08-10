@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784cd218efad5574e8729bcc6cd1376e, type: 3}
+  m_Name: NpcTypeDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Data.NpcTypeDefinitionSO
+  m_TypeName: GasServicesMan1
+  m_AnimationSoundProfile: {fileID: 11400000, guid: 5a2eda6af2c73f74ca99a19f4a290570, type: 2}
+  m_ViewDistance: 60
+  m_ViewHalfAngle: 160
+  m_RequireLineOfSight: 1
+  m_LineOfSightObstacles:
+    serializedVersion: 2
+    m_Bits: 0
+  m_AggressionMode: 1
+  m_StartsAggressive: 0
+  m_InfectionAggressionThreshold: 60
+  m_PatrolSpeed: 1.6
+  m_ChaseSpeed: 4.5
+  m_PanicSpeed: 5
+  m_CatchDistance: 1.2
+  m_LoseSightGiveUpDelay: 5
+  m_ChaseStopsOnlyByStory: 0
+  m_CanOpenDoors: 1
+  m_KnockInterval: 1.5
+  m_DoorDetectionMask:
+    serializedVersion: 2
+    m_Bits: 64
+  m_DoorDetectionDistance: 2
+  m_DoorDetectionRadius: 0.4
+  m_LockedDoorGiveUpDelay: 3
+  m_PatrolDoorOpenerKind: 0
+  m_ChaseDoorOpenerKind: 0
+  m_WanderRadius: 6
+  m_WanderMinInterval: 3
+  m_WanderMaxInterval: 7
+  m_WanderChaseSuppressDuration: 6
