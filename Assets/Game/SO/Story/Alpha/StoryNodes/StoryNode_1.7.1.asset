@@ -16,4 +16,7 @@ MonoBehaviour:
   m_OnEnterActions:
   - {fileID: 11400000, guid: cc24e12dcb8796f4bad7cfd2f7cd1429, type: 2}
   - {fileID: 11400000, guid: d7b5aadad2186d94289be18708c2fbc1, type: 2}
-  m_Branches: []
+  m_Branches:
+  - m_BranchName: 
+    m_Condition: {fileID: 11400000, guid: 279ed42332784fc4ab6c9b242bd008c8, type: 2}
+    m_NextNode: {fileID: 11400000, guid: 4b6b25a8a7f345f42b2407b8871d5ecc, type: 2}

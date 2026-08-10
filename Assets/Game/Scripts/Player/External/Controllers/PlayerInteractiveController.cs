@@ -16,6 +16,7 @@ namespace Game.Scripts.InputController
         
         [Inject] private IInputActions m_InputActions;
         
+        [SerializeField] private Camera m_Camera;
         [SerializeField] private InteractionTrigger m_InteractionTrigger;
         [SerializeField] private PlayerInteractiveView m_PlayerInteractiveView;
         
@@ -58,7 +59,7 @@ namespace Game.Scripts.InputController
 
             if (m_IsCanTryInteracting)
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
 
                 if (Physics.Raycast(ray, out var hit, m_RaycastDistance) &&
                     hit.collider.TryGetComponent(out IInteraction interactable) )

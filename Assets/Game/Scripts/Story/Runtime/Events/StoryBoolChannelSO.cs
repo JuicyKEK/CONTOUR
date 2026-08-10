@@ -36,7 +36,6 @@ namespace Game.Scripts.Story
 
         public void SetValue(bool value)
         {
-            Debug.Log("StoryBoolChannelSO " + value);
             m_HasRuntimeValue = true;
             m_CurrentValue = value;
             m_Changed?.Invoke(value);

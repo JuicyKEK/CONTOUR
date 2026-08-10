@@ -14,6 +14,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
         private readonly CompositeDisposable _disposables = new();
 
         [SerializeField] private UnityEvent _onOpen;
+        [SerializeField] private UnityEvent _onStartOpen;
         [SerializeField] private UnityEvent _onClose;
         [Header("Open Settings")]
         [SerializeField] private Vector3 _openAngle = new Vector3(0f, 90f, 0f);
@@ -83,6 +84,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
 
             _currentTween = transform
                 .DOLocalRotateQuaternion(targetRotation, duration)
+                .OnStart(() => _onStartOpen?.Invoke())
                 .OnComplete(() =>
                 {
                     if (isOpen)

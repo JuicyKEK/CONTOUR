@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEditor;
-
+#if  UNITY_EDITOR
 public class DeformationShaderGUI : ShaderGUI
 {
+
     public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties)
     {
         Material material = materialEditor.target as Material;
@@ -101,4 +102,6 @@ public class DeformationShaderGUI : ShaderGUI
             materialEditor.ShaderProperty(prop, prop.displayName);
         }
     }
+
 }
+#endif

@@ -16,6 +16,7 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override void Enter(NpcBlackboard blackboard)
         {
+            Debug.Log("Entered Idle State");
             if (blackboard.Agent.isOnNavMesh)
             {
                 blackboard.Agent.isStopped = true;

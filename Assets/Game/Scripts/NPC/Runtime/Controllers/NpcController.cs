@@ -206,12 +206,15 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         /// </summary>
         public void SetPatrolRoute(NpcPatrolRoute newRoute)
         {
+            Debug.Log(newRoute.Points.Count + " SetPatrolRoute");
+            Debug.Log( $" {m_Blackboard != null} m_Blackboard != null");
             m_PatrolRoute = newRoute;
 
             if (m_Blackboard != null)
             {
                 m_Blackboard.PatrolRoute = newRoute;
                 m_Blackboard.CurrentPatrolIndex = 0;
+                Debug.Log(m_Blackboard.PatrolRoute + " m_Blackboard.PatrolRoute");
             }
         }
 
@@ -234,7 +237,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         /// <summary>Вызывается NpcPatrolState, когда бот дошёл до конца незацикленного маршрута патрулирования.</summary>
         public void RaisePatrolRouteCompleted()
         {
-            m_OnPatrolRouteCompletedChannel?.Raise();
+            //m_OnPatrolRouteCompletedChannel?.Raise();
         }
 
         public void PlayAnimationSound(string key)

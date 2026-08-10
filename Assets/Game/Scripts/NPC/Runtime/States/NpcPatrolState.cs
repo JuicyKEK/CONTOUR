@@ -1,5 +1,4 @@
 ﻿using Game.Scripts.NPC.Runtime.Core;
-using UnityEngine;
 
 namespace Game.Scripts.NPC.Runtime.States
 {
@@ -60,6 +59,17 @@ namespace Game.Scripts.NPC.Runtime.States
                 return null;
             }
 
+            // Защита от рассинхронизации: маршрут/индекс могли быть подменены
+            // снаружи (SetPatrolRoute) между тиками - если индекс больше не
+            // валиден для текущего маршрута, просто перескакиваем на первую точку
+            // вместо падения с ArgumentOutOfRangeException.
+            if (blackboard.CurrentPatrolIndex >= route.Points.Count)
+            {
+                blackboard.CurrentPatrolIndex = 0;
+                MoveToCurrentPoint(blackboard);
+                return null;
+            }
+
             var currentPoint = route.Points[blackboard.CurrentPatrolIndex];
             var door = currentPoint.ResolveDoor();
 
@@ -102,14 +112,47 @@ namespace Game.Scripts.NPC.Runtime.States
 
         private void AdvanceToNextPoint(NpcBlackboard blackboard)
         {
-            var route = blackboard.PatrolRoute;
+            var routeBeforeEvent = blackboard.PatrolRoute;
+
+            if (routeBeforeEvent == null || blackboard.CurrentPatrolIndex >= routeBeforeEvent.Points.Count)
+            {
+                return;
+            }
 
             // Точка, которую бот только что достиг - если у неё задан
             // ArrivalEventChannel, раздаём его ровно в момент достижения, до того
             // как перейти к следующей точке (или остановиться, если маршрут не
             // зациклен и это была последняя точка).
-            var reachedPoint = route.Points[blackboard.CurrentPatrolIndex];
+            //
+            // ВАЖНО: Raise() может СИНХРОННО вызвать NpcController.SetPatrolRoute
+            // (например, через StoryEventChannelListener), который подменит
+            // blackboard.PatrolRoute и сбросит blackboard.CurrentPatrolIndex прямо
+            // во время этого вызова. Поэтому нельзя переиспользовать захваченные до
+            // Raise() значения route/index ниже - нужно перечитать их заново.
+            var reachedPoint = routeBeforeEvent.Points[blackboard.CurrentPatrolIndex];
             reachedPoint.ArrivalEventChannel?.Raise();
+
+            // Перечитываем маршрут и индекс ПОСЛЕ события - если Raise() подменил
+            // маршрут (например, сюжет сократил список точек), дальше работаем уже
+            // с актуальными данными, а не с теми, что были до вызова.
+            var route = blackboard.PatrolRoute;
+
+            if (route == null || route.Points.Count == 0)
+            {
+                return;
+            }
+
+            bool routeWasReplacedDuringEvent = !ReferenceEquals(route, routeBeforeEvent);
+
+            // Если маршрут подменили прямо во время Raise() - SetPatrolRoute уже
+            // сбросил CurrentPatrolIndex на 0 сам, поэтому просто идём к первой
+            // точке нового маршрута и не трогаем индекс дальше.
+            if (routeWasReplacedDuringEvent)
+            {
+                blackboard.Agent.isStopped = false;
+                MoveToCurrentPoint(blackboard);
+                return;
+            }
 
             int nextIndex = blackboard.CurrentPatrolIndex + 1;
 
@@ -142,6 +185,11 @@ namespace Game.Scripts.NPC.Runtime.States
             if (route == null || route.Points.Count == 0)
             {
                 return;
+            }
+
+            if (blackboard.CurrentPatrolIndex >= route.Points.Count)
+            {
+                blackboard.CurrentPatrolIndex = 0;
             }
 
             var point = route.Points[blackboard.CurrentPatrolIndex];

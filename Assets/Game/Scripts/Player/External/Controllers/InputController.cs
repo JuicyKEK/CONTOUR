@@ -38,6 +38,11 @@ namespace Game.Scripts.InputController
 
         public void CustomUpdate()
         {
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                m_PressingButtonESC?.Invoke();
+            }
+            
             if (!m_IsControlEnabled)
             {
                 return;
@@ -61,11 +66,6 @@ namespace Game.Scripts.InputController
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 m_PressingButtonTab?.Invoke();
-            }
-            
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                m_PressingButtonESC?.Invoke();
             }
 
             if (Input.GetMouseButtonDown(0))

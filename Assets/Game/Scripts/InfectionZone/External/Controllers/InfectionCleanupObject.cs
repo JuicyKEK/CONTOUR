@@ -1,7 +1,9 @@
-﻿using Game.Scripts.InfectionZone.Runtime.Interfaces;
+﻿using Game.Scripts.Audio.Interfaces;
+using Game.Scripts.InfectionZone.Runtime.Interfaces;
 using Game.Scripts.Inventory;
 using Game.Scripts.Inventory.External.Controllers.Interfaces;
 using JuicyDI.Attributes;
+using R3;
 using UnityEngine;
 
 namespace Game.Scripts.InfectionZone.External.Controllers
@@ -15,8 +17,10 @@ namespace Game.Scripts.InfectionZone.External.Controllers
     /// Если нужного предмета нет - ничего не происходит, аномалия остаётся на месте.
     /// </summary>
     [JDIMonoController]
-    public class InfectionCleanupObject : MonoBehaviour, IInteraction
+    public class InfectionCleanupObject : MonoBehaviour, IInteraction, ISoundPlay
     {
+        public Subject<Unit> IsPlaySound => m_IsPlaySound;
+        
         [Header("Ссылка на зону")]
         [Tooltip("Зона, степень заражения которой будет уменьшена при взаимодействии.")]
         [SerializeField] private MonoBehaviour m_ZoneSource; // должен реализовывать IInfectionZone
@@ -31,6 +35,7 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         [Inject] private IInventoryGetObject m_Inventory;
         [Inject] private IInfectionLevelHud m_Hud;
 
+        private Subject<Unit> m_IsPlaySound = new Subject<Unit>();
         private IInfectionZone m_Zone;
 
         private void Awake()
@@ -69,7 +74,8 @@ namespace Game.Scripts.InfectionZone.External.Controllers
             m_Zone.DecreaseInfection(m_DecreaseAmount);
             float levelAfter = m_Zone.InfectionLevel.CurrentValue;
             m_Hud?.ShowLevelChange(m_Zone.DisplayName, levelBefore, levelAfter);
-
+            m_IsPlaySound.OnNext(Unit.Default);
+            
             gameObject.SetActive(false);
         }
     }
