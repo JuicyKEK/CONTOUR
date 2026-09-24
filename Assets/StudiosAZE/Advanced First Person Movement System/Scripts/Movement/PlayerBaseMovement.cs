@@ -39,34 +39,22 @@ namespace AZE.AdvancedFirstPerson
         [Header("SprintBarView")]
         [SerializeField] private bool _useSprintBarView = true;
         [SerializeField] private SprintBarView _sprintBarView;
-        [Tooltip("Максимальный запас времени, которое игрок может непрерывно бежать спринтом (сек).")]
         [SerializeField] private float _timeToSprint = 5f;
-        [Tooltip("За сколько секунд стамина восстановится полностью, если спринт был отпущен ДО того, как закончился.")]
         [SerializeField] private float _timeToResetFullSprint = 3f;
-        [Tooltip("За сколько секунд стамина восстановится полностью, если она была полностью израсходована (истощена).")]
         [SerializeField] private float _timeToResetFullAfterZeroSprint = 8f;
-
-        // Internal sprint stamina state
+        
         private float _sprintRemaining;
         private bool _isSprintDepleted;
 
-        /// <summary>Помечается состоянием спринта - активно ли сейчас движение бегом.</summary>
         public bool IsSprinting { get; set; }
 
-        /// <summary>Текущий остаток стамины спринта (в секундах).</summary>
-        public float SprintRemaining => _sprintRemaining;
+         public float SprintRemaining => _sprintRemaining;
 
-        /// <summary>Максимальный запас стамины спринта (в секундах).</summary>
         public float MaxSprintDuration => _timeToSprint;
 
-        /// <summary>Была ли стамина полностью истощена и ещё не восстановилась до максимума.</summary>
-        public bool IsSprintDepleted => _isSprintDepleted;
+         public bool IsSprintDepleted => _isSprintDepleted;
 
-        /// <summary>
-        /// Можно ли начать/продолжать спринт прямо сейчас. Если стамина была полностью
-        /// израсходована - спринт заблокирован до полного восстановления (_isSprintDepleted == false).
-        /// </summary>
-        public bool CanSprint => _sprintRemaining > 0f && !_isSprintDepleted;
+         public bool CanSprint => _sprintRemaining > 0f && !_isSprintDepleted;
 
 
         public PlayerInputHandler InputHandler { get; private set; }
@@ -145,13 +133,7 @@ namespace AZE.AdvancedFirstPerson
             HandleHeightInterpolation();
             HandleSprintStamina();
         }
-
-        /// <summary>
-        /// Расходует/восстанавливает запас стамины спринта и обновляет визуал полоски.
-        /// Восстановление идёт быстрее (_timeToResetFullSprint), если спринт был отпущен
-        /// до истощения, и медленнее (_timeToResetFullAfterZeroSprint), если стамина
-        /// была полностью израсходована.
-        /// </summary>
+        
         private void HandleSprintStamina()
         {
             if (IsSprinting)

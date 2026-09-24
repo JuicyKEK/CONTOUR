@@ -24,8 +24,6 @@ namespace AZE.AdvancedFirstPerson
 
         public override void CheckSwitchStates()
         {
-            // Стамина спринта закончилась - принудительно переходим на обычную ходьбу,
-            // независимо от того, зажата клавиша спринта или нет.
             if (!ctx.CanSprint)
             {
                 ctx.SwitchState(factory.Walk);
