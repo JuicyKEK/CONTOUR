@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: 00000000000000000000000000000000
+  productGUID: 9d4fa2c28d98bfa4fbfea61fdfe58315
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -925,7 +925,7 @@ PlayerSettings:
   cloudProjectId: 3a6e61ec-4706-45ac-b158-185a597af77c
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
+  projectName: DELETEME1
   organizationId: cykot5hi
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

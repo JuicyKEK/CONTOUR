@@ -35,6 +35,26 @@ namespace AZE.AdvancedFirstPerson
 
         [Header("References")]
         public Transform CameraTransform;
+        
+        [Header("SprintBarView")]
+        [SerializeField] private bool _useSprintBarView = true;
+        [SerializeField] private SprintBarView _sprintBarView;
+        [SerializeField] private float _timeToSprint = 5f;
+        [SerializeField] private float _timeToResetFullSprint = 3f;
+        [SerializeField] private float _timeToResetFullAfterZeroSprint = 8f;
+        
+        private float _sprintRemaining;
+        private bool _isSprintDepleted;
+
+        public bool IsSprinting { get; set; }
+
+         public float SprintRemaining => _sprintRemaining;
+
+        public float MaxSprintDuration => _timeToSprint;
+
+         public bool IsSprintDepleted => _isSprintDepleted;
+
+         public bool CanSprint => _sprintRemaining > 0f && !_isSprintDepleted;
 
 
         public PlayerInputHandler InputHandler { get; private set; }
@@ -79,6 +99,8 @@ namespace AZE.AdvancedFirstPerson
             _crouchHeight = _standingHeight / 2f;
             TargetHeight = _standingHeight;
 
+            _sprintRemaining = _timeToSprint;
+
             _currentState = _states.Idle;
             _currentState.EnterState();
         }
@@ -109,6 +131,37 @@ namespace AZE.AdvancedFirstPerson
 
             ApplyFinalMovement();
             HandleHeightInterpolation();
+            HandleSprintStamina();
+        }
+        
+        private void HandleSprintStamina()
+        {
+            if (IsSprinting)
+            {
+                _sprintRemaining -= Time.deltaTime;
+                if (_sprintRemaining <= 0f)
+                {
+                    _sprintRemaining = 0f;
+                    _isSprintDepleted = true;
+                }
+            }
+            else
+            {
+                float resetTime = _isSprintDepleted ? _timeToResetFullAfterZeroSprint : _timeToResetFullSprint;
+                float recoverRate = resetTime > 0f ? _timeToSprint / resetTime : _timeToSprint;
+
+                _sprintRemaining = Mathf.Clamp(_sprintRemaining + recoverRate * Time.deltaTime, 0f, _timeToSprint);
+
+                if (_sprintRemaining >= _timeToSprint)
+                {
+                    _isSprintDepleted = false;
+                }
+            }
+
+            if (_useSprintBarView && _sprintBarView != null)
+            {
+                _sprintBarView.SprintBarViewUpdate(_sprintRemaining, _timeToSprint, _isSprintDepleted);
+            }
         }
 
         public void SwitchState(PlayerBaseState newState)

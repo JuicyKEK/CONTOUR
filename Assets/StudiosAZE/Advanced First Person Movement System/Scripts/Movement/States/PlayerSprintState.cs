@@ -7,6 +7,7 @@ namespace AZE.AdvancedFirstPerson
         public override void EnterState()
         {
             ctx.TargetHeight = ctx.GetStandingHeight();
+            ctx.IsSprinting = true;
         }
 
         public override void UpdateState()
@@ -18,10 +19,17 @@ namespace AZE.AdvancedFirstPerson
 
         public override void ExitState() 
         {
+            ctx.IsSprinting = false;
         }
 
         public override void CheckSwitchStates()
         {
+            if (!ctx.CanSprint)
+            {
+                ctx.SwitchState(factory.Walk);
+                return;
+            }
+
             if (!ctx.IsGrounded)
             {
                 ctx.SwitchState(factory.Air);
