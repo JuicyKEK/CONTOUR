@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: NewGBSGraph
+  m_EditorClassIdentifier: 
+  m_GraphId: 84c7f0d8-79b0-472d-8998-768e1bc63004
+  m_GraphName: NewGBSGraph
+  m_Nodes:
+  - rid: 8592534255811166208
+  - rid: 8592534255811166209
+  - rid: 8592534255811166210
+  - rid: 8592534255811166211
+  - rid: 8592534255811166212
+  - rid: 8592534255811166213
+  m_Edges:
+  - m_FromNodeId: 93c0a832-4ff3-4f4c-95d5-9f0fa9314c49
+    m_FromPortId: out
+    m_ToNodeId: c27bdc63-74d6-43cd-8c36-9d0bb89259d2
+    m_ToPortId: in
+  - m_FromNodeId: c27bdc63-74d6-43cd-8c36-9d0bb89259d2
+    m_FromPortId: 72279d51-ad1a-47a1-88e4-edc409c14c45
+    m_ToNodeId: 88bf6a14-b426-4b83-b7cf-2a25b382e668
+    m_ToPortId: in
+  - m_FromNodeId: c27bdc63-74d6-43cd-8c36-9d0bb89259d2
+    m_FromPortId: 77915752-f4a0-4fd5-b313-7a78802704f1
+    m_ToNodeId: 347216cd-1f8d-4849-923c-17e502b96c91
+    m_ToPortId: in
+  - m_FromNodeId: 88bf6a14-b426-4b83-b7cf-2a25b382e668
+    m_FromPortId: cb94f6b0-c29a-4fba-b299-9d091abceb84
+    m_ToNodeId: 8be2086c-a3cc-417a-93a5-311550bb27f3
+    m_ToPortId: in
+  - m_FromNodeId: 347216cd-1f8d-4849-923c-17e502b96c91
+    m_FromPortId: 77fe8cb9-046d-4808-a99e-9543f4e9b173
+    m_ToNodeId: 8be2086c-a3cc-417a-93a5-311550bb27f3
+    m_ToPortId: in
+  - m_FromNodeId: 8be2086c-a3cc-417a-93a5-311550bb27f3
+    m_FromPortId: 84b7b86d-720e-442f-9254-295b8c985a6b
+    m_ToNodeId: 3000b892-9f98-4184-ac83-bd19812f00d5
+    m_ToPortId: in
+  references:
+    version: 2
+    RefIds:
+    - rid: 8592534255811166208
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 93c0a832-4ff3-4f4c-95d5-9f0fa9314c49
+        m_NodeName: Start
+        m_Position: {x: 100, y: 319}
+    - rid: 8592534255811166209
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: c27bdc63-74d6-43cd-8c36-9d0bb89259d2
+        m_NodeName: StoryNode
+        m_Position: {x: 626, y: 34}
+        m_OnEnterActions:
+        - {fileID: 11400000, guid: eddd3076dfb77944aa9d220b767948ec, type: 2}
+        m_OnEnterEvents: []
+        m_Branches:
+        - m_Id: 72279d51-ad1a-47a1-88e4-edc409c14c45
+          m_BranchName: Transition 1
+          m_Condition: {fileID: 11400000, guid: b695515c539cd2b459d3669649dd3b7b, type: 2}
+        - m_Id: 77915752-f4a0-4fd5-b313-7a78802704f1
+          m_BranchName: Transition 2
+          m_Condition: {fileID: 11400000, guid: bb90cc9e58ea7d845b82d433cffee6e7, type: 2}
+    - rid: 8592534255811166210
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 88bf6a14-b426-4b83-b7cf-2a25b382e668
+        m_NodeName: StoryNode
+        m_Position: {x: 1217, y: -87}
+        m_OnEnterActions:
+        - {fileID: 11400000, guid: 8cc3e97a095d73247976447f205c788e, type: 2}
+        m_OnEnterEvents: []
+        m_Branches:
+        - m_Id: cb94f6b0-c29a-4fba-b299-9d091abceb84
+          m_BranchName: Next
+          m_Condition: {fileID: 11400000, guid: b695515c539cd2b459d3669649dd3b7b, type: 2}
+    - rid: 8592534255811166211
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 347216cd-1f8d-4849-923c-17e502b96c91
+        m_NodeName: StoryNode
+        m_Position: {x: 1217, y: 295}
+        m_OnEnterActions:
+        - {fileID: 11400000, guid: 5a8ec38e3fdb0a241b14a11607a30c70, type: 2}
+        m_OnEnterEvents: []
+        m_Branches:
+        - m_Id: 77fe8cb9-046d-4808-a99e-9543f4e9b173
+          m_BranchName: Next
+          m_Condition: {fileID: 11400000, guid: b695515c539cd2b459d3669649dd3b7b, type: 2}
+    - rid: 8592534255811166212
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 8be2086c-a3cc-417a-93a5-311550bb27f3
+        m_NodeName: StoryNode
+        m_Position: {x: 1906, y: 129}
+        m_OnEnterActions:
+        - {fileID: 11400000, guid: aba7267156aa9b94e9a9e40db385db7f, type: 2}
+        m_OnEnterEvents: []
+        m_Branches:
+        - m_Id: 84b7b86d-720e-442f-9254-295b8c985a6b
+          m_BranchName: Next
+          m_Condition: {fileID: 11400000, guid: bb90cc9e58ea7d845b82d433cffee6e7, type: 2}
+    - rid: 8592534255811166213
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 3000b892-9f98-4184-ac83-bd19812f00d5
+        m_NodeName: End
+        m_Position: {x: 2584, y: 168}
+        m_OnCompleteEvents: []

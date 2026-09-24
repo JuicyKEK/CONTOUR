@@ -1,294 +1,525 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using JuicyDI.Attributes;
-using JuicyDI.Context;
 using JuicyDI.Utils;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace JuicyDI
 {
-    public class JDIObjectFactory : IObjectFactory
+    /// <summary>
+    /// Контейнер бинов.
+    ///
+    /// Правила скоупов:
+    /// 1. GlobalBean регистрируется ОДИН раз за сессию (повторная загрузка сцены его не дублирует),
+    ///    новые глобальные бины с новых сцен добавляются к уже существующим.
+    /// 2. GlobalBean может зависеть ТОЛЬКО от GlobalBean (captive dependency).
+    /// 3. SceneBean живёт в скоупе своей сцены (ключ - Scene.handle), поэтому аддитивная
+    ///    загрузка/выгрузка локаций чистит ровно свои бины и не задевает соседние сцены.
+    /// 4. SceneBean резолвится: своя сцена -> глобальные -> другие загруженные сцены.
+    /// </summary>
+    public sealed class JDIObjectFactory : IObjectFactory
     {
-        private Dictionary<string, object> m_GlobalBeansContainer = new Dictionary<string, object>();
-        private MultiValueDictionary<string, object> m_SceneBeansContainer = new MultiValueDictionary<string, object>();
-        private MultiValueDictionary<string, string> m_MapInterfaceToBeans = new MultiValueDictionary<string, string>();
-        
-        private List<string> m_MapInterfaceToDestroy = new List<string>();
-        
+        private const int GlobalScopeHandle = 0;
+
+        private readonly struct BeanEntry
+        {
+            public readonly object Instance;
+            public readonly int SceneHandle;
+
+            public BeanEntry(object instance, int sceneHandle)
+            {
+                Instance = instance;
+                SceneHandle = sceneHandle;
+            }
+        }
+
+        // Глобальный скоуп.
+        private readonly Dictionary<Type, object> m_GlobalBeansContainer = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, List<object>> m_GlobalContractToBeans = new Dictionary<Type, List<object>>();
+
+        // Скоупы сцен.
+        private readonly Dictionary<Type, List<BeanEntry>> m_SceneContractToBeans = new Dictionary<Type, List<BeanEntry>>();
+        private readonly Dictionary<int, List<object>> m_SceneScopes = new Dictionary<int, List<object>>();
+
+        private readonly HashSet<object> m_RegisteredSceneInstances =
+            new HashSet<object>(ReferenceEqualityComparer.Instance);
+
+        // Переиспользуемые буферы, чтобы не мусорить в GC на каждой загрузке сцены.
+        private readonly List<Type> m_DeadGlobalsBuffer = new List<Type>(8);
+        private readonly List<Type> m_EmptyContractsBuffer = new List<Type>(16);
+
+        private bool m_HasNewGlobalBeans;
+
+        #region Registration
+
         public void RegisterMonoBehaviorsBeans(List<MonoBehaviour> monoBehaviours)
         {
             if (monoBehaviours == null)
             {
                 return;
             }
-            
-            foreach (var monoBehaviour in monoBehaviours)
+
+            for (int i = 0; i < monoBehaviours.Count; i++)
             {
+                var monoBehaviour = monoBehaviours[i];
                 if (monoBehaviour == null)
                 {
                     continue;
                 }
- 
-                var monoController = monoBehaviour.GetType().GetCustomAttribute<JDIMonoController>();
-                if (monoController != null)
+
+                var type = monoBehaviour.GetType();
+                var isGlobal = JDIReflectionCache.IsGlobalBean(type);
+                if (isGlobal == null)
                 {
-                    string name = monoBehaviour.GetType().AssemblyQualifiedName;
+                    continue;
+                }
 
-                    // if (m_GlobalBeansContainer.ContainsKey(name))
-                    // {
-                    //     Debug.LogError($"bean with name: {name} already exists in GlobalBeansContainer");
-                    //     continue;
-                    // }
-                    //
-                    // if (m_SceneBeansContainer.ContainsKey(name))
-                    // {
-                    //     Debug.LogError($"bean with name: {name} already exists in SceneBeansContainer");
-                    //     continue;
-                    // }
-
-                    if (monoController.Context == typeof(SceneBean))
-                    {
-                        m_SceneBeansContainer.Add(name, monoBehaviour);
-                    }
-                    else
-                    {
-                        m_GlobalBeansContainer.Add(name, monoBehaviour);
-                    }
-                    
-                    RegisterInterface(monoBehaviour);
+                if (isGlobal.Value)
+                {
+                    RegisterGlobalBean(monoBehaviour, type);
+                }
+                else
+                {
+                    RegisterSceneBean(monoBehaviour, type);
                 }
             }
         }
 
+        private void RegisterGlobalBean(MonoBehaviour monoBehaviour, Type type)
+        {
+            if (m_GlobalBeansContainer.TryGetValue(type, out var existing))
+            {
+                if (IsAlive(existing))
+                {
+                    if (!ReferenceEquals(existing, monoBehaviour))
+                    {
+                        // Дубликат глобального бина на новой сцене - оставляем первый.
+                        Debug.LogWarning($"[JuicyDI] Global bean '{type.Name}' already registered. " +
+                                         $"Duplicate on object '{monoBehaviour.name}' is ignored.");
+                    }
+
+                    return;
+                }
+
+                // Старый экземпляр уничтожен - подменяем новым.
+                RemoveGlobalBean(type, existing);
+            }
+
+            KeepAlive(monoBehaviour, type);
+
+            m_GlobalBeansContainer[type] = monoBehaviour;
+
+            var contracts = JDIReflectionCache.GetContracts(type);
+            for (int i = 0; i < contracts.Length; i++)
+            {
+                if (!m_GlobalContractToBeans.TryGetValue(contracts[i], out var beans))
+                {
+                    beans = new List<object>(2);
+                    m_GlobalContractToBeans[contracts[i]] = beans;
+                }
+
+                beans.Add(monoBehaviour);
+            }
+
+            m_HasNewGlobalBeans = true;
+        }
+
+        private void RegisterSceneBean(MonoBehaviour monoBehaviour, Type type)
+        {
+            // Один и тот же инстанс может прийти повторно (повторный InitBins на той же сцене).
+            if (!m_RegisteredSceneInstances.Add(monoBehaviour))
+            {
+                return;
+            }
+
+            int sceneHandle = monoBehaviour.gameObject.scene.handle;
+
+            if (!m_SceneScopes.TryGetValue(sceneHandle, out var scope))
+            {
+                scope = new List<object>(16);
+                m_SceneScopes[sceneHandle] = scope;
+            }
+
+            scope.Add(monoBehaviour);
+
+            var entry = new BeanEntry(monoBehaviour, sceneHandle);
+            var contracts = JDIReflectionCache.GetContracts(type);
+            for (int i = 0; i < contracts.Length; i++)
+            {
+                if (!m_SceneContractToBeans.TryGetValue(contracts[i], out var beans))
+                {
+                    beans = new List<BeanEntry>(4);
+                    m_SceneContractToBeans[contracts[i]] = beans;
+                }
+
+                beans.Add(entry);
+            }
+        }
+
+        /// <summary>
+        /// Глобальный бин обязан пережить смену сцены, иначе контейнер будет хранить мёртвую ссылку.
+        /// </summary>
+        private void KeepAlive(MonoBehaviour monoBehaviour, Type type)
+        {
+            var gameObject = monoBehaviour.gameObject;
+            var scene = gameObject.scene;
+
+            if (!scene.IsValid())
+            {
+                return;
+            }
+
+            if (gameObject.transform.parent != null)
+            {
+                Debug.LogWarning($"[JuicyDI] Global bean '{type.Name}' is not a root object " +
+                                 $"('{gameObject.name}'). Move it to the scene root, otherwise it will be " +
+                                 "destroyed together with its scene.");
+                return;
+            }
+
+            Object.DontDestroyOnLoad(gameObject);
+        }
+
+        #endregion
+
+        #region Injection
+
         public void InjectingBeans()
         {
-            Injecting(m_GlobalBeansContainer);
-            Injecting(m_SceneBeansContainer);
+            if (m_HasNewGlobalBeans)
+            {
+                m_HasNewGlobalBeans = false;
+
+                foreach (var bean in m_GlobalBeansContainer.Values)
+                {
+                    if (IsAlive(bean))
+                    {
+                        Inject(bean, GlobalScopeHandle, true);
+                    }
+                }
+            }
+
+            // Бины сцен переинжектим всегда: состав загруженных сцен мог измениться,
+            // а вместе с ним и содержимое List<T> зависимостей.
+            foreach (var scope in m_SceneScopes)
+            {
+                var beans = scope.Value;
+                for (int i = 0; i < beans.Count; i++)
+                {
+                    var bean = beans[i];
+                    if (IsAlive(bean))
+                    {
+                        Inject(bean, scope.Key, false);
+                    }
+                }
+            }
         }
 
         public void LateInjectingBeans(object bean)
         {
-            Injecting(bean);
-        }
-
-        public void RemoveSceneContext()
-        {
-            if (m_SceneBeansContainer != null)
+            if (bean == null)
             {
-                m_SceneBeansContainer.Clear();
+                return;
             }
 
-            if (m_MapInterfaceToDestroy != null)
-            {
-                m_MapInterfaceToDestroy.Clear();
-            }
+            Inject(bean, SceneManager.GetActiveScene().handle, false);
         }
 
-        private void Injecting(Dictionary<string, object> beansContainer)
+        private void Inject(object bean, int sceneHandle, bool globalOnly)
         {
-            var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
+            var fields = JDIReflectionCache.GetInjectedFields(bean.GetType());
 
-            foreach (var bean in beansContainer.Values)
+            for (int i = 0; i < fields.Length; i++)
             {
-                foreach (var field in bean.GetType().GetFields(bindingFlags))
+                var injectedField = fields[i];
+
+                if (injectedField.IsCollection)
                 {
-                    foreach (var attr in Attribute.GetCustomAttributes(field))
+                    var list = JDIReflectionCache.CreateList(injectedField.CollectionType);
+                    ResolveAll(injectedField.Contract, sceneHandle, globalOnly, list);
+                    injectedField.Field.SetValue(bean, list);
+
+                    if (list.Count == 0)
                     {
-                        if (attr.GetType() == typeof(Inject))
-                        {
-                            InjectToField(field, bean);
-                        }
+                        Debug.LogWarning($"[JuicyDI] No beans of type '{injectedField.Contract.Name}' " +
+                                         $"for field '{injectedField.Field.Name}' in '{bean.GetType().Name}'." +
+                                         ScopeHint(globalOnly, injectedField.Contract));
+                    }
+
+                    continue;
+                }
+
+                var dependency = ResolveSingle(injectedField.Contract, sceneHandle, globalOnly);
+                injectedField.Field.SetValue(bean, dependency);
+
+                if (dependency == null)
+                {
+                    Debug.LogError($"[JuicyDI] Can not resolve '{injectedField.Contract.Name}' " +
+                                   $"for field '{injectedField.Field.Name}' in '{bean.GetType().Name}'." +
+                                   ScopeHint(globalOnly, injectedField.Contract));
+                }
+            }
+        }
+
+        private string ScopeHint(bool globalOnly, Type contract)
+        {
+            if (!globalOnly)
+            {
+                return string.Empty;
+            }
+
+            return m_SceneContractToBeans.ContainsKey(contract)
+                ? $" '{contract.Name}' is a SceneBean: GlobalBean can not depend on scene beans."
+                : string.Empty;
+        }
+
+        #endregion
+
+        #region Resolving
+
+        public T GetBean<T>() where T : class
+        {
+            return (T)ResolveSingle(typeof(T), SceneManager.GetActiveScene().handle, false);
+        }
+
+        public object GetBean(Type contract)
+        {
+            return ResolveSingle(contract, SceneManager.GetActiveScene().handle, false);
+        }
+
+        public List<T> GetBeans<T>() where T : class
+        {
+            var result = new List<T>();
+            ResolveAll(typeof(T), SceneManager.GetActiveScene().handle, false, result);
+            return result;
+        }
+
+        private object ResolveSingle(Type contract, int sceneHandle, bool globalOnly)
+        {
+            if (!globalOnly)
+            {
+                // 1. Своя сцена - самый безопасный по времени жизни источник.
+                var own = ResolveFromScene(contract, sceneHandle, true);
+                if (own != null)
+                {
+                    return own;
+                }
+            }
+
+            // 2. Глобальный скоуп.
+            if (m_GlobalContractToBeans.TryGetValue(contract, out var globalBeans))
+            {
+                for (int i = 0; i < globalBeans.Count; i++)
+                {
+                    if (IsAlive(globalBeans[i]))
+                    {
+                        return globalBeans[i];
+                    }
+                }
+            }
+
+            if (globalOnly)
+            {
+                return null;
+            }
+
+            // 3. Другие загруженные сцены (аддитивные локации).
+            return ResolveFromScene(contract, sceneHandle, false);
+        }
+
+        private object ResolveFromScene(Type contract, int sceneHandle, bool sameSceneOnly)
+        {
+            if (!m_SceneContractToBeans.TryGetValue(contract, out var entries))
+            {
+                return null;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                var entry = entries[i];
+
+                if (sameSceneOnly && entry.SceneHandle != sceneHandle)
+                {
+                    continue;
+                }
+
+                if (IsAlive(entry.Instance))
+                {
+                    return entry.Instance;
+                }
+            }
+
+            return null;
+        }
+
+        private void ResolveAll(Type contract, int sceneHandle, bool globalOnly, IList target)
+        {
+            if (!globalOnly && m_SceneContractToBeans.TryGetValue(contract, out var entries))
+            {
+                // Сначала своя сцена, потом соседние аддитивные.
+                for (int i = 0; i < entries.Count; i++)
+                {
+                    if (entries[i].SceneHandle == sceneHandle && IsAlive(entries[i].Instance))
+                    {
+                        target.Add(entries[i].Instance);
+                    }
+                }
+
+                for (int i = 0; i < entries.Count; i++)
+                {
+                    if (entries[i].SceneHandle != sceneHandle && IsAlive(entries[i].Instance))
+                    {
+                        target.Add(entries[i].Instance);
+                    }
+                }
+            }
+
+            if (m_GlobalContractToBeans.TryGetValue(contract, out var globalBeans))
+            {
+                for (int i = 0; i < globalBeans.Count; i++)
+                {
+                    if (IsAlive(globalBeans[i]))
+                    {
+                        target.Add(globalBeans[i]);
                     }
                 }
             }
         }
-        
-        private void Injecting(MultiValueDictionary<string, object> beansContainer)
+
+        #endregion
+
+        #region Lifetime
+
+        public void RemoveSceneContext(int sceneHandle)
         {
-            var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
-            
-            foreach (var keys in beansContainer.GetKeys())
+            if (m_SceneScopes.TryGetValue(sceneHandle, out var beans))
             {
-                foreach (var bean in beansContainer.Values(keys))
+                for (int i = 0; i < beans.Count; i++)
                 {
-                    foreach (var field in bean.GetType().GetFields(bindingFlags))
+                    var bean = beans[i];
+                    m_RegisteredSceneInstances.Remove(bean);
+
+                    var contracts = JDIReflectionCache.GetContracts(bean.GetType());
+                    for (int j = 0; j < contracts.Length; j++)
                     {
-                        foreach (var attr in Attribute.GetCustomAttributes(field))
+                        if (!m_SceneContractToBeans.TryGetValue(contracts[j], out var entries))
                         {
-                            if (attr.GetType() == typeof(Inject))
+                            continue;
+                        }
+
+                        for (int k = entries.Count - 1; k >= 0; k--)
+                        {
+                            if (ReferenceEquals(entries[k].Instance, bean))
                             {
-                                InjectToField(field, bean);
+                                entries.RemoveAt(k);
                             }
                         }
+
+                        if (entries.Count == 0)
+                        {
+                            m_EmptyContractsBuffer.Add(contracts[j]);
+                        }
                     }
                 }
-            }
-        }
-        
-        private void Injecting(object bean)
-        {
-            var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
-            foreach (var field in bean.GetType().GetFields(bindingFlags))
+                beans.Clear();
+                m_SceneScopes.Remove(sceneHandle);
+            }
+
+            // Чистим пустые списки, чтобы словарь не рос бесконечно.
+            for (int i = 0; i < m_EmptyContractsBuffer.Count; i++)
             {
-                foreach (var attr in Attribute.GetCustomAttributes(field))
+                if (m_SceneContractToBeans.TryGetValue(m_EmptyContractsBuffer[i], out var entries)
+                    && entries.Count == 0)
                 {
-                    if (attr.GetType() == typeof(Inject))
+                    m_SceneContractToBeans.Remove(m_EmptyContractsBuffer[i]);
+                }
+            }
+
+            m_EmptyContractsBuffer.Clear();
+
+            PurgeDestroyedGlobals();
+        }
+
+        public void Clear()
+        {
+            m_GlobalBeansContainer.Clear();
+            m_GlobalContractToBeans.Clear();
+            m_SceneContractToBeans.Clear();
+            m_SceneScopes.Clear();
+            m_RegisteredSceneInstances.Clear();
+            m_DeadGlobalsBuffer.Clear();
+            m_EmptyContractsBuffer.Clear();
+            m_HasNewGlobalBeans = false;
+        }
+
+        /// <summary>
+        /// Глобальный бин мог быть уничтожен вручную - контейнер не должен держать мёртвую ссылку.
+        /// </summary>
+        private void PurgeDestroyedGlobals()
+        {
+            foreach (var pair in m_GlobalBeansContainer)
+            {
+                if (!IsAlive(pair.Value))
+                {
+                    m_DeadGlobalsBuffer.Add(pair.Key);
+                }
+            }
+
+            for (int i = 0; i < m_DeadGlobalsBuffer.Count; i++)
+            {
+                var type = m_DeadGlobalsBuffer[i];
+                RemoveGlobalBean(type, m_GlobalBeansContainer[type]);
+            }
+
+            m_DeadGlobalsBuffer.Clear();
+        }
+
+        private void RemoveGlobalBean(Type type, object bean)
+        {
+            m_GlobalBeansContainer.Remove(type);
+
+            var contracts = JDIReflectionCache.GetContracts(type);
+            for (int i = 0; i < contracts.Length; i++)
+            {
+                if (!m_GlobalContractToBeans.TryGetValue(contracts[i], out var beans))
+                {
+                    continue;
+                }
+
+                for (int j = beans.Count - 1; j >= 0; j--)
+                {
+                    if (ReferenceEquals(beans[j], bean))
                     {
-                        InjectToField(field, bean);
+                        beans.RemoveAt(j);
                     }
                 }
-            }
-        }
 
-        private void InjectToField(FieldInfo field, object bean)
-        {
-            if (!field.FieldType.IsGenericType)
-            {
-                var key = field.FieldType.AssemblyQualifiedName;
-#if UNITY_EDITOR
-                try
+                if (beans.Count == 0)
                 {
-#endif
-                    var b = GetBean(key);
-                    field.SetValue(bean, b);
-#if UNITY_EDITOR
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Inject to object with type: {bean.GetType()}");
-                    throw;
-                }
-#endif
-            }
-            else
-            {
-                var arguments = field.FieldType.GetGenericArguments();
-                if (field.FieldType.GetGenericTypeDefinition() == typeof(List<>))
-                {
-                    string key = arguments[0].AssemblyQualifiedName;
-                    MethodInfo method = typeof(IObjectFactory).GetMethod(nameof(IObjectFactory.GetBeans));
-                    MethodInfo genericMethod = method.MakeGenericMethod(arguments[0]);
-                    object[] parameters = new object[] { key };
-#if UNITY_EDITOR
-                    try
-                    {
-#endif
-                        field.SetValue(bean, genericMethod.Invoke(this, parameters));
-#if UNITY_EDITOR
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"Inject to object with type: {bean.GetType()} I think you have empty collections to inject in field {field.Name}");
-                        throw;
-                    }
-#endif
+                    m_GlobalContractToBeans.Remove(contracts[i]);
                 }
             }
         }
 
-        //Мб это все в отдельные сервисы вынести?
-
-        public List<T> GetBeans<T>(string key)
+        private static bool IsAlive(object bean)
         {
-            List<T> beans = new List<T>();
+            if (bean == null)
+            {
+                return false;
+            }
 
-            if (m_MapInterfaceToBeans.ContainsKey(key))
+            // Fake-null: объект уничтожен движком, но managed-обёртка ещё жива.
+            if (bean is Object unityObject)
             {
-                var values = m_MapInterfaceToBeans.Values(key);
-                for (int i = 0; i < values.Count; i++)
-                {
-                    var result = GetBeanObject(values[i]);
-                    if (result != null)
-                    {
-                        beans.Add((T)result);
-                    }
-                }
-                
-                RemoveOldInterfaceBeans(key);
+                return unityObject != null;
             }
-            
-            if (m_GlobalBeansContainer.ContainsKey(key))
-            {
-                beans.Add((T)m_GlobalBeansContainer[key]);
-            }
-            
-            if (m_SceneBeansContainer.ContainsKey(key))
-            {
-                for (int i = 0; i < m_SceneBeansContainer[key].Count; i++)
-                {
-                    beans.Add((T)m_SceneBeansContainer[key][i]);
-                }
-            }
-            
-            return beans;
-        }
-        
-        private object GetBean(string key)
-        {
-            string beanName;
-            if (m_MapInterfaceToBeans.ContainsKey(key))
-            {
-                beanName = m_MapInterfaceToBeans.Value(key);
-                var bean = GetBeanObject(beanName);
-                RemoveOldInterfaceBeans(key);
-                return bean;
-            }
-            
-            if (m_GlobalBeansContainer.ContainsKey(key))
-            {
-                return m_GlobalBeansContainer[key];
-            }
-            
-            if (m_SceneBeansContainer.ContainsKey(key))
-            {
-                return m_SceneBeansContainer.Value(key);
-            }
-            
-            return null;
+
+            return true;
         }
 
-        private object GetBeanObject(string beanName)
-        {
-            if (m_GlobalBeansContainer.ContainsKey(beanName))
-            {
-                return m_GlobalBeansContainer[beanName];
-            }
-
-            if (m_SceneBeansContainer.ContainsKey(beanName))
-            {
-                return m_SceneBeansContainer.Value(beanName);
-            }
-            
-            m_MapInterfaceToDestroy.Add(beanName);
-            return null;
-        }
-
-        private void RegisterInterface(MonoBehaviour monoBehaviour)
-        {
-            var interfaces = monoBehaviour.GetType().GetInterfaces();
-
-            for (int i = 0; i < interfaces.Length; i++)
-            {
-                m_MapInterfaceToBeans.Add(interfaces[i].AssemblyQualifiedName,
-                    monoBehaviour.GetType().AssemblyQualifiedName); 
-            }
-        }
-
-        private void RemoveOldInterfaceBeans(string key)
-        {
-            if (m_MapInterfaceToDestroy.Count == 1)
-            {
-                m_MapInterfaceToBeans.RemoveValue(key, m_MapInterfaceToDestroy[0]); 
-                return;
-            }
-            
-            if (m_MapInterfaceToDestroy.Count > 1)
-            {
-                m_MapInterfaceToBeans.RemoveValues(key, m_MapInterfaceToDestroy); 
-                return;
-            }
-        }
+        #endregion
     }
 }

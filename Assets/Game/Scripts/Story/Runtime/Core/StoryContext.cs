@@ -73,6 +73,41 @@ namespace Game.Scripts.Story
             value = false;
             return false;
         }
+
+        /// <summary>
+        /// Снимок булевых флагов blackboard - используется системой сохранений GBS.
+        /// </summary>
+        public IEnumerable<KeyValuePair<string, bool>> GetBoolFlags()
+        {
+            foreach (var pair in m_Blackboard)
+            {
+                if (pair.Value is bool boolValue)
+                {
+                    yield return new KeyValuePair<string, bool>(pair.Key, boolValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Восстанавливает флаги из сейва (значения перезаписываются).
+        /// </summary>
+        public void RestoreFlags(IEnumerable<KeyValuePair<string, bool>> flags)
+        {
+            if (flags == null)
+            {
+                return;
+            }
+
+            foreach (var flag in flags)
+            {
+                m_Blackboard[flag.Key] = flag.Value;
+            }
+        }
+
+        public void ClearFlags()
+        {
+            m_Blackboard.Clear();
+        }
     }
 }
 

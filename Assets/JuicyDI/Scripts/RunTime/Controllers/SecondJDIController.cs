@@ -6,19 +6,13 @@ namespace JuicyDI
     public class SecondJDIController : MonoBehaviour
     {
         private IBinController m_BinController;
-        
+
         public void Init()
         {
-            m_BinController = BinController.GetContext();
-            
-            List<MonoBehaviour> allSceneObjects = new List<MonoBehaviour>();
-            foreach (var rootGameObject in gameObject.scene.GetRootGameObjects())
-            {
-                allSceneObjects.AddRange(
-                    rootGameObject.GetComponentsInChildren<MonoBehaviour>(true));
-            }
+            // Сцена может быть загружена как аддитивно, так и первой - контейнер создаём при необходимости.
+            m_BinController = BinController.GetOrCreateContext();
 
-            m_BinController.InitBins(allSceneObjects);
+            m_BinController.InitBins(JDISceneScanner.CollectSceneBehaviours(gameObject.scene));
         }
     }
 }

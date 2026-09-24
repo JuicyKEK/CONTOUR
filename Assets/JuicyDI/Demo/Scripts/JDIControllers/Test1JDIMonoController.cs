@@ -9,20 +9,20 @@ namespace JuicyDI.Demo.Scripts
     [SequenceParticipant(1)]
     public class Test1JDIMonoController : MonoBehaviour, ITest1JDIMonoInterface, ITest2JDIMonoInterface, ISequence
     {
-        [Inject] private Test3JDIMonoController m_Test1JDIMonoController;
+        // ВАЖНО: глобальный бин не может держать ссылку на бин сцены - после выгрузки сцены
+        // это будет уничтоженный объект. Сценные зависимости берём "на месте", в момент вызова.
+        private Test3JDIMonoController SceneTest3 => BinController.GetContext()?.GetBean<Test3JDIMonoController>();
 
         public void Run()
         {
-            DontDestroyOnLoad(this);
-            Debug.Log($"m_Test1JDIMonoController - {m_Test1JDIMonoController == null}");
-            m_Test1JDIMonoController.Test1();
+            LogSceneDependency();
         }
-        
+
         public void Test3()
         {
             Debug.Log($"Test1JDIMonoController - I exist");
         }
-                
+
         public void Test2()
         {
             Debug.Log($"Test1JDIMonoController - I exist");
@@ -36,14 +36,19 @@ namespace JuicyDI.Demo.Scripts
         public void MethodStart()
         {
             Debug.Log($"______Test1JDIMonoController____");
-            DontDestroyOnLoad(this);
-            Debug.Log($"m_Test1JDIMonoController - {m_Test1JDIMonoController == null}");
-            m_Test1JDIMonoController.Test1();
+            LogSceneDependency();
         }
 
         public void LateInjectDebug()
         {
             Debug.Log("LateInject Run");
+        }
+
+        private void LogSceneDependency()
+        {
+            var test3 = SceneTest3;
+            Debug.Log($"m_Test1JDIMonoController - {test3 == null}");
+            test3?.Test1();
         }
     }
 }

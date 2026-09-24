@@ -13,9 +13,12 @@ namespace JuicyDI
 
         public GameUpdateSequenceController(List<IUpdateSequence> sequence)
         {
-            m_SortedSequence = sequence
-                .OrderBy(type => type.GetType().GetCustomAttribute<SequenceParticipant>().Number)
-                .ToList();
+            m_SortedSequence = sequence == null
+                ? new List<IUpdateSequence>()
+                : sequence
+                    .Where(element => element != null)
+                    .OrderBy(element => element.GetType().GetCustomAttribute<SequenceParticipant>()?.Number ?? 0)
+                    .ToList();
         }
         
         public void UpdateSequence()

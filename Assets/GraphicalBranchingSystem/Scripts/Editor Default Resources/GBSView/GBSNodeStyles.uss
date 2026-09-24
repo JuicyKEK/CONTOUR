@@ -1,0 +1,250 @@
+﻿/* CONTAINERS */
+
+.gbs-node_extension-container
+{
+	background-color: #1D1D1E;
+	padding: 8px;
+}
+
+.ds-node__main-container
+{
+	background-color: var(--ds-colors-window-dark-grey-1);
+}
+
+.gbs-node_custom-data-container
+{
+	background-color: #212325;
+	border-radius: 4px;
+	padding: 8px;
+}
+
+/* INPUTS */
+
+.ds-node__text-field > .unity-text-field__input
+{
+	background-color: var(--ds-colors-window-dark-grey-1);
+	border-color: var(--ds-colors-window-dark-grey-6);
+	border-radius: var(--ds-metrics-window-pixels-4);
+	max-width: var(--ds-metrics-window-pixels-240);
+	min-width: var(--ds-metrics-window-pixels-160);
+	padding: var(--ds-metrics-window-pixels-8);
+	white-space: normal;
+}
+
+.ds-node__text-field__hidden > .unity-text-field__input
+{
+	background-color: transparent;
+	border-color: transparent;
+}
+
+.ds-node__text-field__hidden > .unity-text-field__input:focus
+{
+	background-color: var(--ds-colors-window-dark-grey-1);
+	border-color: var(--ds-colors-window-dark-grey-6);
+}
+
+.ds-node__filename-text-field > .unity-text-field__input
+{
+	max-width: var(--ds-metrics-window-pixels-1000);
+	margin: var(--ds-metrics-window-pixels-4);
+	padding: var(--ds-metrics-window-pixels-4);
+}
+
+.ds-node__choice-text-field > .unity-text-field__input
+{
+	font-size: var(--ds-metrics-window-pixels-11);
+	height: var(--ds-metrics-window-pixels-35);
+	max-width: var(--ds-metrics-window-pixels-1000);
+	min-width: var(--ds-metrics-window-pixels-0);
+}
+
+.ds-node__choice-text-field > .unity-text-field__input:focus
+{
+	height: var(--ds-metrics-window-pixels-25);
+	margin: var(--ds-metrics-window-pixels-4);
+	padding: var(--ds-metrics-window-pixels-4);
+}
+
+.ds-node__quote-text-field > .unity-text-field__input
+{
+	background-color: var(--ds-colors-window-dark-grey-4);
+	border-color: transparent;
+	border-left-color: var(--ds-colors-window-dark-grey-6);
+	border-left-width: var(--ds-metrics-window-pixels-4);
+	padding: var(--ds-metrics-window-pixels-16);
+	max-width: var(--ds-metrics-window-pixels-600);
+}
+
+.ds-node__quote-text-field > .unity-text-field__input:hover
+{
+	background-color: var(--ds-colors-window-dark-grey-5);
+}
+
+.ds-node__quote-text-field > .unity-text-field__input:focus
+{
+	background-color: var(--ds-colors-window-dark-grey-1);
+	border-color: var(--ds-colors-window-dark-grey-6);
+}
+
+/* BUTTONS */
+
+.ds-node__button
+{
+	background-color: var(--ds-colors-window-dark-grey-5);
+	border-color: var(--ds-colors-window-dark-grey-1);
+	margin: var(--ds-metrics-window-pixels-4);
+	max-height: var(--ds-metrics-window-pixels-25);
+}
+
+.ds-node__button:hover
+{
+	background-color: var(--ds-colors-window-dark-grey-2);
+}
+
+.ds-node__button:active
+{
+	background-color: var(--ds-colors-window-dark-grey-3);
+	color: var(--ds-colors-window-yellow);
+}
+
+/* ELEMENTS */
+
+TextField
+{
+	margin-left: var(--ds-metrics-window-pixels-0);
+}
+
+.ds-node__custom-data-container > Foldout
+{
+	margin-left: var(--ds-metrics-window-pixels-n4);
+	margin-top: var(--ds-metrics-window-pixels-4);
+}
+
+.ds-node__custom-data-container > Foldout > TextField
+{
+	margin-left: var(--ds-metrics-window-pixels-n12);
+	margin-top: var(--ds-metrics-window-pixels-8);
+}
+
+/* BUILT IN */
+
+.unity-toggle__text
+{
+	margin-left: var(--ds-metrics-window-pixels-2);
+}
+/* GBS v2.3 - строки переходов и кнопки удаления */
+.gbs-node__delete-button
+{
+background-color: #5A2B2B;
+border-color: #1D1D1E;
+color: #E0D6D6;
+font-size: 10px;
+margin: 2px;
+padding: 0px;
+width: 22px;
+min-width: 22px;
+max-height: 20px;
+flex-shrink: 0;
+flex-grow: 0;
+}
+.gbs-node__delete-button:hover
+{
+background-color: #7A3535;
+}
+.gbs-node__transition
+{
+background-color: #26282B;
+border-radius: 4px;
+margin-bottom: 4px;
+padding: 4px;
+flex-shrink: 1;
+min-width: 0;
+}
+.gbs-node__transition ObjectField
+{
+flex-grow: 1;
+flex-shrink: 1;
+min-width: 0;
+}
+ObjectField
+{
+flex-grow: 1;
+flex-shrink: 1;
+min-width: 0;
+}
+/* GBS v2.6 - фиксированная ширина ноды и сжимаемый контент */
+.gbs-node
+{
+	width: 430px;
+	min-width: 430px;
+	max-width: 430px;
+}
+.gbs-node #node-border
+{
+overflow: hidden;
+}
+.gbs-node #contents
+{
+min-width: 0;
+flex-shrink: 1;
+}
+.gbs-node #top
+{
+min-width: 0;
+flex-shrink: 1;
+}
+.gbs-node #top > #input
+{
+flex-grow: 0;
+flex-shrink: 0;
+width: auto;
+min-width: 0;
+max-width: 70px;
+}
+.gbs-node #top > #input Port
+{
+flex-grow: 0;
+flex-shrink: 0;
+padding-right: 2px;
+}
+.gbs-node #top > #input .unity-label
+{
+font-size: 10px;
+margin-right: 0px;
+}
+.gbs-node #top > #output
+{
+flex-grow: 1;
+flex-shrink: 1;
+min-width: 0;
+align-items: stretch;
+}
+.gbs-node #extension
+{
+min-width: 0;
+flex-shrink: 1;
+}
+.gbs-node ObjectField > .unity-object-field__input
+{
+min-width: 0;
+flex-shrink: 1;
+}
+.gbs-node .unity-object-field__selector
+{
+flex-grow: 0;
+flex-shrink: 0;
+width: 19px;
+min-width: 19px;
+}
+.gbs-node Foldout > .unity-foldout__content
+{
+margin-left: 0px;
+min-width: 0;
+}
+.gbs-node__transition Port
+{
+flex-grow: 0;
+flex-shrink: 0;
+margin-right: 0px;
+padding-right: 0px;
+}
