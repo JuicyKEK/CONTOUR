@@ -51,7 +51,7 @@ namespace AZE.AdvancedFirstPerson
                 return;
             }
 
-            if (ctx.InputHandler.SprintPressed && ctx.InputHandler.MoveInput.magnitude > 0.1f)
+            if (ctx.InputHandler.SprintPressed && ctx.InputHandler.MoveInput.magnitude > 0.1f && ctx.CanSprint)
             {
                 ctx.SwitchState(factory.Sprint);
             }

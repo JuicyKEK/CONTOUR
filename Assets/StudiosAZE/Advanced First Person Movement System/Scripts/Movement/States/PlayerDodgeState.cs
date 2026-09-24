@@ -53,7 +53,7 @@ namespace AZE.AdvancedFirstPerson
 
         public override void CheckSwitchStates()
         {
-            if (ctx.InputHandler.SprintPressed)
+            if (ctx.InputHandler.SprintPressed && ctx.CanSprint)
                 ctx.SwitchState(factory.Sprint);
             else
                 ctx.SwitchState(factory.Walk);

@@ -32,7 +32,7 @@ namespace AZE.AdvancedFirstPerson
                 }
                 else
                 {
-                    if (ctx.InputHandler.SprintPressed)
+                    if (ctx.InputHandler.SprintPressed && ctx.CanSprint)
                         ctx.SwitchState(factory.Sprint);
                     else
                         ctx.SwitchState(factory.Walk);
