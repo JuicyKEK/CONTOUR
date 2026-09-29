@@ -1,4 +1,6 @@
-﻿namespace Game.Scripts.Instructions.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Game.Scripts.Instructions.Interfaces
 {
     /// <summary>
     /// Хранит, какие аудио-кассеты уже найдены игроком по ходу игры. Регистрируется как
@@ -8,6 +10,11 @@
     public interface IAudioTapeFoundRegistry
     {
         /// <summary>
+        /// Id всех кассет, доступных игроку на текущий момент (используется для сохранения).
+        /// </summary>
+        IReadOnlyCollection<string> FoundTapeIds { get; }
+
+        /// <summary>
         /// Найдена ли кассета с данным TapeId.
         /// </summary>
         bool IsTapeFound(string tapeId);
@@ -16,6 +23,11 @@
         /// Отметить кассету как найденную (вызывается объектом подбора кассеты в мире).
         /// </summary>
         void MarkTapeFound(string tapeId);
+
+        /// <summary>
+        /// Полностью заменяет набор найденных кассет (используется при загрузке сохранения).
+        /// </summary>
+        void RestoreFoundTapes(IEnumerable<string> tapeIds);
     }
 }
 

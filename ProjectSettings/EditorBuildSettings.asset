@@ -12,9 +12,8 @@ EditorBuildSettings:
     path: Assets/Scenes/MovementTestScene.unity
     guid: 85c97c924d2eb484e966d2736b259dfe
   - enabled: 1
-    path: Assets/StudiosAZE/Advanced First Person Movement System/Demo/DemoSceneMovement
-      1.unity
-    guid: ab7350ad7093bb943b3c1b06f935e320
+    path: Assets/Scenes/CassettesTestScene.unity
+    guid: 20d6a3125f1bcac4aa4afd1a36625fbf
   - enabled: 1
     path: Assets/Game/Scenes/LoacationMain.unity
     guid: e2abf0100c2a5ea4ca99ae5ad407590e

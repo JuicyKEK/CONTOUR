@@ -1,10 +1,12 @@
+using JuicyDI.Attributes;
 using UnityEngine;
 
 namespace AZE.AdvancedFirstPerson
 {
+    [JDIMonoController]
     [RequireComponent(typeof(CharacterController))]
     [RequireComponent(typeof(PlayerInputHandler))]
-    public class PlayerMovementStateMachine : MonoBehaviour
+    public class PlayerMovementStateMachine : MonoBehaviour, IPlayerMoveController
     {
         [Header("Speed Settings")]
         [Range(1f, 10f)] public float WalkSpeed = 4.5f;
@@ -43,18 +45,21 @@ namespace AZE.AdvancedFirstPerson
         [SerializeField] private float _timeToResetFullSprint = 3f;
         [SerializeField] private float _timeToResetFullAfterZeroSprint = 8f;
         
+        [Header("Camera Rotation")]
+        [SerializeField] private PlayerCameraController _cameraController;
+        
         private float _sprintRemaining;
         private bool _isSprintDepleted;
+        private bool _isUseMouse = false;
+        private bool _isCanMove = true;
 
         public bool IsSprinting { get; set; }
-
-         public float SprintRemaining => _sprintRemaining;
-
+        public float SprintRemaining => _sprintRemaining;
         public float MaxSprintDuration => _timeToSprint;
-
-         public bool IsSprintDepleted => _isSprintDepleted;
-
-         public bool CanSprint => _sprintRemaining > 0f && !_isSprintDepleted;
+        public bool IsSprintDepleted => _isSprintDepleted;
+        public bool IsUseMouse => _isUseMouse;
+        public bool IsCanMove => _isCanMove;
+        public bool CanSprint => _sprintRemaining > 0f && !_isSprintDepleted;
 
 
         public PlayerInputHandler InputHandler { get; private set; }
@@ -248,5 +253,16 @@ namespace AZE.AdvancedFirstPerson
 
         public float GetStandingHeight() => _standingHeight;
         public float GetCrouchHeight() => _crouchHeight;
+        public void SetMouseState(bool isSetMouseState)
+        {
+            _isUseMouse = isSetMouseState;
+            _cameraController.SetCameraActive(!_isUseMouse);
+        }
+
+        public void SetCanMovement(bool canMovement)
+        {
+            _isCanMove = canMovement;
+            _cameraController.SetCameraActive(_isCanMove);
+        }
     }
 }

@@ -23,6 +23,18 @@ namespace AZE.AdvancedFirstPerson
 
         public override void CheckSwitchStates()
         {
+            if (!ctx.IsCanMove)
+            {
+                ctx.SwitchState(factory.Mouse);
+                return;
+            }
+            
+            if (ctx.IsUseMouse)
+            {
+                ctx.SwitchState(factory.Mouse);
+                return;
+            }
+            
             if (!ctx.IsGrounded)
             {
                 ctx.SwitchState(factory.Air);

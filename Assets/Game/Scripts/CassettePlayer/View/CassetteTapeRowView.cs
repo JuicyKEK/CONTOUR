@@ -8,12 +8,14 @@ namespace Game.Scripts.Instructions.View
     /// <summary>
     /// Одна строка кассеты в списке: название (или "?????", если кассета не найдена)
     /// и кнопка, по которой запускается проигрывание (неактивна для ненайденных кассет).
+    /// Метка "новая" пропадает после первого проигрывания, метка "искажённая" видна всегда.
     /// </summary>
     public class CassetteTapeRowView : MonoBehaviour
     {
         [SerializeField] private TMP_Text m_TapeTitle;
         [SerializeField] private Button m_Button;
         [SerializeField] private GameObject m_InformationNew;
+        [SerializeField] private GameObject m_InformationEvel;
 
         private Action m_OnClick;
         private bool m_IsFound;
@@ -28,9 +30,10 @@ namespace Game.Scripts.Instructions.View
         }
 
         /// <summary>
-        /// Настраивает строку. Если кассета не найдена - текст "?????", кнопка неактивна.
+        /// Настраивает строку. Если кассета не найдена - текст "?????", кнопка неактивна,
+        /// метки не показываются (чтобы не раскрывать, какая кассета искажённая).
         /// </summary>
-        public void Setup(string displayName, bool isFound, Action onClick)
+        public void Setup(string displayName, bool isFound, bool isEvil, Action onClick)
         {
             if (m_TapeTitle != null)
             {
@@ -43,6 +46,11 @@ namespace Game.Scripts.Instructions.View
             if (m_Button != null)
             {
                 m_Button.interactable = isFound;
+            }
+
+            if (m_InformationEvel != null)
+            {
+                m_InformationEvel.SetActive(isFound && isEvil);
             }
 
             SetInformationNew();

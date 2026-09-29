@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81f61e9f9f094899aa78d2c9b5af340c, type: 3}
-  m_Name: AudioTapeSection_T1
+  m_Name: AudioTapeSection_P2_T1
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Data.AudioTapeSectionDefinition
-  m_DisplayName: "\u0411\u0430\u0437\u043E\u0432\u044B\u0435 \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0438"
+  m_DisplayName: Test1
   m_Tapes:
   - {fileID: 11400000, guid: 776a466655b81f64eb723fc12341b6ea, type: 2}
-  - {fileID: 11400000, guid: df9d44f6a17a6dc44b4941b7854de060, type: 2}
+  - {fileID: 11400000, guid: 74b8f7f739c4e4d478cd2cd1291d5aa6, type: 2}
