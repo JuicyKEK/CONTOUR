@@ -7,7 +7,6 @@ using JuicyDI.Attributes;
 using System.Collections.Generic;
 using AZE.AdvancedFirstPerson;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Game.Scripts.Instructions.Controllers
 {
@@ -28,10 +27,6 @@ namespace Game.Scripts.Instructions.Controllers
     [SequenceParticipant(120)]
     public class CassettePlayerController : MonoBehaviour, ISequence, IUpdateSequence
     {
-        [Header("Вид")]
-        [SerializeField] private CassettePlayerView m_View;
-        [SerializeField] private RectTransform m_PanelRectTransform;
-
         [Header("Данные")]
         [Tooltip("Все страницы кассет, доступные в игре (найденные/ненайденные кассеты определяются реестром в рантайме).")]
         [SerializeField] private AudioTapePageSO[] m_Pages;
@@ -44,11 +39,12 @@ namespace Game.Scripts.Instructions.Controllers
                  "(чтобы звук нажатия кнопки успел проиграться).")]
         [SerializeField, Min(0f)] private float m_MinRewindDuration = 1f;
 
-        [Header("Игрок")]
-        [Tooltip("Контроллер камеры игрока - на время открытой панели плеера его вращение блокируется.")]
-        [SerializeField] private GameObject m_CassettePlayerModel;
-        [Inject] private IPlayerMoveController m_PlayerMoveController;
+        // Вид панели и 3D-модель плеера на сцене в одном экземпляре - приходят через DI.
+        [Inject] private CassettePlayerView m_View;
+        [Inject] private CassettePlayerModelView m_PlayerModelView;
 
+        // Контроллер движения игрока - на время открытой панели плеера вращение камеры блокируется.
+        [Inject] private IPlayerMoveController m_PlayerMoveController;
         [Inject] private IInputActions m_InputActions;
         [Inject] private IAudioTapeFoundRegistry m_Registry;
 
@@ -205,8 +201,8 @@ namespace Game.Scripts.Instructions.Controllers
                 m_PlayerMoveController.SetMouseState(true);
             }
 
-            CassettePlayerModel();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(m_PanelRectTransform);
+            m_PlayerModelView.SetVisible(true);
+            m_View.RebuildLayout();
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
@@ -224,21 +220,16 @@ namespace Game.Scripts.Instructions.Controllers
                 m_PlayerMoveController.SetMouseState(false);
             }
 
-            CassettePlayerModel();
+            m_PlayerModelView.SetVisible(false);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-        }
-
-        private void CassettePlayerModel() //Можно все переделать под реакт т.к. view
-        {
-            m_CassettePlayerModel.SetActive(m_IsOpen);
         }
 
         private void OnPageSelected(int pageIndex)
         {
             // Пока панель была закрыта, могли найтись новые кассеты - обновляем открытую страницу.
             RefreshPage(pageIndex);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(m_PanelRectTransform);
+            m_View.RebuildLayout();
         }
 
         private void RefreshPage(int pageIndex)

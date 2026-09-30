@@ -20,6 +20,7 @@ namespace Game.Scripts.Player.Runtime.Services
             {
                 m_NumberInteractionObject++;
                 m_NumberInteractionChanged?.Invoke(m_NumberInteractionObject);
+                Debug.Log($"OnTriggerEnter Interacted with {m_NumberInteractionObject}");
             }
         }
 
@@ -29,6 +30,7 @@ namespace Game.Scripts.Player.Runtime.Services
             {
                 m_NumberInteractionObject--;
                 m_NumberInteractionChanged?.Invoke(m_NumberInteractionObject);
+                Debug.Log($"OnTriggerExit Interacted with {m_NumberInteractionObject}");
             }
         }
     }

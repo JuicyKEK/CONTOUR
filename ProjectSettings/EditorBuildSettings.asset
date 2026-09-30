@@ -15,6 +15,12 @@ EditorBuildSettings:
     path: Assets/Scenes/CassettesTestScene.unity
     guid: 20d6a3125f1bcac4aa4afd1a36625fbf
   - enabled: 1
+    path: Assets/Scenes/InteractTestScene.unity
+    guid: d71676ef0176f7146a9b4a04ef0bef13
+  - enabled: 1
+    path: Assets/Scenes/InfectionTestScene.unity
+    guid: 9e1395682a6edc74c98e4c7e928bca0b
+  - enabled: 1
     path: Assets/Game/Scenes/LoacationMain.unity
     guid: e2abf0100c2a5ea4ca99ae5ad407590e
   - enabled: 1

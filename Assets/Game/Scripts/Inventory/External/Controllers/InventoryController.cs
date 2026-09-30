@@ -13,8 +13,7 @@ namespace Game.Scripts.Inventory.Controllers
     public class InventoryController : MonoBehaviour, IInventoryAdd, IInventoryGetObject, ISequence
     {
         [Inject] private IInputSelectionActions m_inputSelectionActions;
-        
-        [SerializeField] private InventoryViewController m_InventoryViewController;
+        [Inject] private InventoryViewController m_InventoryViewController;
         
         private IInventoryDataController m_InventoryDataController = new InventoryDataController();
         private int m_CurrentSellectObject;

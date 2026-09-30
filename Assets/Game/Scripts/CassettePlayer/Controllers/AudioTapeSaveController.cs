@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using Game.Scripts.Instructions.Data;
 using Game.Scripts.Instructions.Interfaces;
+using Game.Scripts.Utilities.Save;
 using JuicyDI;
 using JuicyDI.Attributes;
 using JuicyDI.Context;
@@ -10,7 +10,7 @@ using UnityEngine;
 namespace Game.Scripts.Instructions.Controllers
 {
     /// <summary>
-    /// Сохранение прогресса кассет в JSON-файл (Application.persistentDataPath/Saves).
+    /// Сохранение прогресса кассет в JSON-файл (Application.persistentDataPath/Saves, см. <see cref="JsonSaveFile"/>).
     /// Пишет/читает только Id найденных, прослушанных и выполненных кассет из <see cref="IAudioTapeFoundRegistry"/>.
     ///
     /// Сохранение вызывается снаружи (чекпоинты) через <see cref="IAudioTapeSaveService.Save"/>.
@@ -21,8 +21,6 @@ namespace Game.Scripts.Instructions.Controllers
     [JDIMonoController(Context = typeof(GlobalBean))]
     public class AudioTapeSaveController : MonoBehaviour, IAudioTapeSaveService, ISequence
     {
-        private const string SaveFolderName = "Saves";
-
         [Tooltip("Имя JSON-файла сохранения кассет (лежит в Application.persistentDataPath/Saves).")]
         [SerializeField] private string m_FileName = "audio_tapes.json";
         [Tooltip("Загружать сохранение при первом старте игровой сессии.")]
@@ -32,8 +30,8 @@ namespace Game.Scripts.Instructions.Controllers
 
         private bool m_IsStartLoadDone;
 
-        public string SavePath => Path.Combine(Application.persistentDataPath, SaveFolderName, m_FileName);
-        public bool HasSave => File.Exists(SavePath);
+        public string SavePath => JsonSaveFile.GetPath(m_FileName);
+        public bool HasSave => JsonSaveFile.Exists(m_FileName);
 
         public void MethodInit()
         {
@@ -70,30 +68,7 @@ namespace Game.Scripts.Instructions.Controllers
             data.CompletedTapeIds.AddRange(m_Registry.CompletedTapeIds);
             data.CompletedTapeIds.Sort(StringComparer.Ordinal);
 
-            string path = SavePath;
-            string tempPath = path + ".tmp";
-
-            try
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-                // Пишем во временный файл и подменяем им сохранение, чтобы падение посреди записи
-                // не оставило игрока с повреждённым файлом.
-                File.WriteAllText(tempPath, JsonUtility.ToJson(data, true));
-
-                if (File.Exists(path))
-                {
-                    File.Replace(tempPath, path, null);
-                }
-                else
-                {
-                    File.Move(tempPath, path);
-                }
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"[AudioTapeSaveController] Не удалось сохранить кассеты в '{path}': {exception}", this);
-            }
+            JsonSaveFile.TryWrite(m_FileName, data, this);
         }
 
         public bool Load()
@@ -104,28 +79,8 @@ namespace Game.Scripts.Instructions.Controllers
                 return false;
             }
 
-            string path = SavePath;
-
-            if (!File.Exists(path))
+            if (!JsonSaveFile.TryRead(m_FileName, out AudioTapeSaveData data, this))
             {
-                return false;
-            }
-
-            AudioTapeSaveData data;
-
-            try
-            {
-                data = JsonUtility.FromJson<AudioTapeSaveData>(File.ReadAllText(path));
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"[AudioTapeSaveController] Не удалось прочитать сохранение кассет '{path}': {exception}", this);
-                return false;
-            }
-
-            if (data == null)
-            {
-                Debug.LogError($"[AudioTapeSaveController] Сохранение кассет '{path}' пустое.", this);
                 return false;
             }
 
@@ -138,19 +93,7 @@ namespace Game.Scripts.Instructions.Controllers
         [ContextMenu("Delete Save")]
         public void DeleteSave()
         {
-            string path = SavePath;
-
-            try
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
-            catch (Exception exception)
-            {
-                Debug.LogError($"[AudioTapeSaveController] Не удалось удалить сохранение кассет '{path}': {exception}", this);
-            }
+            JsonSaveFile.Delete(m_FileName, this);
         }
 
         [ContextMenu("Load")]

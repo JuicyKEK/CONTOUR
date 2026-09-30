@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using Game.Scripts.Inventory.Runtime.Data.Interfaces;
 using Game.Scripts.Inventory.Runtime.View;
+using JuicyDI.Attributes;
 using UnityEngine;
 
 namespace Game.Scripts.Inventory.Controllers
 {
+    [JDIMonoController]
     public class InventoryViewController : MonoBehaviour
     {
         [SerializeField] private InventoryItemView m_InventoryItemViewPrefab;

@@ -43,5 +43,11 @@ namespace Game.Scripts.InfectionZone.Runtime.Interfaces
         /// Жёстко выставить степень заражения (используется тестовым инструментом в инспекторе).
         /// </summary>
         void SetInfection(float value);
+
+        /// <summary>
+        /// Восстановить степень заражения из сохранения. Если вызвано до старта зоны,
+        /// её стартовое значение из инспектора уже не применяется.
+        /// </summary>
+        void RestoreInfection(float value);
     }
 }
