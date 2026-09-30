@@ -38,6 +38,11 @@ namespace Game.Scripts.Instructions.Controllers
 
         [Header("Воспроизведение")]
         [SerializeField] private AudioSource m_AudioSource;
+        [Tooltip("Звук нажатия Play и перемотки - играет перед кассетой, пока догружается её аудио.")]
+        [SerializeField] private AudioClip m_RewindClip;
+        [Tooltip("Сколько секунд звук перемотки играет минимум, даже если аудио кассеты уже загружено " +
+                 "(чтобы звук нажатия кнопки успел проиграться).")]
+        [SerializeField, Min(0f)] private float m_MinRewindDuration = 1f;
 
         [Header("Игрок")]
         [Tooltip("Контроллер камеры игрока - на время открытой панели плеера его вращение блокируется.")]
@@ -51,6 +56,7 @@ namespace Game.Scripts.Instructions.Controllers
         private readonly Dictionary<string, AudioTapeDefinitionSO> m_TapesById = new();
         private bool m_IsOpen;
         private bool m_WasPlayingLastFrame;
+        private AudioTapePlayback m_Playback;
 
         public void MethodInit()
         {
@@ -58,6 +64,7 @@ namespace Game.Scripts.Instructions.Controllers
 
         public void MethodStart()
         {
+            m_Playback = new AudioTapePlayback(m_AudioSource, m_RewindClip, m_MinRewindDuration);
             CollectPagesAndTapes();
             RegistryCaseToStart();
             m_InputActions.AddPressingButtonTabAction(ToggleOpen);
@@ -152,16 +159,17 @@ namespace Game.Scripts.Instructions.Controllers
         /// <summary>
         /// Вызывается общей системой обновления (см. <see cref="IUpdateSequence"/>).
         /// Пока панель открыта - следит за естественным окончанием аудиофайла и прячет
-        /// кнопку паузы, когда проигрывание закончилось само по себе.
+        /// кнопку паузы, когда проигрывание закончилось само по себе (перемотка перед кассетой
+        /// проигрыванием считается, даже если звук перемотки уже кончился, а аудио ещё грузится).
         /// </summary>
         public void CustomUpdate()
         {
-            if (!m_IsOpen || m_AudioSource == null)
+            if (!m_IsOpen || m_Playback == null)
             {
                 return;
             }
 
-            bool isPlayingNow = m_AudioSource.isPlaying;
+            bool isPlayingNow = m_Playback.IsActive;
 
             if (m_WasPlayingLastFrame && !isPlayingNow)
             {
@@ -189,8 +197,8 @@ namespace Game.Scripts.Instructions.Controllers
 
             RefreshPage(m_View.SelectedPageIndex);
             m_View.SetVisible(true);
-            m_View.SetPauseButtonVisible(m_AudioSource != null && m_AudioSource.isPlaying);
-            m_WasPlayingLastFrame = m_AudioSource != null && m_AudioSource.isPlaying;
+            m_View.SetPauseButtonVisible(m_Playback.IsActive);
+            m_WasPlayingLastFrame = m_Playback.IsActive;
 
             if (m_PlayerMoveController != null)
             {
@@ -281,7 +289,10 @@ namespace Game.Scripts.Instructions.Controllers
                     }
 
                     bool isFound = m_Registry != null && m_Registry.IsTapeFound(tape.TapeId);
-                    tapeRows.Add(new CassetteTapeRowData(tape.TapeId, tape.DisplayName, isFound, tape.IsEvilCassette));
+                    bool isListened = m_Registry != null && m_Registry.IsTapeListened(tape.TapeId);
+                    bool isCompleted = m_Registry != null && m_Registry.IsTapeCompleted(tape.TapeId);
+                    tapeRows.Add(new CassetteTapeRowData(tape.TapeId, tape.DisplayName, isFound, isListened,
+                        tape.IsEvilCassette, isCompleted));
                 }
 
                 sections.Add(new CassetteSectionRowData(section.DisplayName, tapeRows));
@@ -294,14 +305,21 @@ namespace Game.Scripts.Instructions.Controllers
         {
             var tape = FindTapeById(tapeId);
 
-            if (tape == null || tape.Clip == null || m_AudioSource == null)
+            if (tape == null)
             {
                 return;
             }
 
-            m_AudioSource.Stop();
-            m_AudioSource.clip = tape.Clip;
-            m_AudioSource.Play();
+            // Метка "НОВОЕ" снимается при первом запуске кассеты - запоминаем это в реестре (и в сохранении).
+            m_Registry?.MarkTapeListened(tape.TapeId);
+
+            if (tape.Clip == null || m_AudioSource == null)
+            {
+                return;
+            }
+
+            // Сначала звук нажатия/перемотки, само аудио кассеты - после асинхронной загрузки.
+            m_Playback.Play(tape.Clip);
 
             m_View.SetPauseButtonVisible(true);
             m_WasPlayingLastFrame = true;
@@ -309,13 +327,15 @@ namespace Game.Scripts.Instructions.Controllers
 
         private void StopPlayback()
         {
-            if (m_AudioSource != null)
-            {
-                m_AudioSource.Stop();
-            }
+            m_Playback.Stop();
 
             m_View.SetPauseButtonVisible(false);
             m_WasPlayingLastFrame = false;
+        }
+
+        private void OnDestroy()
+        {
+            m_Playback?.Dispose();
         }
 
         private AudioTapeDefinitionSO FindTapeById(string tapeId)

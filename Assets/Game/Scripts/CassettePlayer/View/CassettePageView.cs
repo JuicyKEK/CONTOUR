@@ -60,8 +60,7 @@ namespace Game.Scripts.Instructions.View
                     tapeRow.gameObject.SetActive(true);
 
                     string tapeId = tapeData.TapeId;
-                    tapeRow.Setup(tapeData.DisplayName, tapeData.IsFound, tapeData.IsEvil,
-                        () => onTapeClicked?.Invoke(tapeId));
+                    tapeRow.Setup(tapeData, () => onTapeClicked?.Invoke(tapeId));
                 }
             }
 

@@ -51,8 +51,9 @@ MonoBehaviour:
   m_PanelRectTransform: {fileID: 0}
   m_Pages:
   - {fileID: 11400000, guid: 735f377518038f04690fe43a032ae83e, type: 2}
-  - {fileID: 11400000, guid: 30ff8f9b39c5e5d42b39017345ea9f37, type: 2}
   m_AudioSource: {fileID: 1741216471000346568}
+  m_RewindClip: {fileID: 8300000, guid: 66efaf306106a354f8178f2b2863282f, type: 3}
+  m_MinRewindDuration: 1
   m_CassettePlayerModel: {fileID: 0}
 --- !u!114 &4407189615993012632
 MonoBehaviour:

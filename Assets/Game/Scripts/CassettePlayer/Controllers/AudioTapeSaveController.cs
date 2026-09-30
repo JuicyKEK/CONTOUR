@@ -10,8 +10,8 @@ using UnityEngine;
 namespace Game.Scripts.Instructions.Controllers
 {
     /// <summary>
-    /// Сохранение полученных кассет в JSON-файл (Application.persistentDataPath/Saves).
-    /// Пишет/читает только Id кассет из <see cref="IAudioTapeFoundRegistry"/>.
+    /// Сохранение прогресса кассет в JSON-файл (Application.persistentDataPath/Saves).
+    /// Пишет/читает только Id найденных, прослушанных и выполненных кассет из <see cref="IAudioTapeFoundRegistry"/>.
     ///
     /// Сохранение вызывается снаружи (чекпоинты) через <see cref="IAudioTapeSaveService.Save"/>.
     /// Загрузка при старте - один раз за сессию, повторная (например, откат на чекпоинт) -
@@ -65,6 +65,10 @@ namespace Game.Scripts.Instructions.Controllers
             var data = new AudioTapeSaveData();
             data.FoundTapeIds.AddRange(m_Registry.FoundTapeIds);
             data.FoundTapeIds.Sort(StringComparer.Ordinal);
+            data.ListenedTapeIds.AddRange(m_Registry.ListenedTapeIds);
+            data.ListenedTapeIds.Sort(StringComparer.Ordinal);
+            data.CompletedTapeIds.AddRange(m_Registry.CompletedTapeIds);
+            data.CompletedTapeIds.Sort(StringComparer.Ordinal);
 
             string path = SavePath;
             string tempPath = path + ".tmp";
@@ -126,6 +130,8 @@ namespace Game.Scripts.Instructions.Controllers
             }
 
             m_Registry.RestoreFoundTapes(data.FoundTapeIds);
+            m_Registry.RestoreListenedTapes(data.ListenedTapeIds);
+            m_Registry.RestoreCompletedTapes(data.CompletedTapeIds);
             return true;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Game.Scripts.InputController;
+using Game.Scripts.Instructions.Interfaces;
 
 namespace Game.Scripts.Story
 {
@@ -18,6 +19,7 @@ namespace Game.Scripts.Story
         public ICutsceneDirector CutsceneDirector { get; }
         public ICameraDirector CameraDirector { get; }
         public IScreenFader ScreenFader { get; }
+        public IAudioTapeFoundRegistry AudioTapes { get; }
 
         private readonly Dictionary<string, object> m_Blackboard = new();
 
@@ -28,7 +30,8 @@ namespace Game.Scripts.Story
             IStoryHintView hintView,
             ICutsceneDirector cutsceneDirector,
             ICameraDirector cameraDirector,
-            IScreenFader screenFader)
+            IScreenFader screenFader,
+            IAudioTapeFoundRegistry audioTapes = null)
         {
             InputActions = inputActions;
             InputSelectionActions = inputSelectionActions;
@@ -37,6 +40,7 @@ namespace Game.Scripts.Story
             CutsceneDirector = cutsceneDirector;
             CameraDirector = cameraDirector;
             ScreenFader = screenFader;
+            AudioTapes = audioTapes;
         }
 
         public void SetControlEnabled(bool isEnabled)

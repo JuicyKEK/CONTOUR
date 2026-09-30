@@ -5,7 +5,8 @@ namespace Game.Scripts.Instructions.Data
 {
     /// <summary>
     /// Сохраняемое состояние кассет - то, что пишется в JSON-файл (через <see cref="UnityEngine.JsonUtility"/>).
-    /// Хранятся только Id кассет, которые игрок уже получил.
+    /// Хранятся только Id кассет: полученных игроком, уже прослушанных (без метки "НОВОЕ")
+    /// и тех, задачи из которых уже выполнены.
     /// </summary>
     [Serializable]
     public class AudioTapeSaveData
@@ -18,5 +19,7 @@ namespace Game.Scripts.Instructions.Data
         public int Version = CurrentVersion;
 
         public List<string> FoundTapeIds = new();
+        public List<string> ListenedTapeIds = new();
+        public List<string> CompletedTapeIds = new();
     }
 }
