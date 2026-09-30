@@ -1,5 +1,6 @@
 ﻿using System;
 using Game.Scripts.InputController;
+using Game.Scripts.Instructions.Interfaces;
 using Game.Scripts.Story;
 using UnityEngine;
 
@@ -21,6 +22,7 @@ namespace GBS
         [SerializeField] private bool m_RequireCutsceneDirector;
         [SerializeField] private bool m_RequireCameraDirector;
         [SerializeField] private bool m_RequireScreenFader;
+        [SerializeField] private bool m_RequireAudioTapes;
 
         public virtual StoryContext Build(GBSDependencyResolver resolver)
         {
@@ -40,7 +42,8 @@ namespace GBS
                 resolver.Resolve<IStoryHintView>(m_RequireHintView),
                 resolver.Resolve<ICutsceneDirector>(m_RequireCutsceneDirector),
                 resolver.Resolve<ICameraDirector>(m_RequireCameraDirector),
-                resolver.Resolve<IScreenFader>(m_RequireScreenFader));
+                resolver.Resolve<IScreenFader>(m_RequireScreenFader),
+                resolver.Resolve<IAudioTapeFoundRegistry>(m_RequireAudioTapes));
         }
     }
 }

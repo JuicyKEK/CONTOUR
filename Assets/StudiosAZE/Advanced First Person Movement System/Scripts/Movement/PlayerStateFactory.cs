@@ -11,6 +11,8 @@ namespace AZE.AdvancedFirstPerson
         public PlayerBaseState Dodge { get; private set; }
         public PlayerBaseState Jump { get; private set; }
         public PlayerBaseState Air { get; private set; }
+        public PlayerBaseState Mouse { get; private set; }
+        public PlayerBaseState Stop { get; private set; }
 
         public PlayerStateFactory(PlayerMovementStateMachine currentContext)
         {
@@ -22,6 +24,8 @@ namespace AZE.AdvancedFirstPerson
             Dodge = new PlayerDodgeState(_context, this);
             Jump = new PlayerJumpState(_context, this);
             Air = new PlayerAirState(_context, this);
+            Mouse = new PlayerMouseState(_context, this);
+            Stop = new PlayerStopState(_context, this);
         }
     }
 }

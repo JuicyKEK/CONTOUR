@@ -16,6 +16,7 @@ namespace AZE.AdvancedFirstPerson
         [SerializeField] private PlayerInputHandler inputHandler;
 
         private float _cameraPitch = 0f;
+        private bool _cameraActive = true;
 
         private void Awake()
         {
@@ -30,6 +31,11 @@ namespace AZE.AdvancedFirstPerson
 
         private void HandleRotation()
         {
+            if (!_cameraActive)
+            {
+                return;
+            }
+            
             Vector2 lookInput = inputHandler.LookInput;
             if (lookInput.sqrMagnitude < 0.0001f) return;
 
@@ -58,6 +64,11 @@ namespace AZE.AdvancedFirstPerson
             _cameraPitch = Mathf.Clamp(_cameraPitch, TopClamp, BottomClamp);
 
             CameraTransform.localRotation = Quaternion.Euler(_cameraPitch, 0f, 0f);
+        }
+
+        public void SetCameraActive(bool active)
+        {
+            _cameraActive = active;
         }
     }
 }
