@@ -30,6 +30,7 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         [Inject] private IInfectionZoneRegistry m_Registry;
 
         private readonly ReactiveProperty<float> m_InfectionLevel = new(0f);
+        private bool m_IsLevelRestored;
 
         public string ZoneId => m_ZoneId;
         public string DisplayName => string.IsNullOrEmpty(m_DisplayName) ? m_ZoneId : m_DisplayName;
@@ -37,12 +38,19 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
 
         public void MethodInit()
         {
-            m_InfectionLevel.Value = Mathf.Clamp(m_StartInfectionLevel, 0f, 100f);
+            // Регистрируемся уже в MethodInit: InfectionZoneSaveController в своём MethodInit (он идёт позже)
+            // восстанавливает уровень зоны из сохранения до того, как в MethodStart применится стартовый.
+            m_Registry?.RegisterZone(this);
         }
 
         public void MethodStart()
         {
-            m_Registry?.RegisterZone(this);
+            // Стартовый уровень - только если уровень не пришёл из сохранения. Иначе подписчики (например
+            // прогрессия аномалий, которая аномалии только открывает) успели бы отреагировать на стартовое значение.
+            if (!m_IsLevelRestored)
+            {
+                SetInfection(m_StartInfectionLevel);
+            }
         }
 
         private void OnDestroy()
@@ -76,6 +84,12 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         public void SetInfection(float value)
         {
             m_InfectionLevel.Value = Mathf.Clamp(value, 0f, 100f);
+        }
+
+        public void RestoreInfection(float value)
+        {
+            m_IsLevelRestored = true;
+            SetInfection(value);
         }
     }
 }

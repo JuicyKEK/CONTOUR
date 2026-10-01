@@ -15,6 +15,8 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
     {
         private readonly Dictionary<string, IInfectionZone> m_ZonesById = new();
 
+        public IReadOnlyCollection<IInfectionZone> Zones => m_ZonesById.Values;
+
         public IInfectionZone GetZone(string zoneId)
         {
             if (string.IsNullOrEmpty(zoneId))

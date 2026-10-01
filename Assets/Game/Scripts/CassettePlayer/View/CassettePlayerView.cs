@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JuicyDI.Attributes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +10,9 @@ namespace Game.Scripts.Instructions.View
     /// Чисто визуальная панель кассетного плеера: тоглы страниц, сами страницы (ScrollView с разделами
     /// и кассетами) и кнопка паузы по центру (видна только когда что-то проигрывается). Ничего не решает
     /// сама - только предоставляет примитивы управления, вызывается из
-    /// <see cref="Controllers.CassettePlayerController"/>.
+    /// <see cref="Controllers.CassettePlayerController"/> (получает вид через [Inject]).
     /// </summary>
+    [JDIMonoController]
     public class CassettePlayerView : MonoBehaviour
     {
         [Header("Корень панели")]
@@ -62,6 +64,18 @@ namespace Game.Scripts.Instructions.View
                 {
                     SetPauseButtonVisible(false);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Немедленно пересчитывает вёрстку панели (после открытия/смены страницы, чтобы layout-группы
+        /// не отрисовали один кадр со старыми размерами).
+        /// </summary>
+        public void RebuildLayout()
+        {
+            if (m_Root != null && m_Root.transform is RectTransform rootRect)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
             }
         }
 

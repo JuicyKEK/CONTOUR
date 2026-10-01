@@ -1,4 +1,6 @@
-﻿namespace Game.Scripts.InfectionZone.Runtime.Interfaces
+﻿using System.Collections.Generic;
+
+namespace Game.Scripts.InfectionZone.Runtime.Interfaces
 {
     /// <summary>
     /// Глобальный реестр всех зон заражения на сцене.
@@ -7,6 +9,11 @@
     /// </summary>
     public interface IInfectionZoneRegistry
     {
+        /// <summary>
+        /// Все зарегистрированные сейчас зоны (используется сохранением).
+        /// </summary>
+        IReadOnlyCollection<IInfectionZone> Zones { get; }
+
         /// <summary>
         /// Найти зону по её идентификатору. Возвращает null, если зона с таким Id не найдена.
         /// </summary>

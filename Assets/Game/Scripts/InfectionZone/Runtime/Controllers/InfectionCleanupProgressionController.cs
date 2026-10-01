@@ -32,6 +32,8 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
 
         [Header("Случайные аномалии (появляются после обязательных, порядок перемешан)")]
         [SerializeField] private GameObject[] m_RandomPoolAnomalies;
+        
+        [SerializeField] private bool m_DisableAfterUse = false;
 
         private readonly CompositeDisposable m_Disposables = new();
 
@@ -40,6 +42,7 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         private bool[] m_Revealed;
         private float m_ThresholdSize;
         private int m_TotalCount;
+        private int m_MandatoryCount;
 
         private void Awake()
         {
@@ -88,6 +91,8 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         {
             m_OrderedSlots = new List<GameObject>();
 
+            m_MandatoryCount = m_MandatoryAnomalies?.Length ?? 0;
+
             if (m_MandatoryAnomalies != null)
             {
                 m_OrderedSlots.AddRange(m_MandatoryAnomalies);
@@ -120,9 +125,17 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         }
 
         /// <summary>
-        /// Пересчитывает, сколько слотов должно быть открыто при текущей степени заражения,
-        /// и активирует ещё не показанные аномалии по порядку. Уже показанные аномалии
-        /// автоматически не скрываются - это может сделать только сама аномалия при очистке.
+        /// Пересчитывает, сколько слотов должно быть открыто при текущей степени заражения.
+        ///
+        /// Обычный режим (m_DisableAfterUse == false): просто активирует все слоты в пределах
+        /// окна activeCount - ранее очищенные объекты (как обязательные, так и случайные)
+        /// могут появляться снова, повторно пересекая свой порог заражения.
+        ///
+        /// Режим m_DisableAfterUse == true: однажды показанный ОБЯЗАТЕЛЬНЫЙ слот блокируется
+        /// навсегда и больше не учитывается и не активируется повторно (считается "использованным").
+        /// Если из-за этого свободных обязательных слотов не хватает, чтобы набрать нужное
+        /// количество activeCount, остаток добирается из случайного пула. Случайные слоты
+        /// блокировке не подлежат никогда - ведут себя как в обычном режиме.
         /// </summary>
         private void UpdateSlots(float infectionLevel)
         {
@@ -137,7 +150,38 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                 0,
                 m_TotalCount);
 
-            for (int i = 0; i < activeCount; i++)
+            if (!m_DisableAfterUse)
+            {
+                for (int i = 0; i < activeCount; i++)
+                {
+                    if (m_OrderedSlots[i] != null)
+                    {
+                        m_OrderedSlots[i].SetActive(true);
+                    }
+                }
+
+                return;
+            }
+
+            int mandatoryCount = Mathf.Min(m_MandatoryCount, m_TotalCount);
+
+            // Сколько обязательных слотов ещё не заблокировано (не было показано ранее).
+            int availableMandatoryCount = 0;
+            for (int i = 0; i < mandatoryCount; i++)
+            {
+                if (!m_Revealed[i])
+                {
+                    availableMandatoryCount++;
+                }
+            }
+
+            int neededFromMandatory = Mathf.Min(activeCount, availableMandatoryCount);
+            int neededFromRandom = Mathf.Max(0, activeCount - availableMandatoryCount);
+
+            // Активируем первые ещё не заблокированные обязательные слоты по порядку
+            // и сразу же помечаем их как использованные - больше они не активируются.
+            int activatedMandatory = 0;
+            for (int i = 0; i < mandatoryCount && activatedMandatory < neededFromMandatory; i++)
             {
                 if (m_Revealed[i])
                 {
@@ -145,10 +189,26 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                 }
 
                 m_Revealed[i] = true;
+                activatedMandatory++;
 
                 if (m_OrderedSlots[i] != null)
                 {
                     m_OrderedSlots[i].SetActive(true);
+                }
+            }
+
+            // Недостающее количество добираем из случайного пула - он никогда не блокируется,
+            // поэтому просто активируем нужное число слотов по порядку, не трогая m_Revealed.
+            int randomCount = m_TotalCount - mandatoryCount;
+            int takeFromRandom = Mathf.Min(neededFromRandom, randomCount);
+
+            for (int i = 0; i < takeFromRandom; i++)
+            {
+                int index = mandatoryCount + i;
+
+                if (m_OrderedSlots[index] != null)
+                {
+                    m_OrderedSlots[index].SetActive(true);
                 }
             }
         }
