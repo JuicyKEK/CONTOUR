@@ -13,7 +13,10 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [Tooltip("Необязательно: если по пути к этой точке бот должен пройти через дверь, укажите её здесь - бот попробует её открыть/подождать, если заперта (см. NpcTypeDefinitionSO.CanOpenDoors).")]
         public MonoBehaviour DoorToPass; // должен реализовывать IInteractionDoor
 
-        [Tooltip("Необязательно: если задан - при достижении этой точки бот один раз вызовет ArrivalEventChannel.Raise() (полезно для сюжетных триггеров вида 'бот дошёл до точки X').")]
+        [Tooltip("Необязательно: сигнал сюжета при достижении этой точки (для сюжетных триггеров вида 'бот дошёл до точки X').")]
+        [StoryKey(StoryKeyKind.Signal)] public string ArrivalSignal;
+
+        [Tooltip("Устаревший SO-канал (используйте ArrivalSignal): при достижении точки бот вызовет ArrivalEventChannel.Raise().")]
         public StoryEventChannelSO ArrivalEventChannel;
 
         public IInteractionDoor ResolveDoor() => DoorToPass as IInteractionDoor;

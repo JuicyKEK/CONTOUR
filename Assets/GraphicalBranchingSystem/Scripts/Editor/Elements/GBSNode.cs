@@ -76,6 +76,37 @@ namespace GBS.Elements
             {
                 styleSheets.Add(styleSheet);
             }
+
+            // Нажатия в текстовых полях ноды не должны доходить до горячих клавиш GraphView
+            // (пробел - окно создания ноды, A/O/[ ] - перемещение камеры).
+            RegisterCallback<KeyDownEvent>(StopFromTextFields);
+
+            // То же для команд: Ctrl+C / Ctrl+V / Ctrl+D в текстовом поле работают с текстом,
+            // а не копируют/вставляют ноды.
+            RegisterCallback<ValidateCommandEvent>(StopFromTextFields);
+            RegisterCallback<ExecuteCommandEvent>(StopFromTextFields);
+        }
+
+        private void StopFromTextFields(EventBase evt)
+        {
+            if (IsInsideTextField(evt.target as VisualElement))
+            {
+                evt.StopPropagation();
+            }
+        }
+
+        private bool IsInsideTextField(VisualElement target)
+        {
+            for (var element = target; element != null && element != this; element = element.parent)
+            {
+                // Класс есть у всех текстовых полей: TextField, FloatField, IntegerField...
+                if (element.ClassListContains(TextField.ussClassName) || element.ClassListContains("unity-base-text-field"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Строит UI ноды. Вызывается после LoadFrom.</summary>
@@ -83,6 +114,11 @@ namespace GBS.Elements
 
         /// <summary>Сериализует ноду в данные графа.</summary>
         public abstract GBSNodeData Save();
+
+        /// <summary>Освобождает ресурсы редактора ноды (вызывается при удалении ноды / очистке окна).</summary>
+        public virtual void Dispose()
+        {
+        }
 
         /// <summary>Заполняет ноду из сохранённых данных (до Draw).</summary>
         public virtual void LoadFrom(GBSNodeData data)

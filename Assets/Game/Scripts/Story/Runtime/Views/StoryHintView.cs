@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using JuicyDI.Attributes;
@@ -8,8 +8,7 @@ using UnityEngine;
 namespace Game.Scripts.Story
 {
     /// <summary>
-    /// Нижняя текстовая подсказка. Регистрируется как SceneBean и
-    /// внедряется в StoryManager через [Inject] IStoryHintView.
+    /// Нижняя текстовая подсказка. Регистрируется как SceneBean и используется только через интерфейс
     /// </summary>
     [JDIMonoController]
     public class StoryHintView : MonoBehaviour, IStoryHintView
@@ -17,8 +16,18 @@ namespace Game.Scripts.Story
         [SerializeField] private GameObject m_Root;
         [SerializeField] private TMP_Text m_Text;
 
+        // Номер последнего показа: таймер старой подсказки не должен скрыть уже новую.
+        private int m_ShowVersion;
+
         public async UniTask ShowAsync(string text, float duration, CancellationToken token)
         {
+            if (m_Root == null || m_Text == null)
+            {
+                Debug.LogWarning($"[Story] StoryHintView '{name}': не назначены Root или Text - подсказка не видна.", this);
+            }
+
+            int version = ++m_ShowVersion;
+
             if (m_Text != null)
             {
                 m_Text.text = text;
@@ -31,11 +40,22 @@ namespace Game.Scripts.Story
 
             try
             {
-                await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token);
+                if (float.IsPositiveInfinity(duration))
+                {
+                    // Без таймера: до отмены токена (например, пока сюжет не уйдёт с ноды).
+                    await UniTask.WaitUntilCanceled(token);
+                }
+                else
+                {
+                    await UniTask.Delay(TimeSpan.FromSeconds(duration), cancellationToken: token);
+                }
             }
             finally
             {
-                Hide();
+                if (version == m_ShowVersion)
+                {
+                    Hide();
+                }
             }
         }
 
@@ -48,4 +68,3 @@ namespace Game.Scripts.Story
         }
     }
 }
-

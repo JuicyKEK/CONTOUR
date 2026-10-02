@@ -17,13 +17,13 @@ namespace Game.Scripts.InfectionZone.External.Controllers
     /// Бин сцены: при перезагрузке сцены (откат на чекпоинт) зоны создаются заново и снова получают
     /// уровни из файла.
     ///
-    /// Сохранение вызывается снаружи (чекпоинты) через <see cref="IInfectionZoneSaveService.Save"/>.
-    /// Уровни зон, которых сейчас нет на сцене (другие локации), из файла не теряются.
+    /// Сохранение вызывается общим контроллером сохранений (GameSaveController, ISaveParticipant) на
+    /// чекпоинтах. Уровни зон, которых сейчас нет на сцене (другие локации), из файла не теряются.
     /// Для проверки в Play Mode методы доступны из контекстного меню компонента.
     /// </summary>
     [JDIMonoController]
     [SequenceParticipant(15)]
-    public class InfectionZoneSaveController : MonoBehaviour, IInfectionZoneSaveService, ISequence
+    public class InfectionZoneSaveController : MonoBehaviour, IInfectionZoneSaveService, ISaveParticipant, ISequence
     {
         [Tooltip("Имя JSON-файла сохранения зон (лежит в Application.persistentDataPath/Saves).")]
         [SerializeField] private string m_FileName = "infection_zones.json";

@@ -9,10 +9,11 @@ namespace GBS
     /// Проект может добавить свой компонент-наследник рядом с GBSStarter
     /// (или подменить его в рантайме через GBSStarter.SetContextProvider),
     /// чтобы собрать контекст из других зависимостей / моков / заглушек.
+    /// Состояние сюжета (<paramref name="state"/>) нужно передать в контекст как есть - им владеет
+    /// GBSStarter (сохраняет его и отдаёт сцене как IStoryState).
     /// </summary>
     public abstract class GBSStoryContextProvider : MonoBehaviour
     {
-        public abstract StoryContext CreateContext(GBSDependencyResolver resolver);
+        public abstract StoryContext CreateContext(GBSDependencyResolver resolver, StoryState state);
     }
 }
-

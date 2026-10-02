@@ -1,23 +1,26 @@
-﻿# GBS — руководство пользователя (RU)
+# GBS — руководство пользователя (RU)
 
 > English version: `GBS_MANUAL_EN.md`
 
-GBS (Graphical Branching System) — визуальный однонаправленный граф сюжета.
-Сюжет собирается мышкой в окне графа: ноды-этапы, действия при входе, условия перехода и рёбра
-между ними. Условия и действия — это готовые ScriptableObject-ассеты из папки `Assets/Story`.
+GBS (Graphical Branching System) — визуальный граф сюжета. Сюжет собирается мышкой в окне графа:
+ноды-этапы, действия при входе, условия переходов и рёбра между ними. Графов сколько угодно:
+основной сюжет, его главы/этапы, побочные микро-сюжеты, сюжетные нападения монстров.
+
+Главное в v3.0:
+
+- **действия и условия живут прямо в нодах** — без отдельного SO-ассета на каждую подсказку/задержку;
+- **связь с миром — через состояние сюжета по ключам** (сигналы и флаги) вместо SO-каналов;
+  ключи выбираются из одного каталога, события не теряются и сохраняются;
+- **реакции сцены** — один компонент со списком «ключ → UnityEvent» вместо пары
+  «SO + слушатель» на каждый шаг.
 
 ---
 
-## 0. Проверка, что установлена актуальная версия
+## 0. Проверка версии
 
-Открой `UnityDev → GBS → Open Graph`. В правой части тулбара должна быть надпись **`GBS v2.7`**.
-Если её нет — Unity не пересобрала скрипты:
-
-1. Переключись в окно Unity (пересборка запускается при фокусе).
-2. `Edit → Preferences → Asset Pipeline → Auto Refresh` должен быть включён, либо жми `Ctrl+R`.
-3. Проверь Console: если есть ошибки компиляции, Unity продолжает работать на **старой** сборке,
-   и все новые ноды/кнопки будут выглядеть по-старому.
-4. Закрой и заново открой окно графа (ноды строятся в момент создания, старое окно не перерисуется).
+`UnityDev → GBS → Open Graph` — справа в тулбаре должна быть надпись **`GBS v3.2`**.
+Если её нет — Unity не пересобрала скрипты: переключись в окно Unity (или `Ctrl+R`), проверь
+Console на ошибки компиляции, переоткрой окно графа.
 
 ---
 
@@ -26,24 +29,26 @@ GBS (Graphical Branching System) — визуальный однонаправл
 | Слой | Где лежит | Что делает |
 |------|-----------|------------|
 | Модель графа | `GraphicalBranchingSystem/Scripts/Runtime/Data` | `GBSGraphSO` — ассет графа: ноды + рёбра |
-| Исполнение | `Scripts/Runtime/Core` | `GBSGraphRunner` (проигрывание), `GBSBoolEvaluator` (булева логика), `GBSStarter` (компонент сцены) |
-| Сейвы | `Scripts/Runtime/Save` | `GBSSaveSystem` — JSON-прогресс |
-| Редактор | `Scripts/Editor` | окно графа, ноды, сохранение/загрузка, импорт старого Story |
-| Контент | `Assets/Story` | `StoryAction` / `StoryCondition` / каналы / сервисы (см. раздел 6) |
+| Шаги графа | `Scripts/Runtime/Steps` | Встроенные действия (`GBSAction`) и условия (`GBSCondition`) |
+| Исполнение | `Scripts/Runtime/Core` | `GBSStarter` (компонент сцены), `GBSGraphRunner`, `GBSBoolEvaluator` |
+| Сейвы | `Scripts/Runtime/Save` | JSON-прогресс графов + состояние сюжета |
+| Редактор | `Scripts/Editor` | Окно графа, ноды, импорт старого Story |
+| Состояние сюжета | `Assets/Game/Scripts/Story/Runtime/Core` | `StoryState` / `IStoryState` — сигналы и флаги по ключам |
+| Ключи | `Assets/Game/Scripts/Story/Runtime/Keys` | `StoryKeyCatalogSO` (каталог), атрибут `[StoryKey]` (выпадающий список) |
+| Связь со сценой | `Assets/Game/Scripts/Story/Runtime/Scene` | `StorySceneReactions`, `StorySignalEmitter`, `StoryTriggerZone`, `DoorStoryFlagBridge` |
 
 ---
 
-## 2. Быстрый старт за 6 шагов
+## 2. Быстрый старт
 
-1. `UnityDev → GBS → Open Graph`.
-2. ПКМ по пустому месту → `Add Node/Start`, затем `Add Node/Story` и `Add Node/End`.
-3. Соедини: `Start.Out → Story.In`, затем выход условия перехода Story-ноды → `End.In`.
-4. В Story-ноде разверни `On Enter Actions`, нажми `Add Action`, положи туда, например,
-   `ShowHintAction` (создаётся через `Create → Story/Actions/Show Hint`).
-5. В строке условия перехода положи `StoryCondition` — например `InputButtonCondition` (клавиша F).
-6. Впиши имя в поле `File Name:` и нажми `Save`. Ассет графа появится в
-   `Assets/GraphicalBranchingSystem/Graphs/`. Положи его в список `Graphs` компонента `GBSStarter`
-   на сцене — сюжет заработает при запуске игры.
+1. Создай каталог ключей: `Create → Story/Story Key Catalog` (или он создастся сам при первом
+   нажатии `+` у поля ключа — `Assets/Game/SO/Story/StoryKeys.asset`).
+2. `UnityDev → GBS → Open Graph`. ПКМ по полотну → `Add Node/Start`, `Add Node/Story`, `Add Node/End`.
+3. Соедини `Start.Out → Story.In`, выход перехода Story-ноды → `End.In`.
+4. В Story-ноде: `On Enter Actions → Add Action → UI/Show Hint`, впиши текст прямо в ноде.
+5. В строке перехода нажми `None` → `Input/Button Pressed` → выбери кнопку `F`.
+6. `File Name:` → `Save`. Граф появится в `Assets/GraphicalBranchingSystem/Graphs/`.
+7. На сцене: объект с `GBSStarter`, граф — в его список `Graphs`. Готово.
 
 ---
 
@@ -51,274 +56,302 @@ GBS (Graphical Branching System) — визуальный однонаправл
 
 | Элемент тулбара | Назначение |
 |-----------------|------------|
-| `File Name:` | Имя ассета графа. Если оно отличается от ассета в поле `Graph:`, `Save` создаст **новый** граф |
-| `Graph:` | Ассет `GBSGraphSO`, с которым работаем (для `Load` и перезаписи) |
-| `Save` | Сохранить текущее полотно в ассет |
-| `Load` | Загрузить ассет из поля `Graph:` в окно |
-| `New` | Очистить полотно и начать новый граф |
-| `Clear Saves` | Удалить игровой сейв прогресса (`gbs_story_save.json`) |
-| `GBS v2.7` | Версия окна |
+| `File Name:` | Имя ассета графа. Если отличается от ассета в поле `Graph:`, `Save` создаст **новый** граф |
+| `Graph:` | Ассет `GBSGraphSO`, с которым работаем |
+| `Save` / `Load` / `New` | Сохранить полотно в ассет / загрузить ассет / очистить полотно |
+| `Clear Saves` | Удалить игровой сейв прогресса |
 
-Действия на полотне:
-
-- **Создать ноду:** ПКМ → `Add Node/...` или пробел (окно поиска).
-- **Удалить ноду/ребро:** выделить → `Delete`.
-- **Соединить:** тянуть от выходного порта к входному. Flow-порты соединяются только с flow,
-  булевы — только с булевыми.
-- **Двойной клик по ассету `GBSGraphSO`** в Project открывает граф в окне.
-- **ПКМ по Story/End-ноде** содержит дубли кнопок: `GBS/Add Transition`, `GBS/Remove Last Transition`,
-  `GBS/Add Action`, `GBS/Remove Last Action`, `GBS/Add Event`, `GBS/Remove Last Event`.
+- **Создать ноду:** ПКМ → `Add Node/...` или пробел.
+- **Удалить:** выделить → `Delete`. **Соединить:** тянуть от выхода ко входу (flow — с flow, bool — с bool).
+- **Копировать / вставить:** `Ctrl+C` / `Ctrl+X` / `Ctrl+V` / `Ctrl+D` (дублировать) или ПКМ → `Copy` / `Cut` / `Paste` / `Duplicate`.
+  Копируются ноды со всеми действиями и условиями и связи между выделенными нодами. `Paste` ставит ноды под курсор,
+  `Duplicate` — рядом с оригиналом. Вставлять можно и в другой граф. Вторая `Start`-нода в граф не вставляется.
+- **Двойной клик по `GBSGraphSO`** открывает граф в окне.
+- Изменения попадают в ассет **только по `Save`**.
 
 ---
 
-## 4. Ноды и все их поля
+## 4. Ноды
 
-### 4.1. Start (старт графа)
+### 4.1. Start
+`Start If` (вход, bool): пусто — граф стартует сразу, подключено — ждёт, пока выражение станет истинным.
+`Out` (flow) — первая нода сюжета.
 
-| Порт/поле | Тип | Описание |
-|-----------|-----|----------|
-| `Start If` | вход, bool | Условие старта. **Пусто → граф стартует сразу.** Если подключено выражение — граф ждёт, пока оно станет истинным |
-| `Out` | выход, flow | Первая нода сюжета |
+### 4.2. Story
+- `In` — единственный вход (сколько угодно рёбер).
+- **`On Enter Actions`** — список действий. `Add Action` открывает меню типов; у каждого действия
+  заголовок (клик — сменить тип), `↑ ↓` — порядок, `X` — удалить. Поля редактируются прямо в ноде.
+- **Переходы**: `Add Transition`; в строке — имя, `X`, выходной порт; под ней — условие `If`
+  (`None` — переход сразу).
 
-Типовое использование: подключить `Graph Completed` (порт `Value`) → `Start If`, чтобы микро-сюжет
-стартовал только после завершения основного.
+Как работает:
+1. Вход в ноду → действия выполняются **по очереди, с ожиданием** каждого.
+2. Затем нода ждёт условия переходов параллельно; побеждает выполнившееся первым.
+3. **При одновременной готовности побеждает верхний переход** — так строится ветвление:
+   сверху `Story State/Flag Is ...`, внизу переход без условия («иначе»).
+4. Ошибка в одном действии пишется в Console и не останавливает сюжет.
 
-### 4.2. Story (сюжетная нода)
+### 4.3. End
+`On Complete Actions` выполняются, затем граф помечается пройденным (видно нодам `Graph Completed`
+других графов, попадает в сейв).
 
-Поля:
+### 4.4. Condition
+Встроенное условие → булев выход `Value`. Значение **защёлкивается**: сработав, остаётся `true`
+до сброса прогресса. Ожидание стартует лениво — когда значение впервые понадобилось.
+Пустое условие не срабатывает никогда (для «всегда истинно» — `Flow/Always True`).
 
-| Элемент | Описание |
-|---------|----------|
-| Имя (текст в заголовке) | Только для читаемости и логов |
-| `In` (вход, flow) | **Единственный вход ноды.** Принимает сколько угодно рёбер |
-| `On Enter Events` (список `GBSEvent`) | Мгновенные события-«выстрелы», поднимаются при входе. `Add Event` / `X` |
-| `On Enter Actions` (список `StoryAction`) | Действия, выполняются **строго по очереди с ожиданием** каждого. `Add Action` / `X` |
-| `Add Transition` | Добавляет условие перехода |
-| Строка условия перехода | имя · `X` · **выход, flow**; под строкой - поле `StoryCondition` |
+### 4.5. Boolean Operation
+`And`, `Or`, `Not`, `Nand`, `Nor`, `Xor`, `Xnor`; `+`/`-` — число входов. Неподключённые входы
+игнорируются; без подключённых — `false`; `Not` инвертирует первый подключённый.
 
-Порядок работы в рантайме:
+### 4.6. Graph Completed
+Поле `GBSGraphSO` (пусто = выполнено). Два способа использования:
 
-1. Вход в ноду → поднимаются все `GBSEvent`.
-2. Последовательно выполняются все `StoryAction` (каждый — с `await`).
-3. Проверяются условия перехода:
-   - если какое-то условие **уже выполнено** на момент проверки — переход происходит немедленно;
-   - иначе все условия ждут параллельно, побеждает **выполнившееся первым**, остальные отменяются.
-4. Сюжет уходит **по ребру, выходящему из победившего условия**.
-
-Источник условия для строки перехода - только поле `StoryCondition` в этой строке.
-
-* поле заполнено - переход ждёт выполнения этого условия;
-* поле пустое - переход срабатывает мгновенно (ветка «по умолчанию»).
-
-Булевых входов у переходов больше нет: вход в Story-ноду ровно один - flow-порт `In`.
-Составные условия («И», «ИЛИ») собираются ассетами `AllOfCondition` / `AnyOfCondition`.
-
-> Ветку «по умолчанию» ставь **последней** в списке — при одновременной готовности побеждает та,
-> что выше по списку.
-
-### 4.3. End (финал графа)
-
-| Элемент | Описание |
-|---------|----------|
-| `In` (вход, flow) | Приход сюда завершает граф |
-| `On Complete Events` (список `GBSEvent`) | Поднимаются при завершении. `Add Event` / `X` |
-
-После входа в End граф помечается пройденным — это состояние видят ноды `Graph Completed`
-других графов и оно попадает в сейв.
-
-### 4.4. Condition (условие как булев сигнал)
-
-| Элемент | Описание |
-|---------|----------|
-| Поле `StoryCondition` | Любой ассет-условие из `Assets/Story` |
-| `Value` (выход, bool) | `true`, как только условие сработало. Подключается к `Start If` или к входам `Boolean Operation` |
-
-Особенность: значение **защёлкивается**. Один раз сработав, оно остаётся `true` до сброса прогресса
-(`ClearProgress` / `Clear Saves`). Именно это позволяет строить `AND`, `NOT` и сохранять состояние.
-Ожидание условия стартует лениво — в момент, когда выражение впервые понадобилось.
-
-### 4.5. Boolean Operation (булева алгебра)
-
-| Элемент | Описание |
-|---------|----------|
-| Выпадающий список | `And`, `Or`, `Not`, `Nand`, `Nor`, `Xor`, `Xnor` |
-| `-` / `+` | Убрать/добавить вход (от 1 до 16) |
-| `In 0..N` (входы, bool) | Операнды |
-| `Value` (выход, bool) | Результат |
-
-Правила: неподключённые входы игнорируются; если подключённых входов нет — результат `false`.
-`Not` инвертирует **первый** подключённый вход.
-
-### 4.6. Graph Completed (завершён ли другой граф)
-
-| Элемент | Описание |
-|---------|----------|
-| Поле `GBSGraphSO` | Целевой граф. **Если пусто — считается выполненным** (то есть ожидания нет) |
-| `In` (вход, flow) | Позволяет вставить ноду в середину сюжета |
-| `Out` (выход, flow) | Куда идти после завершения целевого графа |
-| `Value` (выход, bool) | `true`, если целевой граф пройден |
-
-Два способа применения:
-
-- **как условие:** `Value` → `Start If` стартовой ноды;
-- **как ожидание в потоке:** сюжет приходит по `In`, нода ждёт завершения указанного графа,
-  затем сюжет продолжается по `Out`.
+- **`Value` (bool-выход)** — «указанный граф пройден». Тянется в `Start If` Start-ноды (этот граф стартует
+  после другого) или во входы `Logic`-ноды (`AND`/`OR`...). Не нужен — не подключай.
+- **`In`/`Out` (flow)** — ожидание завершения другого графа прямо в потоке сюжета: сюжет входит в ноду,
+  ждёт и идёт дальше по `Out`.
 
 ---
 
-## 5. `GBSEvent` vs `StoryAction` vs `StoryCondition`
+## 5. Встроенные шаги
 
-| | `GBSEvent` (`Create → GBS/Events/New Base Event`) | `StoryAction` (`Create → Story/Actions/...`) | `StoryCondition` (`Create → Story/Conditions/...`) |
-|---|---|---|---|
-| Что это | Простой SO-сигнал «событие произошло» | SO-действие с логикой и **ожиданием** | SO-условие: «жди, пока…» |
-| Время выполнения | Мгновенно, fire-and-forget | Может занимать время (`await`): фейд, таймлайн, подсказка | Ждёт сколько угодно |
-| Кто слушает | Компонент `UnityGameEventListener` на сцене (`UnityEvent` в инспекторе) | Никто, действие само что-то делает | Раннер графа |
-| Где в ноде | `On Enter Events` (Story), `On Complete Events` (End) | `On Enter Actions` | Поле `Condition` строки перехода / нода `Condition` |
-| Когда использовать | Дёрнуть сценный скрипт «здесь и сейчас» (открыть дверь, включить свет) | Нужен сценарий с длительностью и порядком | Нужно дождаться игрока/события/таймера |
+### 5.1. Действия (`On Enter Actions`, `On Complete Actions`)
 
-Коротко: **события — «крикнуть на сцену», действия — «сделать и дождаться», условия — «дождаться и пойти дальше»**.
+| Меню | Поля | Что делает |
+|------|------|------------|
+| `UI/Show Hint` | Text, Until Node Exit, Duration, Wait Until Hidden | Подсказка внизу экрана (`IStoryHintView`). `Until Node Exit` — держать, пока не сработает переход ноды; иначе — `Duration` секунд. `Wait Until Hidden` — не выполнять следующие действия, пока подсказка не скроется (подсказку не удерживает) |
+| `Player/Set Player Control` | Is Enabled | Вкл/выкл управление: движение и обзор (`FirstPersonController`) и взаимодействие (`PlayerInteractiveController`) — все `IPlayerControlHandle`. Кнопки ввода (`Input/Button Pressed`, Tab) продолжают работать |
+| `Camera/Blend Camera` | Camera Key, Fade Duration | Затемнение → камера по ключу (`CameraDirector`) → осветление |
+| `Camera/Play Timeline` | Timeline, Wait For Completion | Катсцена через `CutsceneDirector` |
+| `Flow/Wait Seconds` | Seconds | Пауза между действиями |
+| `Story State/Set Flag` | Key, Value | Флаг состояния сюжета (сохраняется) |
+| `Story State/Raise Signal` | Key | Сигнал (например разбудить ветку другого графа) |
+| `Scene/Invoke Scene Reaction` | Key | Вызвать реакции сцены с ключом (`StorySceneReactions`) |
+| `Save/Save Game` | — | Чекпоинт: сохранить всю игру через `GameSaveController` (см. раздел 10) |
+| `Audio Tapes/Mark Tape Completed` | Tape | Метка «выполнено» у кассеты |
+| `Legacy/...` | ассет | Старый SO `StoryAction` / `GBSEvent` (для своих SO без аналога) |
 
----
+### 5.2. Условия (переходы, нода Condition)
 
-## 6. Каталог ScriptableObject из `Assets/Story`
-
-### 6.1. Действия (`StoryAction`) — кладутся в `On Enter Actions`
-
-| Ассет | Меню создания | Поля | Что делает |
-|-------|---------------|------|------------|
-| `SetPlayerControlAction` | `Story/Actions/Set Player Control` | `Is Enabled` | Включает/выключает управление игрока (все `IPlayerControlHandle`) |
-| `CameraBlendAction` | `Story/Actions/Blend Camera` | `Target Camera Key`, `Fade Duration` | Затемнение → переключение камеры по ключу (`CameraDirector`) → осветление |
-| `PlayTimelineAction` | `Story/Actions/Play Timeline` | `Timeline` (PlayableAsset), `Wait For Completion` | Проигрывает катсцену через `CutsceneDirector`; при `Wait For Completion` ждёт конца |
-| `ShowHintAction` | `Story/Actions/Show Hint` | `Text`, `Duration`, `Wait Until Hidden` | Показывает подсказку через `StoryHintView` |
-| `SetBlackboardFlagAction` | `Story/Actions/Set Blackboard Flag` | `Key`, `Value` | Пишет флаг в blackboard контекста (читается `BlackboardFlagCondition`, попадает в сейв) |
-| `RaiseEventChannelAction` | `Story/Actions/Raise Event Channel` | `Channel` (`StoryEventChannelSO`) | «Стреляет» в канал события — его ждёт `StoryEventCondition` в другой ветке/графе |
-| `UnityEventAction` | `Story/Actions/Unity Event` | — | Вызывает подписчиков. На сцене вешается `StoryEventChannelListener` с этим же ассетом, и уже там настраивается `UnityEvent` на сценные объекты |
-
-### 6.2. Условия (`StoryCondition`) — кладутся в строку перехода или в ноду `Condition`
-
-| Ассет | Меню создания | Поля | Когда срабатывает |
-|-------|---------------|------|-------------------|
-| `AlwaysTrueCondition` | `Story/Conditions/Always True` | — | Мгновенно |
-| `DelayCondition` | `Story/Conditions/Delay` | `Seconds` | Через N секунд после начала ожидания |
-| `InputButtonCondition` | `Story/Conditions/Input Button Pressed` | `Button` (`F`, `E`, `R`, `Tab`, `MouseLeftDown`, `MouseLeftUp`, `ESC`) | По нажатию клавиши игроком |
-| `StoryEventCondition` | `Story/Conditions/Story Event` | `Event Channel` (`StoryEventChannelSO`) | При `Raise()` канала (из `RaiseEventChannelAction` или из геймплейного скрипта) |
-| `BoolChannelCondition` | `Story/Conditions/Bool Channel State` | `Channel` (`StoryBoolChannelSO`), `Expected Value` | Мгновенно, если канал уже равен `Expected Value`, иначе — при следующем совпадении |
-| `BlackboardFlagCondition` | `Story/Conditions/Blackboard Flag` | `Key`, `Expected Value` | **Только мгновенная проверка**: если флаг уже нужный — срабатывает, иначе не срабатывает никогда. Использовать в связке с другими условиями |
-| `AllOfCondition` | `Story/Conditions/Composite/All Of` | `Conditions[]` | Когда выполнились все вложенные |
-| `AnyOfCondition` | `Story/Conditions/Composite/Any Of` | `Conditions[]` | Когда выполнилось любое вложенное |
-
-> `AllOf` / `AnyOf` — это «логика внутри ассета». В графе то же самое нагляднее делается нодой
-> `Boolean Operation` (и там доступны `Not`, `Xor`, `Nand`, `Nor`).
-
-### 6.3. Каналы и сценные мосты
-
-| Ассет/компонент | Меню/место | Поля | Назначение |
-|-----------------|-----------|------|------------|
-| `StoryEventChannelSO` | `Story/Events/Story Event Channel` | — | Одноразовый сигнал: сцена → сюжет и обратно |
-| `StoryBoolChannelSO` | `Story/Events/Bool State Channel` | `Default Value` | «Живое» bool-состояние (дверь открыта, рубильник поднят). Подписка сразу отдаёт текущее значение |
-| `StoryEventChannelListener` | компонент сцены | `Channel` (`UnityEventAction`), `On Raised` (`UnityEvent`) | Мост: действие `UnityEventAction` из ноды → методы сценных объектов |
-| `StoryBoolChannelListener` | компонент сцены | `Channel`, `Push Initial Value On Enable`, `Initial Value` | Мост: сценный источник → `StoryBoolChannelSO`. Методы `SetValue(bool)` / `ChangeValue()` можно дёргать из `UnityEvent` источника |
-| `DoorOpenStateToBoolChannelBridge` | компонент сцены | `Door`, `Field` (`IsOpen`/`IsLocked`), `Channel` | Готовый мост от двери проекта к bool-каналу |
-| `UnityGameEventListener` (GBS) | компонент сцены | `Event` (`GBSEvent`), `Response` (`UnityEvent`) | Мост: `GBSEvent` из ноды → методы сценных объектов |
-
-### 6.4. Сервисы и вью (компоненты сцены, нужны действиям)
-
-| Компонент | Поля | Кому нужен |
-|-----------|------|-----------|
-| `CameraDirector` | `Cameras[]` — пары `Key` + `Camera` | `CameraBlendAction` (по `Target Camera Key`) |
-| `CutsceneDirector` | `Director` (`PlayableDirector`) | `PlayTimelineAction` |
-| `StoryHintView` | `Root` (GameObject), `Text` (`TMP_Text`) | `ShowHintAction` |
-| `ScreenFaderView` | `Canvas Group` | `CameraBlendAction` (fade) |
-| Реализации `IPlayerControlHandle` | — | `SetPlayerControlAction` |
-
-Все они помечены `[JDIMonoController]` и приходят в граф через JuicyDI — просто положи их на сцену.
-
-### 6.5. Легаси (старая механика Story)
-
-| Ассет/компонент | Статус |
-|-----------------|--------|
-| `StoryNodeSO` (`Story/Story Node`), `StoryBranch` | Заменены Story-нодой графа. Нужны только для импорта |
-| `StoryManager` | Заменён `GBSStarter`. Не держи оба на сцене одновременно |
-
-Импорт: выдели стартовую `StoryNodeSO` в Project → `UnityDev → GBS → Import Story From StoryNodeSO`.
-Получишь граф с расставленными нодами, Start и End; ассеты действий и условий переиспользуются.
+| Меню | Поля | Когда выполнено |
+|------|------|-----------------|
+| `Flow/Always True` | — | Сразу |
+| `Time/After Delay` | Seconds | Через N секунд после начала ожидания |
+| `Input/Button Pressed` | Button | Игрок нажал кнопку |
+| `Story State/Signal Raised` | Key, Only After Node Enter | Пришёл сигнал (по умолчанию — после входа в ноду; иначе — хоть раз за игру) |
+| `Story State/Flag Is` | Key, Expected | Флаг равен нужному (если уже равен — сразу) |
+| `Story State/Value Compare` | Key, Comparison, Value | Значение ключа (счётчик/флаг) удовлетворяет сравнению |
+| `Logic/All Of`, `Logic/Any Of` | Conditions | Все / любое из вложенных условий |
+| `Legacy/Story Condition Asset` | ассет | Старый SO `StoryCondition` |
 
 ---
 
-## 7. Компонент сцены `GBSStarter`
+## 6. Состояние сюжета и ключи
+
+`StoryState` хранит целые значения по строковым ключам:
+
+- **сигнал** (`Signal`) — счётчик событий: «игрок вошёл в комнату», «NPC поймал игрока»;
+- **флаг** (`Flag`) — да/нет: «дверь открыта», «игрок взял задание».
+
+Что выбрать: **сигнал** — событие, которое сюжет ждёт *сейчас* («игрок нажал на рацию»): каждое срабатывание —
+новое, `Signal Raised` по умолчанию реагирует только на сигналы после входа в ноду, а `Value Compare` может
+считать срабатывания («нашёл ≥ 3»). **Флаг** — факт, который пригодится *потом* или для ветвления («взял ключ»):
+`Flag Is` выполнен сразу, если флаг уже стоит, а повторная запись того же значения ничего не меняет.
+
+Почему это лучше SO-каналов:
+
+- **событие не теряется** — если игрок открыл дверь раньше, чем сюжет начал это ждать, значение
+  уже в состоянии; `Signal Raised` с выключенным `Only After Node Enter` или `Flag Is` сработают сразу;
+- **сохраняется** вместе с прогрессом графов — после загрузки сюжет знает, что уже случилось;
+- **нелинейность**: выбор игрока записывается флагом и читается любым графом (`Flag Is`, `Value Compare`).
+
+**Ключи** — строки, но выбираются из каталогов `StoryKeyCatalogSO` (один на проект или по одному на главу).
+У каждого поля ключа: `▾` — выбрать ключ: **сначала каталог, потом ключ из него**; `+` — добавить введённый
+ключ (появляется, только если ключа нет ни в одном каталоге — защита от опечаток; при нескольких каталогах
+спросит, в какой). Подсказка поля показывает каталог ключа. Внутри каталога группируй ключи через `/`:
+`Door_1_3/Entered` → подменю. Ключи в сюжете **общие**: одинаковый ключ в двух каталогах — один и тот же
+флаг/сигнал (подсказка поля предупредит), поэтому давай ключам уникальные имена, например с префиксом главы.
+
+---
+
+## 7. Связь со сценой
+
+### Мир → сюжет
+| Способ | Как |
+|--------|-----|
+| `StorySignalEmitter` | Компонент с ключом; из любого UnityEvent вызвать `Raise()` / `SetFlagTrue()` / `SetFlagFalse()` |
+| `StorySignalInteract` | На объект с `IInteraction` (дверь, кассета, предмет, NPC): игрок нажал E → сигнал или флаг. Без UnityEvent — объект оповещает `PlayerInteractiveController`. Срабатывает на каждую попытку (и на запертую дверь); результат — через мосты вроде `DoorStoryFlagBridge` |
+| `StoryTriggerZone` | Триггер-зона: игрок вошёл → сигнал и/или флаг. При добавлении сам ставит `Is Trigger` и слой `Ignore Raycast` |
+| `DoorStoryFlagBridge` | Держит флаг равным состоянию двери (открыта / заперта) |
+| NPC | Поля сигналов у `NpcController` (поймал игрока, начал погоню), `NpcDocumentCheckBehaviour`, точки `NpcPatrolRoute` (`ArrivalSignal`) |
+| Код | `[Inject] IStoryState` (`RaiseSignal`, `SetFlag`) или `StorySignals.Raise(key)` там, где сюжета на сцене может не быть |
+
+### Сюжет → мир
+`StorySceneReactions` — список «ключ → UnityEvent». Один компонент может держать все реакции
+главы/локации: включить объекты, забрать управление, скомандовать NPC/монстрам (`ForceChase`,
+`SetAggressiveOn`, `SetPatrolRoute`, `ForceIdle`...), проиграть анимацию. В графе —
+`Scene/Invoke Scene Reaction` с тем же ключом. Реакций с одним ключом может быть несколько (на разных
+компонентах/сценах) — вызываются все.
+
+`IStoryState` отдаёт `GBSStarter` — без него на сцене `StorySignalEmitter`/`StoryTriggerZone` пишут
+ошибку DI.
+
+---
+
+## 8. Свои действия и условия
+
+Новый шаг = `[Serializable]` класс-наследник. Он сам появится в меню ноды; путь задаёт `GBSMenu`.
+Сервисы сцены — через `context.Resolve<T>()` (любой бин JuicyDI), без правок `StoryContext`.
+
+```csharp
+[Serializable, GBSMenu("Monsters/Start Attack")]
+public class StartMonsterAttack : GBSAction
+{
+    [SerializeField] private string m_GroupId;
+
+    public override UniTask ExecuteAsync(StoryContext context, CancellationToken token)
+    {
+        context.Resolve<IMonsterDirector>()?.StartAttack(m_GroupId);
+        return UniTask.CompletedTask;
+    }
+}
+```
+
+Условие — наследник `GBSCondition` с `WaitAsync(GBSConditionContext, token)`; для условий по
+состоянию сюжета есть готовый помощник `WaitStateAsync(state, predicate, token)`.
+Важно: **не переименовывай и не переноси** классы шагов в другой namespace без `[MovedFrom]` — граф
+хранит имя типа.
+
+---
+
+## 9. Компонент `GBSStarter`
 
 | Поле | Описание |
 |------|----------|
-| `Graphs` | Список ассетов `GBSGraphSO`: большой сюжет + микро-сюжеты |
-| `Load On Start` | Загружать сохранённый прогресс при старте |
-| `Auto Save On Node Enter` | Автосейв при входе в каждую ноду и при завершении графа |
+| `Graphs` | Ассеты графов: большой сюжет + микро-сюжеты. Все запускаются одновременно; с `Start If` — ждут |
+| `Load On Start` | Загрузить прогресс при старте |
+| `Context Provider` | Обычно пусто. Свой наследник `GBSStoryContextProvider`, если нужно полностью подменить контекст (тесты, заглушки) |
+| `Context Builder` | Стандартная сборка контекста. Сервисы (подсказка, камеры, ввод…) берутся из JuicyDI в момент обращения; галочки — проверка на старте: ошибка в Console, если отмеченного сервиса нет |
 
-Все графы запускаются одновременно; те, у кого `Start If` подключён, ждут своё условие.
-Публичные методы (и контекстное меню компонента): `Save Progress`, `Load Progress`, `Clear Progress`.
-
----
-
-## 8. Сейвы
-
-- Файл: `%UserProfile%/AppData/LocalLow/<Company>/<Product>/gbs_story_save.json`
-  (точный путь: `UnityDev → GBS → Saves → Show Save Path`).
-- Что сохраняется: текущая нода каждого графа, флаг завершённости, защёлкнутые условия,
-  булевы флаги blackboard.
-- Очистка: `UnityDev → GBS → Saves → Clear Saves`, кнопка `Clear Saves` в окне графа или
-  `GBSStarter.ClearProgress()`.
+Методы (и контекстное меню): `Save Progress`, `Load Progress`, `Clear Progress`.
+Не держи на одной сцене `GBSStarter` и старый `StoryManager`.
 
 ---
 
-## 9. Рецепты
+## 10. Сейвы
 
-**Развилка «выполнил / отказался / проигнорировал»**
-Три условия перехода в Story-ноде: `StoryEventCondition` (квест сдан), `InputButtonCondition` (отказ),
-`DelayCondition` (таймаут). Из каждой строки — своё ребро в свою ноду.
+Сохранение **не автоматическое** — только по вызову, на чекпоинтах. За него отвечает общий
+`GameSaveController` (вешается один раз на сцену): `SaveGame()` обходит все механики, которые
+участвуют в сейвах (`ISaveParticipant`): сюжет GBS, кассеты, зоны заражения. Новая механика попадает
+в пул автоматически — достаточно реализовать `ISaveParticipant` у её бина JuicyDI.
 
-**«Дверь открыта И игрок нажал F»**
-Ноды `Condition` (`BoolChannelCondition` двери) и `Condition` (`InputButtonCondition`) → нода
-`Boolean Operation` (`And`) → её `Value` в `Start If` (гейт графа).
-В строке перехода тот же смысл даёт ассет `AllOfCondition` с двумя вложенными условиями.
+Как сохранить:
+- **из сюжета** — действие `Save/Save Game` в ноде-чекпоинте;
+- **из кода** — `[Inject] IGameSaveService` → `SaveGame()`;
+- **вручную** — контекстное меню компонента `GameSaveController` → `Save Game`.
 
-**«Игрок НЕ взял задание»**
-`Condition` (`StoryEventCondition` «взял задание») → `Boolean Operation` (`Not`) → `Start If` микро-графа.
-Не забудь второе условие-таймер, иначе `Not` истинен сразу.
+Загрузка — при старте сцены, каждая механика сама (у `GBSStarter` — `Load On Start`).
+Вернуться к чекпоинту = перезагрузить сцену.
 
-**Микро-сюжет после основного**
-В микро-графе: нода `Graph Completed` с ассетом основного графа → `Value` → `Start If` его `Start`-ноды.
-Оба графа положи в `Graphs` у `GBSStarter`.
-
-**Пауза посреди сюжета до конца другого графа**
-Вставь ноду `Graph Completed` прямо в поток: `Story.выход → GraphCompleted.In`, `GraphCompleted.Out → следующая Story`.
+- Файлы: `Application.persistentDataPath/Saves/` (`gbs_story_save.json` — сюжет).
+- Сюжет сохраняет: текущую ноду каждого графа, завершённость, защёлкнутые условия, **состояние сюжета**.
+- Прогресс графа запоминается на ноде, где выполнялось сохранение: после загрузки сюжет продолжит
+  с неё и заново выполнит **её** действия. Удобно делать отдельную ноду-чекпоинт с `Save Game` первым действием.
+- Удалить все сейвы: `UnityDev → Saves → Delete All Saves`; открыть папку: `UnityDev → Saves → Open Saves Folder`.
+  Только сюжет: `UnityDev → GBS → Saves → Clear Saves`.
 
 ---
 
-## 10. Траблшутинг
+## 11. Рецепты
+
+**Ветвление по выбору игрока.** В ноде выбора — переходы `Input/Button Pressed` (согласился → `Set Flag
+TookTask = true`) и `After Delay` (проигнорировал). Позже, в любом графе: два перехода —
+сверху `Flag Is TookTask = true`, снизу без условия («иначе»).
+
+**«Дверь открыта И игрок нажал F».** Переход с условием `Logic/All Of` из `Flag Is Door_Open` и
+`Button Pressed F`; или ноды `Condition` → `Boolean Operation (And)` → `Start If` графа.
+
+**Сюжетное нападение монстров.** Отдельный граф «Нападение»: `Start If` ← `Graph Completed` главы /
+`Condition (Signal Raised Alpha/Alarm)`. Ноды: `Invoke Scene Reaction Attack_Start` (на сцене —
+`SetAggressiveOn`, `ForceChase` монстров) → переходы `Signal Raised Npc_PlayerCaught` (проигрыш) /
+`Flag Is Generator_On` (отбился) → `Invoke Scene Reaction Attack_End` (`ForceIdle`).
+У монстра в `NpcController` — ключ `Player Caught Signal = Npc_PlayerCaught`.
+
+**Микро-сюжет после основного.** В микро-графе `Graph Completed` (основной граф) → `Start If`.
+
+**Пауза до конца другого графа.** `Graph Completed` прямо в потоке: `Story → GraphCompleted.In`,
+`GraphCompleted.Out → следующая Story`.
+
+---
+
+## 12. Переезд со старого Story (StoryNodeSO + SO-каналы)
+
+1. Выдели стартовую `StoryNodeSO` → `UnityDev → GBS → Import Story From StoryNodeSO`.
+   Получишь граф, где подсказки/задержки/камера/кнопки — уже встроенные шаги, а SO-каналы
+   стали ключами `Legacy/<имя ассета>` (они сразу добавлены в каталог).
+2. На сцене замени `StoryManager` на `GBSStarter` и положи граф в `Graphs`.
+3. **Сцену переделывать не нужно** — работают мосты:
+   - `StoryEventChannelSO.Raise()` дополнительно поднимает сигнал `Legacy/<имя>`;
+   - `StoryBoolChannelSO.SetValue()` пишет флаг `Legacy/<имя>`;
+   - `StoryEventChannelListener` отвечает на `Invoke Scene Reaction Legacy/<имя UnityEventAction>`.
+4. Дальше по шагу за раз: перенеси UnityEvent слушателя в `StorySceneReactions` под нормальным
+   ключом, замени `Raise` канала на `StorySignalEmitter`, поменяй ключ в графе — и удали SO-ассеты.
+
+Старые графы (v2.x) открываются как есть: при загрузке в окно SO-действия/условия переносятся во
+встроенные шаги; после `Save` старые поля очищаются. Не пересохранённый граф тоже работает в игре.
+
+---
+
+## 13. Траблшутинг
 
 | Симптом | Причина / решение |
 |---------|-------------------|
-| Нет надписи `GBS v2.7`, ноды выглядят по-старому | Unity не пересобрала скрипты: `Ctrl+R`, включить Auto Refresh, проверить Console, переоткрыть окно |
-| Кнопки `X` / `Add ...` не реагируют | Используй ПКМ по ноде → `GBS/...` (те же действия) и убедись, что версия `v2.7` |
-| Сюжет не стартует | Нет `Start`-ноды; `Start.Out` ни с чем не соединён; граф не добавлен в `Graphs`; граф уже помечен пройденным в сейве (`Clear Saves`) |
-| Сюжет встал на ноде | Ни одно условие не выполнилось, либо у победившего условия нет ребра — смотри Warning в Console |
-| Условие «залипло» истинным | Ноды `Condition` защёлкиваются по дизайну; сбрось прогресс (`Clear Saves` / `ClearProgress`) |
-| `BlackboardFlagCondition` никогда не срабатывает | Он проверяет флаг только в момент входа; комбинируй его через `Boolean Operation` с ожидающим условием |
+| Нет `GBS v3.2` | Unity не пересобрала скрипты: `Ctrl+R`, Console, переоткрыть окно |
+| `Save Game`: «нет GameSaveController» | Повесь `GameSaveController` на сцену |
+| В меню `Add Action` нет моего шага | Класс должен быть `[Serializable]`, не абстрактный, с конструктором без параметров |
+| Сюжет не стартует | Нет Start-ноды / `Start.Out` не соединён / граф не в `Graphs` / граф уже пройден в сейве (`Clear Saves`) |
+| Сюжет встал на ноде | Ни одно условие не выполнилось или у победившего перехода нет ребра — Warning в Console |
+| `Invoke Scene Reaction`: «нет реакций с ключом» | Нет `StorySceneReactions` с этим ключом на загруженных сценах, или опечатка |
+| Ошибка DI у `StorySignalEmitter` / `StoryTriggerZone` | На сцене нет `GBSStarter` |
+| У поля ключа видна кнопка `+` | Ключа нет в каталоге — опечатка или новый ключ (нажми `+`) |
+| Условие «залипло» истинным | Ноды `Condition` защёлкиваются по дизайну; `Clear Saves` |
+| `Show Hint`: «нет IStoryHintView» / ошибки JuicyDI `Can not resolve` | Префаб `StoryHintView` должен лежать под Canvas сцены. Если корень с `JDI` уходит в `DontDestroyOnLoad` (`DontDestroer`), нужна актуальная версия `MainJDIController` — она регистрирует и объекты исходной сцены |
+| Подсказка не видна, в Console «не назначены Root или Text» | В `StoryHintView` не заполнены поля — возьми префаб `Prefabs/Story/StoryHintView` |
+| `Blend Camera`: «нет камеры с ключом» | Добавь камеру с этим ключом в `CameraDirector` (и камеру игрока — чтобы вернуться на неё) |
 
-## 11. Что нового в v2.7
-- Строка условия перехода перестроена в две линии, чтобы ничего не выходило за границы ноды:
-  - верхняя: имя перехода - `X` (удалить) - **выходной порт** (ребро на следующую ноду);
-  - нижняя: подпись `Condition` и поле `StoryCondition` (кружок выбора ассета теперь всегда внутри ноды).
-- Все поля ассетов стали сжимаемыми (flex-shrink), кнопки `X` имеют фиксированную ширину 22 px
-  и больше не могут быть обрезаны рамкой ноды.
-- В каждом списке (`On Enter Events`, `On Enter Actions`, `On Complete Events`) у строки есть `X`,
-  а рядом с кнопкой `Add ...` появилась кнопка `X` - "удалить последний элемент".
-- End-нода: список `On Complete Events` с добавлением и удалением элементов.
-- Story-нода: кнопка `Add Transition` и рядом `X` - удалить последний переход.
-- Минимальная ширина нод увеличена (260 px, секция переходов - 300 px).
+---
 
-## 12. Что нового в v2.7
-- У переходов убран булев вход `If`. **Вход в Story-ноду теперь ровно один** - flow-порт `In`.
-- Строка перехода: имя · `X` · выходной flow-порт, под строкой - поле `StoryCondition`.
-- Пустое поле `StoryCondition` = мгновенный переход. Составные условия собираются ассетами `AllOfCondition` / `AnyOfCondition`.
-- Булевы выходы нод `Condition` / `Boolean Operation` / `Graph Completed` теперь применяются для `Start If` и как операнды других логических нод.
-- Старые графы грузятся без ошибок: рёбра, ведшие в удалённые порты `If`, пропускаются при загрузке.
+## 14. Что нового в v3.2
+
+- В окне графа работают `Copy` / `Cut` / `Paste` / `Duplicate` для нод (горячие клавиши и меню ПКМ).
+- `Show Hint`: галочка `Until Node Exit` — подсказка держится, пока не сработает переход ноды.
+- Выбор ключа: сначала каталог `StoryKeyCatalogSO`, потом ключ; `+` спрашивает каталог; подсказка поля — каталог ключа.
+- `StorySignalInteract`: сигнал/флаг сюжету при взаимодействии игрока с любым `IInteraction`, без UnityEvent.
+- Контекст сюжета больше не запоминает сервисы на старте: подсказка, камеры, ввод берутся из JuicyDI в момент
+  обращения — находятся, даже если сцена с ними загрузилась позже `GBSStarter`.
+- `Set Player Control` выключает и движение/обзор игрока (`FirstPersonController` — теперь `IPlayerControlHandle`).
+- `Show Hint`: новая подсказка больше не скрывается таймером предыдущей.
+- `Blend Camera` / `CameraDirector`: неизвестный ключ камеры больше не выключает все камеры (чёрный экран) — Warning.
+
+## 15. Что нового в v3.1
+
+- Исправлено: поля встроенных действий/условий в нодах не редактировались.
+- Нажатия в текстовых полях нод больше не срабатывают как горячие клавиши графа (пробел и т.п.).
+- Автосейв при входе в ноду убран: сохранение только по вызову через общий `GameSaveController`;
+  в графе — действие `Save/Save Game`.
+- Меню `UnityDev → Saves`: удалить все сохранения, открыть папку сохранений.
+
+## 16. Что нового в v3.0
+
+- Действия и условия — встроенные шаги прямо в нодах (`[SerializeReference]`), меню типов, `↑ ↓ X`.
+- Состояние сюжета (сигналы/флаги по ключам) вместо SO-каналов; сохраняется в сейв.
+- Каталог ключей + выпадающий список `[StoryKey]` с проверкой опечаток.
+- `StorySceneReactions`, `StorySignalEmitter`, `StoryTriggerZone`, `DoorStoryFlagBridge`; ключи сигналов у NPC.
+- `context.Resolve<T>()` — любые сервисы в своих шагах без правок `StoryContext`.
+- End-нода: `On Complete Actions` вместо `GBSEvent`.
+- При одновременной готовности переходов побеждает верхний (раньше переход без условия
+  срабатывал всегда, даже если верхний уже выполнен).
+- Ошибка в действии не останавливает граф. Сейв — атомарная запись в `Saves/`.
+- Импортёр переносит старый сюжет во встроенные шаги; мосты `Legacy/<имя>` для старой сцены.
+- Исправлено: `UnityGameEventListener` не отписывался в `OnDisable`.

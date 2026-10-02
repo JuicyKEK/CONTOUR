@@ -1,4 +1,5 @@
 ﻿using Game.Scripts.NPC.Runtime.Core;
+using Game.Scripts.Story;
 
 namespace Game.Scripts.NPC.Runtime.States
 {
@@ -130,6 +131,7 @@ namespace Game.Scripts.NPC.Runtime.States
             // во время этого вызова. Поэтому нельзя переиспользовать захваченные до
             // Raise() значения route/index ниже - нужно перечитать их заново.
             var reachedPoint = routeBeforeEvent.Points[blackboard.CurrentPatrolIndex];
+            StorySignals.Raise(reachedPoint.ArrivalSignal);
             reachedPoint.ArrivalEventChannel?.Raise();
 
             // Перечитываем маршрут и индекс ПОСЛЕ события - если Raise() подменил

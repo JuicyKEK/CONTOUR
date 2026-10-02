@@ -14,9 +14,11 @@ namespace Game.Scripts.Utilities.Save
     {
         public const string SaveFolderName = "Saves";
 
+        public static string FolderPath => Path.Combine(Application.persistentDataPath, SaveFolderName);
+
         public static string GetPath(string fileName)
         {
-            return Path.Combine(Application.persistentDataPath, SaveFolderName, fileName);
+            return Path.Combine(FolderPath, fileName);
         }
 
         public static bool Exists(string fileName)

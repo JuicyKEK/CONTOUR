@@ -1,0 +1,190 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: StoryTestScene
+  m_EditorClassIdentifier: Assembly-CSharp::GBS.Data.GBSGraphSO
+  m_GraphId: 2db17333-bc68-4fe8-ad46-ad08a9a88a9d
+  m_GraphName: StoryTestScene
+  m_Nodes:
+  - rid: 4597201109614330184
+  - rid: 4597201109614330185
+  - rid: 4597201109614330186
+  - rid: 4597201109614330187
+  - rid: 4597201109614330188
+  - rid: 4597201109614330189
+  m_Edges:
+  - m_FromNodeId: 2a7cd2c0-3243-4811-9bc4-8a912134226c
+    m_FromPortId: out
+    m_ToNodeId: fc04ada3-3953-42d0-8b49-b4b2019205b8
+    m_ToPortId: in
+  - m_FromNodeId: fc04ada3-3953-42d0-8b49-b4b2019205b8
+    m_FromPortId: def5cac0-d094-4e96-bac9-dc83470c63a2
+    m_ToNodeId: 4518230e-4a48-4a0c-b2eb-d60eb1503edd
+    m_ToPortId: in
+  - m_FromNodeId: 4518230e-4a48-4a0c-b2eb-d60eb1503edd
+    m_FromPortId: f61d668a-7847-4a75-a2fe-986eaf2006ae
+    m_ToNodeId: 4fcae2f2-e62e-44c9-a833-286c6adb6c6c
+    m_ToPortId: in
+  - m_FromNodeId: 4518230e-4a48-4a0c-b2eb-d60eb1503edd
+    m_FromPortId: 602f9a79-b7ce-4518-a7ef-05c25c9c9368
+    m_ToNodeId: ba00a7d2-e63b-41c3-9272-414199cd6131
+    m_ToPortId: in
+  - m_FromNodeId: ba00a7d2-e63b-41c3-9272-414199cd6131
+    m_FromPortId: def5cac0-d094-4e96-bac9-dc83470c63a2
+    m_ToNodeId: a3632729-76ed-49e5-b8f9-79443c33f39f
+    m_ToPortId: in
+  - m_FromNodeId: 4fcae2f2-e62e-44c9-a833-286c6adb6c6c
+    m_FromPortId: def5cac0-d094-4e96-bac9-dc83470c63a2
+    m_ToNodeId: a3632729-76ed-49e5-b8f9-79443c33f39f
+    m_ToPortId: in
+  references:
+    version: 2
+    RefIds:
+    - rid: 4597201109614330184
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 2a7cd2c0-3243-4811-9bc4-8a912134226c
+        m_NodeName: Start
+        m_Position: {x: 200, y: 221}
+    - rid: 4597201109614330185
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: a3632729-76ed-49e5-b8f9-79443c33f39f
+        m_NodeName: End
+        m_Position: {x: 2235, y: 237}
+        m_OnCompleteActions:
+        - rid: 4597201109614330190
+        m_OnCompleteEvents: []
+    - rid: 4597201109614330186
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: fc04ada3-3953-42d0-8b49-b4b2019205b8
+        m_NodeName: StoryNode
+        m_Position: {x: 713, y: 72}
+        m_Actions:
+        - rid: 4597201109614330191
+        m_Branches:
+        - m_Id: def5cac0-d094-4e96-bac9-dc83470c63a2
+          m_BranchName: Transition 1
+          m_InlineCondition:
+            rid: 4597201109614330192
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614330187
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 4518230e-4a48-4a0c-b2eb-d60eb1503edd
+        m_NodeName: StoryNode
+        m_Position: {x: 1178, y: 72}
+        m_Actions:
+        - rid: 4597201109614330193
+        m_Branches:
+        - m_Id: f61d668a-7847-4a75-a2fe-986eaf2006ae
+          m_BranchName: Next
+          m_InlineCondition:
+            rid: 4597201109614330194
+          m_Condition: {fileID: 0}
+        - m_Id: 602f9a79-b7ce-4518-a7ef-05c25c9c9368
+          m_BranchName: Transition 2
+          m_InlineCondition:
+            rid: 4597201109614330195
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614330188
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 4fcae2f2-e62e-44c9-a833-286c6adb6c6c
+        m_NodeName: StoryNode
+        m_Position: {x: 1741, y: -73}
+        m_Actions:
+        - rid: 4597201109614330196
+        m_Branches:
+        - m_Id: def5cac0-d094-4e96-bac9-dc83470c63a2
+          m_BranchName: Transition 1
+          m_InlineCondition:
+            rid: 4597201109614330197
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614330189
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: ba00a7d2-e63b-41c3-9272-414199cd6131
+        m_NodeName: StoryNode
+        m_Position: {x: 1741, y: 491}
+        m_Actions:
+        - rid: 4597201109614330198
+        m_Branches:
+        - m_Id: def5cac0-d094-4e96-bac9-dc83470c63a2
+          m_BranchName: Transition 1
+          m_InlineCondition:
+            rid: 4597201109614330199
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614330190
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST END
+        m_UntilNodeExit: 0
+        m_Duration: 8
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614330191
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST1
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614330192
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 4
+    - rid: 4597201109614330193
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST BUTTON
+        m_UntilNodeExit: 1
+        m_Duration: 4
+        m_WaitUntilHidden: 1
+    - rid: 4597201109614330194
+      type: {class: InputPressed, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Button: 3
+    - rid: 4597201109614330195
+      type: {class: InputPressed, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Button: 0
+    - rid: 4597201109614330196
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST BUTTON TAB
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614330197
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 4
+    - rid: 4597201109614330198
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST BUTTON F
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614330199
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 4

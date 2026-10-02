@@ -11,6 +11,10 @@ namespace GBS.EditorTools
     /// Конвертер старого сюжета (цепочка StoryNodeSO) в граф GBS.
     /// Выделите стартовую StoryNodeSO в Project и вызовите
     /// UnityDev/GBS/Import Story From StoryNodeSO.
+    ///
+    /// Действия и условия переносятся во встроенные шаги графа (см. GBSLegacyConverter):
+    /// подсказки/задержки/камера - с теми же настройками, SO-каналы - ключами "Legacy/&lt;имя&gt;",
+    /// которые продолжают работать со старой разводкой сцены (каналы и StoryEventChannelListener).
     /// </summary>
     public static class GBSStoryImporter
     {
@@ -73,9 +77,18 @@ namespace GBS.EditorTools
                     Id = System.Guid.NewGuid().ToString(),
                     NodeName = string.IsNullOrEmpty(storyNode.NodeName) ? storyNode.name : storyNode.NodeName,
                     Position = new Vector2(depth * ColumnWidth, row * RowHeight),
-                    OnEnterActions = new List<StoryAction>(storyNode.OnEnterActions),
                     Branches = new List<GBSBranchData>()
                 };
+
+                foreach (var legacyAction in storyNode.OnEnterActions)
+                {
+                    var action = GBSLegacyConverter.ConvertAction(legacyAction);
+
+                    if (action != null)
+                    {
+                        data.Actions.Add(action);
+                    }
+                }
 
                 storyNodes.Add(storyNode, data);
                 nodes.Add(data);
@@ -90,7 +103,7 @@ namespace GBS.EditorTools
                     {
                         Id = System.Guid.NewGuid().ToString(),
                         BranchName = string.IsNullOrEmpty(branch.BranchName) ? "Branch " + i : branch.BranchName,
-                        Condition = branch.Condition
+                        InlineCondition = GBSLegacyConverter.ConvertCondition(branch.Condition)
                     });
 
                     if (branch.NextNode != null && !depths.ContainsKey(branch.NextNode))

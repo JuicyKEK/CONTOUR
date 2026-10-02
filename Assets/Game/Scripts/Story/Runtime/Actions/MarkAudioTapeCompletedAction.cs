@@ -1,19 +1,23 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Scripts.Instructions.Data;
+using Game.Scripts.Instructions.Interfaces;
 using UnityEngine;
 
 namespace Game.Scripts.Story
 {
     /// <summary>
-    /// Помечает задачу аудио-кассеты выполненной - в кассетном плеере у неё появится метка
-    /// "выполнено". Кладётся в On Enter Actions ноды сюжета, в которой задача считается сделанной.
+    /// SO-версия действия "отметить задачу кассеты выполненной" (для старого StoryManager).
+    /// В графах GBS используйте встроенное действие "Audio Tapes/Mark Tape Completed" - без SO-ассета;
+    /// импортёр сам переносит этот ассет в него.
     /// </summary>
     [CreateAssetMenu(menuName = "Story/Actions/Mark Audio Tape Completed", fileName = "MarkAudioTapeCompletedAction")]
     public class MarkAudioTapeCompletedAction : StoryAction
     {
         [Tooltip("Кассета, задача из которой выполнена.")]
         [SerializeField] private AudioTapeDefinitionSO m_Tape;
+
+        public AudioTapeDefinitionSO Tape => m_Tape;
 
         public override UniTask ExecuteAsync(StoryContext context, CancellationToken token)
         {
@@ -23,14 +27,16 @@ namespace Game.Scripts.Story
                 return UniTask.CompletedTask;
             }
 
-            if (context.AudioTapes == null)
+            var registry = context.Resolve<IAudioTapeFoundRegistry>();
+
+            if (registry == null)
             {
-                Debug.LogWarning($"[{nameof(MarkAudioTapeCompletedAction)}] {name}: в StoryContext нет реестра кассет - " +
+                Debug.LogWarning($"[{nameof(MarkAudioTapeCompletedAction)}] {name}: на сцене нет реестра кассет - " +
                                  $"'{m_Tape.TapeId}' не отмечена выполненной.", this);
                 return UniTask.CompletedTask;
             }
 
-            context.AudioTapes.MarkTapeCompleted(m_Tape.TapeId);
+            registry.MarkTapeCompleted(m_Tape.TapeId);
             return UniTask.CompletedTask;
         }
     }

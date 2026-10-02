@@ -21,7 +21,10 @@ namespace GBS
 
         private void OnDisable()
         {
-            eventTest.RegistersListeners(this);
+            if (eventTest != null)
+            {
+                eventTest.UnregisterListener(this);
+            }
         }
 
         public void OnEventRaised()

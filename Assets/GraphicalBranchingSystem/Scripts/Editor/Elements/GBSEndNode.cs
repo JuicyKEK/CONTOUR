@@ -1,73 +1,42 @@
-﻿using System.Collections.Generic;
-using GBS.Data;
-using GBS.Events;
+﻿using GBS.Data;
+using GBS.Steps;
 using GBS.Utility;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine.UIElements;
 
 namespace GBS.Elements
 {
     /// <summary>
-    /// Финальная нода. Как только сюжет доходит сюда, граф помечается пройденным
-    /// (это можно использовать как условие старта другого графа).
+    /// Финальная нода. Как только сюжет доходит сюда, выполняются её действия и граф помечается
+    /// пройденным (это можно использовать как условие старта другого графа).
     /// </summary>
-    public class GBSEndNode : GBSNode
+    public class GBSEndNode : GBSDataNode<GBSEndNodeData>
     {
-        private List<GBSEvent> m_OnCompleteEvents = new List<GBSEvent>();
-
-        private GBSObjectListField<GBSEvent> m_EventsList;
-
         public override GBSNodeType NodeType => GBSNodeType.End;
-
         protected override string DefaultName => "End";
 
         public override void Draw()
         {
+            EnsureState();
+
             title = "END";
 
             var inPort = CreatePort(GBSPortId.In, Direction.Input, Port.Capacity.Multi, typeof(GBSFlow), "In");
             inputContainer.Add(inPort);
 
-            m_EventsList = new GBSObjectListField<GBSEvent>("On Complete Events (GBSEvent)", m_OnCompleteEvents, "Add Event");
+            var actionsFoldout = GBSElementUtility.CreateFoldout("On Complete Actions");
+            actionsFoldout.Add(GBSManagedReferenceUI.CreateList(
+                SerializedState, NodePath + ".m_OnCompleteActions", typeof(GBSAction), "Add Action"));
 
-            extensionContainer.Add(m_EventsList.Root);
+            extensionContainer.Add(actionsFoldout);
 
             expanded = true;
-
             RefreshExpandedState();
             RefreshPorts();
         }
 
-        public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        protected override void OnStateCreated(GBSEndNodeData data)
         {
-            evt.menu.AppendAction("GBS/Add Event", _ => m_EventsList?.Add());
-            evt.menu.AppendAction("GBS/Remove Last Event", _ => m_EventsList?.RemoveLast());
-
-            base.BuildContextualMenu(evt);
-        }
-
-        public override void LoadFrom(GBSNodeData data)
-        {
-            base.LoadFrom(data);
-
-            if (data is GBSEndNodeData endData)
-            {
-                m_OnCompleteEvents = new List<GBSEvent>(endData.OnCompleteEvents);
-            }
-        }
-
-        public override GBSNodeData Save()
-        {
-            var data = new GBSEndNodeData
-            {
-                OnCompleteEvents = new List<GBSEvent>(m_OnCompleteEvents)
-            };
-
-            PopulateBaseData(data);
-
-            return data;
+            GBSLegacyConverter.UpgradeEndNode(data);
         }
     }
 }
-
-

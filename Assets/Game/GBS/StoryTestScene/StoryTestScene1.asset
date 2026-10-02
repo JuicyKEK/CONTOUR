@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: StoryTestScene1
+  m_EditorClassIdentifier: Assembly-CSharp::GBS.Data.GBSGraphSO
+  m_GraphId: 104d53c9-c2f8-4180-aac2-6c27e2e8d3b2
+  m_GraphName: StoryTestScene1
+  m_Nodes:
+  - rid: 4597201109614330159
+  - rid: 4597201109614330160
+  - rid: 4597201109614330161
+  - rid: 4597201109614330162
+  - rid: 4597201109614330163
+  m_Edges:
+  - m_FromNodeId: 2a7cd2c0-3243-4811-9bc4-8a912134226c
+    m_FromPortId: out
+    m_ToNodeId: 3721ba82-85c0-49fc-84fd-7a7a9efcd2fe
+    m_ToPortId: in
+  - m_FromNodeId: 3721ba82-85c0-49fc-84fd-7a7a9efcd2fe
+    m_FromPortId: flowOut
+    m_ToNodeId: fc04ada3-3953-42d0-8b49-b4b2019205b8
+    m_ToPortId: in
+  - m_FromNodeId: fc04ada3-3953-42d0-8b49-b4b2019205b8
+    m_FromPortId: def5cac0-d094-4e96-bac9-dc83470c63a2
+    m_ToNodeId: f9e887d1-67b3-4f8b-8d06-4252df72d562
+    m_ToPortId: in
+  - m_FromNodeId: f9e887d1-67b3-4f8b-8d06-4252df72d562
+    m_FromPortId: 1cb04295-94c3-4f40-82de-406b0811596f
+    m_ToNodeId: a3632729-76ed-49e5-b8f9-79443c33f39f
+    m_ToPortId: in
+  references:
+    version: 2
+    RefIds:
+    - rid: 4597201109614330159
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 2a7cd2c0-3243-4811-9bc4-8a912134226c
+        m_NodeName: Start
+        m_Position: {x: 200, y: 221}
+    - rid: 4597201109614330160
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: fc04ada3-3953-42d0-8b49-b4b2019205b8
+        m_NodeName: StoryNode
+        m_Position: {x: 1113, y: 99}
+        m_Actions:
+        - rid: 4597201109614330164
+        m_Branches:
+        - m_Id: def5cac0-d094-4e96-bac9-dc83470c63a2
+          m_BranchName: Transition 1
+          m_InlineCondition:
+            rid: 4597201109614330165
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614330161
+      type: {class: GBSGraphCompletedNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 3721ba82-85c0-49fc-84fd-7a7a9efcd2fe
+        m_NodeName: Graph Completed
+        m_Position: {x: 658, y: 152}
+        m_TargetGraph: {fileID: 11400000, guid: 6fab9323017950e4ab218f8456f7ab1c, type: 2}
+    - rid: 4597201109614330162
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: a3632729-76ed-49e5-b8f9-79443c33f39f
+        m_NodeName: End
+        m_Position: {x: 2025, y: 123}
+        m_OnCompleteActions:
+        - rid: 4597201109614330166
+        m_OnCompleteEvents: []
+    - rid: 4597201109614330163
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: f9e887d1-67b3-4f8b-8d06-4252df72d562
+        m_NodeName: StoryNode
+        m_Position: {x: 1564, y: 64}
+        m_Actions:
+        - rid: 4597201109614330167
+        m_Branches:
+        - m_Id: 1cb04295-94c3-4f40-82de-406b0811596f
+          m_BranchName: Next
+          m_InlineCondition:
+            rid: 4597201109614330168
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614330164
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST_2_1
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614330165
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 4
+    - rid: 4597201109614330166
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: TEST 2 END
+        m_UntilNodeExit: 0
+        m_Duration: 8
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614330167
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "TEST_2_2_\u0412\u0437\u044F\u0442\u044C \u043A\u0430\u0441\u0441\u0435\u0442\u0443"
+        m_UntilNodeExit: 1
+        m_Duration: 2
+        m_WaitUntilHidden: 1
+    - rid: 4597201109614330168
+      type: {class: FlagIs, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: TakeTapeT_1_1
+        m_Expected: 1

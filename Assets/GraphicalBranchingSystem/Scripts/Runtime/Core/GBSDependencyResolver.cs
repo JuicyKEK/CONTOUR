@@ -11,7 +11,7 @@ namespace GBS
     /// Сюжетным графам далеко не всегда нужны все директоры (камера, катсцены, фейдер),
     /// поэтому GBS резолвит их вручную и молча допускает отсутствие.
     /// </summary>
-    public sealed class GBSDependencyResolver
+    public sealed class GBSDependencyResolver : Game.Scripts.Story.IStoryServiceResolver
     {
         private readonly IBinController m_Container;
 
@@ -47,6 +47,11 @@ namespace GBS
             }
 
             return bean;
+        }
+
+        T Game.Scripts.Story.IStoryServiceResolver.Resolve<T>()
+        {
+            return Resolve<T>();
         }
 
         /// <summary>

@@ -248,3 +248,23 @@ flex-shrink: 0;
 margin-right: 0px;
 padding-right: 0px;
 }
+/* v3.0: встроенные действия/условия (GBSManagedReferenceUI) */
+.gbs-step
+{
+background-color: rgba(255, 255, 255, 0.04);
+border-width: 1px;
+border-color: rgba(0, 0, 0, 0.35);
+border-radius: 4px;
+padding: 2px 4px 4px 4px;
+margin-bottom: 4px;
+min-width: 0;
+flex-shrink: 1;
+}
+.gbs-step__header
+{
+margin-bottom: 2px;
+}
+.gbs-node .unity-base-field__label
+{
+min-width: 90px;
+}

@@ -43,9 +43,15 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [Header("Старт")]
         [SerializeField] private NpcStateId m_InitialState = NpcStateId.Patrol;
 
-        [Header("Сюжетные события (все опциональны)")]
+        [Header("Сюжетные сигналы (все опциональны)")]
+        [Tooltip("Сигнал сюжета в момент, когда бот догнал и 'схватил' игрока.")]
+        [SerializeField, StoryKey(StoryKeyKind.Signal)] private string m_PlayerCaughtSignal;
+        [Tooltip("Сигнал сюжета в момент начала преследования (полезно для катсцен/скримеров).")]
+        [SerializeField, StoryKey(StoryKeyKind.Signal)] private string m_ChaseStartedSignal;
+
+        [Header("Сюжетные события - устаревшие SO-каналы (используйте сигналы выше)")]
         [Tooltip("Раздаётся в момент, когда бот догнал и 'схватил' игрока.")]
-        [SerializeField] private StoryEventChannelSO m_OnPlayerCaughtChannel; //TODO: Переделать нафиг потом
+        [SerializeField] private StoryEventChannelSO m_OnPlayerCaughtChannel;
         [Tooltip("Раздаётся в момент начала преследования (полезно для катсцен/скримеров).")]
         [SerializeField] private StoryEventChannelSO m_OnChaseStartedChannel;
         [Tooltip("Раздаётся один раз, когда бот дошёл до последней точки НЕзацикленного маршрута патрулирования (NpcPatrolRoute.Loop == false).")]
@@ -222,15 +228,17 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         public void CatchPlayer()
         {
             PlayAnimationSound("Catch");
+            StorySignals.Raise(m_PlayerCaughtSignal);
             m_OnPlayerCaughtChannel?.Raise();
-            // Дальше сценарий обычно продолжает сюжет (StoryEventCondition на этот
-            // канал): затемнение экрана, переспавн игрока и т.д. Сам бот после
+            // Дальше сценарий обычно продолжает сюжет (условие графа на этот
+            // сигнал): затемнение экрана, переспавн игрока и т.д. Сам бот после
             // этого чаще всего должен быть переведён в Idle/Patrol сюжетным
             // событием (ForceIdle/ForcePatrol) либо деактивирован.
         }
 
         public void RaiseReachedChaseStart()
         {
+            StorySignals.Raise(m_ChaseStartedSignal);
             m_OnChaseStartedChannel?.Raise();
         }
         

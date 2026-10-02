@@ -7,6 +7,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Game.Scripts.Audio.Interfaces;
+using Game.Scripts.Story;
+using JuicyDI.Attributes;
 using R3;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +18,10 @@ using UnityEngine.UI;
     using System.Net;
 #endif
 
-    public class FirstPersonController : MonoBehaviour, ISoundPlay
+    // Бин JuicyDI ради IPlayerControlHandle: действие сюжета "Set Player Control" выключает
+    // движение и обзор игрока вместе с взаимодействием.
+    [JDIMonoController]
+    public class FirstPersonController : MonoBehaviour, ISoundPlay, IPlayerControlHandle
     {
         private Rigidbody rb;
 

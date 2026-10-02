@@ -13,13 +13,13 @@ namespace Game.Scripts.Instructions.Controllers
     /// Сохранение прогресса кассет в JSON-файл (Application.persistentDataPath/Saves, см. <see cref="JsonSaveFile"/>).
     /// Пишет/читает только Id найденных, прослушанных и выполненных кассет из <see cref="IAudioTapeFoundRegistry"/>.
     ///
-    /// Сохранение вызывается снаружи (чекпоинты) через <see cref="IAudioTapeSaveService.Save"/>.
-    /// Загрузка при старте - один раз за сессию, повторная (например, откат на чекпоинт) -
+    /// Сохранение вызывается общим контроллером сохранений (GameSaveController, ISaveParticipant) на
+    /// чекпоинтах. Загрузка при старте - один раз за сессию, повторная (например, откат на чекпоинт) -
     /// явным вызовом <see cref="IAudioTapeSaveService.Load"/>.
     /// Для проверки в Play Mode методы доступны из контекстного меню компонента.
     /// </summary>
     [JDIMonoController(Context = typeof(GlobalBean))]
-    public class AudioTapeSaveController : MonoBehaviour, IAudioTapeSaveService, ISequence
+    public class AudioTapeSaveController : MonoBehaviour, IAudioTapeSaveService, ISaveParticipant, ISequence
     {
         [Tooltip("Имя JSON-файла сохранения кассет (лежит в Application.persistentDataPath/Saves).")]
         [SerializeField] private string m_FileName = "audio_tapes.json";

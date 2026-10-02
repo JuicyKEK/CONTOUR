@@ -83,7 +83,16 @@ namespace GBS.Utility
                 }
             }
 
-            var edges = graph.Edges;
+            ConnectEdges(graphView, graph.Edges, createdNodes);
+        }
+
+        /// <summary>
+        /// Восстанавливает рёбра между нодами окна (загрузка графа, вставка из буфера обмена).
+        /// Ребро, у которого нет ноды или порта, пропускается.
+        /// </summary>
+        public static List<Edge> ConnectEdges(GBSGraphView graphView, IReadOnlyList<GBSEdgeData> edges, IReadOnlyDictionary<string, GBSNode> nodesById)
+        {
+            var result = new List<Edge>();
 
             for (int i = 0; i < edges.Count; i++)
             {
@@ -94,8 +103,8 @@ namespace GBS.Utility
                     continue;
                 }
 
-                if (!createdNodes.TryGetValue(edgeData.FromNodeId ?? string.Empty, out var fromNode) ||
-                    !createdNodes.TryGetValue(edgeData.ToNodeId ?? string.Empty, out var toNode))
+                if (!nodesById.TryGetValue(edgeData.FromNodeId ?? string.Empty, out var fromNode) ||
+                    !nodesById.TryGetValue(edgeData.ToNodeId ?? string.Empty, out var toNode))
                 {
                     continue;
                 }
@@ -111,14 +120,25 @@ namespace GBS.Utility
                 var edge = fromPort.ConnectTo(toPort);
 
                 graphView.AddElement(edge);
+                result.Add(edge);
             }
+
+            return result;
         }
 
         private static List<GBSEdgeData> CollectEdges(GBSGraphView graphView)
         {
+            return CollectEdges(graphView.edges.ToList());
+        }
+
+        /// <summary>
+        /// Данные рёбер окна редактора (сохранение графа, копирование нод).
+        /// </summary>
+        public static List<GBSEdgeData> CollectEdges(IEnumerable<Edge> edges)
+        {
             var result = new List<GBSEdgeData>();
 
-            foreach (var edge in graphView.edges.ToList())
+            foreach (var edge in edges)
             {
                 if (edge?.output?.node is not GBSNode fromNode || edge.input?.node is not GBSNode toNode)
                 {

@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using GBS.Data;
 using GBS.Save;
+using GBS.Steps;
 using Game.Scripts.Story;
 using UnityEngine;
 
@@ -12,17 +13,19 @@ namespace GBS.Runtime
     /// <summary>
     /// Проигрывает один граф GBS:
     ///   1) ждёт условие старта (если к Start-ноде подключено булево выражение);
-    ///   2) входит в сюжетную ноду: поднимает GBSEvent'ы и последовательно
-    ///      выполняет StoryAction'ы;
-    ///   3) параллельно ждёт условия всех веток (race) и уходит в ту,
-    ///      что сработала первой;
-    ///   4) дойдя до End-ноды, помечает граф завершённым.
+    ///   2) входит в сюжетную ноду и последовательно выполняет её действия;
+    ///   3) параллельно ждёт условия всех переходов (race) и уходит в тот, что сработал первым
+    ///      (если готовы сразу несколько - побеждает верхний в списке);
+    ///   4) дойдя до End-ноды, выполняет её действия и помечает граф завершённым.
     /// </summary>
     public class GBSGraphRunner
     {
         private readonly GBSGraphSO m_Graph;
         private readonly StoryContext m_Context;
         private readonly GBSBoolEvaluator m_Evaluator;
+
+        // Номер изменения состояния сюжета на входе в текущую ноду (для условий "сигнал после входа").
+        private long m_NodeEnterSequence;
 
         public GBSGraphRunner(GBSGraphSO graph, StoryContext context, IGBSGraphProgressProvider progress)
         {
@@ -97,7 +100,7 @@ namespace GBS.Runtime
 
                     if (node is GBSEndNodeData endNode)
                     {
-                        CompleteGraph(endNode);
+                        await CompleteGraphAsync(endNode, token);
                         return;
                     }
 
@@ -116,9 +119,20 @@ namespace GBS.Runtime
                     CurrentNodeId = storyNode.Id;
                     NodeEntered?.Invoke(this);
 
-                    await RunEnterAsync(storyNode, token);
+                    using (var nodeScope = CancellationTokenSource.CreateLinkedTokenSource(token))
+                    {
+                        try
+                        {
+                            await RunEnterAsync(storyNode, token, nodeScope.Token);
 
-                    node = await WaitForNextNodeAsync(storyNode, token);
+                            node = await WaitForNextNodeAsync(storyNode, token);
+                        }
+                        finally
+                        {
+                            // Уход с ноды: всё, что жило "пока мы на ноде" (подсказки и т.п.), завершается.
+                            nodeScope.Cancel();
+                        }
+                    }
                 }
             }
             catch (OperationCanceledException)
@@ -189,24 +203,44 @@ namespace GBS.Runtime
             return m_Graph.GetNode(edge.ToNodeId);
         }
 
-        private async UniTask RunEnterAsync(GBSStoryNodeData node, CancellationToken token)        {
-            var events = node.OnEnterEvents;
+        private UniTask RunEnterAsync(GBSStoryNodeData node, CancellationToken token, CancellationToken nodeExitToken)
+        {
+            // Запоминаем момент входа ДО действий: сигнал, пришедший пока идут действия ноды
+            // (подсказка, катсцена), тоже считается "после входа" и не теряется.
+            m_NodeEnterSequence = m_Context.State.Sequence;
 
-            for (int i = 0; i < events.Count; i++)
-            {
-                events[i]?.Raise();
-            }
+            return RunActionsAsync(node.GetActions(), node, token, nodeExitToken);
+        }
 
-            var actions = node.OnEnterActions;
+        private async UniTask RunActionsAsync(IReadOnlyList<GBSAction> actions, GBSNodeData node,
+            CancellationToken token, CancellationToken nodeExitToken)
+        {
+            var actionContext = new GBSActionContext(m_Context, nodeExitToken);
 
             for (int i = 0; i < actions.Count; i++)
             {
-                if (actions[i] == null)
+                var action = actions[i];
+
+                if (action == null)
                 {
                     continue;
                 }
 
-                await actions[i].ExecuteAsync(m_Context, token);
+                try
+                {
+                    await action.ExecuteAsync(actionContext, token);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    // Ошибка одного действия не должна останавливать весь сюжет.
+                    Debug.LogError($"[GBS] Граф '{m_Graph.GraphName}', нода '{node.NodeName}': " +
+                                   $"ошибка в действии {action.GetType().Name}.");
+                    Debug.LogException(exception);
+                }
             }
         }
 
@@ -220,29 +254,25 @@ namespace GBS.Runtime
                 return null;
             }
 
-            // 1) Переход без условия срабатывает мгновенно - уходим сразу.
-            for (int i = 0; i < branches.Count; i++)
-            {
-                if (branches[i].Condition == null)
-                {
-                    return GetBranchTarget(node, branches[i]);
-                }
-            }
+            var conditionContext = new GBSConditionContext(m_Context, m_NodeEnterSequence);
 
-            // 2) Иначе ждём: побеждает то условие, которое выполнится первым.
             if (branches.Count == 1)
             {
-                await WaitBranchAsync(node, branches[0], token);
+                await WaitBranchAsync(branches[0], conditionContext, token);
                 return GetBranchTarget(node, branches[0]);
             }
 
+            // Ждём все переходы параллельно: побеждает выполнившийся первым. Уже выполненные условия
+            // (и переходы без условия) завершаются синхронно, а WhenAny среди готовых выбирает
+            // наименьший индекс - поэтому при одновременной готовности побеждает верхний переход
+            // (ветвление по флагам: "Flag Is ..." выше, переход без условия - "иначе" - ниже).
             using var raceCts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
             var raceTasks = new UniTask<bool>[branches.Count];
 
             for (int i = 0; i < branches.Count; i++)
             {
-                raceTasks[i] = WaitBranchSafeAsync(node, branches[i], raceCts.Token);
+                raceTasks[i] = WaitBranchSafeAsync(branches[i], conditionContext, raceCts.Token);
             }
 
             var (winnerIndex, _) = await UniTask.WhenAny(raceTasks);
@@ -252,11 +282,11 @@ namespace GBS.Runtime
             return GetBranchTarget(node, branches[winnerIndex]);
         }
 
-        private async UniTask<bool> WaitBranchSafeAsync(GBSStoryNodeData node, GBSBranchData branch, CancellationToken token)
+        private async UniTask<bool> WaitBranchSafeAsync(GBSBranchData branch, GBSConditionContext context, CancellationToken token)
         {
             try
             {
-                await WaitBranchAsync(node, branch, token);
+                await WaitBranchAsync(branch, context, token);
                 return true;
             }
             catch (OperationCanceledException)
@@ -265,14 +295,10 @@ namespace GBS.Runtime
             }
         }
 
-        private UniTask WaitBranchAsync(GBSStoryNodeData node, GBSBranchData branch, CancellationToken token)
+        private static UniTask WaitBranchAsync(GBSBranchData branch, GBSConditionContext context, CancellationToken token)
         {
-            if (branch.Condition != null)
-            {
-                return branch.Condition.WaitAsync(m_Context, token);
-            }
-
-            return UniTask.CompletedTask;
+            var condition = branch.GetCondition();
+            return condition != null ? condition.WaitAsync(context, token) : UniTask.CompletedTask;
         }
 
         private GBSNodeData GetBranchTarget(GBSStoryNodeData node, GBSBranchData branch)
@@ -288,18 +314,24 @@ namespace GBS.Runtime
             return m_Graph.GetNode(edge.ToNodeId);
         }
 
-        private void CompleteGraph(GBSEndNodeData endNode)
+        private async UniTask CompleteGraphAsync(GBSEndNodeData endNode, CancellationToken token)
         {
             CurrentNodeId = endNode.Id;
-            IsCompleted = true;
 
-            var events = endNode.OnCompleteEvents;
-
-            for (int i = 0; i < events.Count; i++)
+            // У End-ноды нет переходов: "уход с ноды" - сразу после её действий.
+            using (var nodeScope = CancellationTokenSource.CreateLinkedTokenSource(token))
             {
-                events[i]?.Raise();
+                try
+                {
+                    await RunActionsAsync(endNode.GetActions(), endNode, token, nodeScope.Token);
+                }
+                finally
+                {
+                    nodeScope.Cancel();
+                }
             }
 
+            IsCompleted = true;
             NodeEntered?.Invoke(this);
             Completed?.Invoke(this);
         }
