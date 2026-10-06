@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using GBS.Data;
+using GBS.Steps;
 using Game.Scripts.Story;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace GBS.Runtime
     /// Вычислитель булевой части графа.
     ///
     /// Как это работает:
-    ///  - нода Condition оборачивает StoryCondition. Ожидание запускается лениво,
+    ///  - нода Condition оборачивает условие (GBSCondition). Ожидание запускается лениво,
     ///    в момент, когда выражение впервые понадобилось. Сработав, условие
     ///    "защёлкивается" (latched) и дальше считается истинным - это позволяет
     ///    строить NOT/NAND и сохранять состояние в сейв;
@@ -204,7 +205,9 @@ namespace GBS.Runtime
 
         private void TryRunCondition(GBSConditionNodeData conditionNode)
         {
-            if (conditionNode.Condition == null)
+            var condition = conditionNode.GetCondition();
+
+            if (condition == null)
             {
                 return;
             }
@@ -215,14 +218,17 @@ namespace GBS.Runtime
             }
 
             m_Running.Add(conditionNode.Id);
-            RunConditionAsync(conditionNode).Forget();
+            RunConditionAsync(conditionNode, condition).Forget();
         }
 
-        private async UniTaskVoid RunConditionAsync(GBSConditionNodeData conditionNode)
+        private async UniTaskVoid RunConditionAsync(GBSConditionNodeData conditionNode, GBSCondition condition)
         {
             try
             {
-                await conditionNode.Condition.WaitAsync(m_Context, m_LifetimeToken);
+                // Ожидание стартует лениво - "после начала" для ноды Condition значит после первого
+                // запроса её значения.
+                var context = new GBSConditionContext(m_Context, m_Context.State.Sequence);
+                await condition.WaitAsync(context, m_LifetimeToken);
                 m_Latched.Add(conditionNode.Id);
             }
             catch (System.OperationCanceledException)

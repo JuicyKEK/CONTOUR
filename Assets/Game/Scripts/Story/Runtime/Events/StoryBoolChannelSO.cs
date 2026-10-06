@@ -21,6 +21,10 @@ namespace Game.Scripts.Story
     /// и, для примера, DoorOpenStateToBoolChannelBridge (готовый мост для
     /// дверей проекта). Сам канал ничего не знает о конкретном источнике -
     /// подходит для любых bool-состояний, не только дверей.
+    ///
+    /// Устаревший способ: для новых состояний используйте флаги сюжета по ключам
+    /// (DoorStoryFlagBridge / StorySignalEmitter). SetValue() дополнительно пишет флаг
+    /// "Legacy/&lt;имя ассета&gt;", поэтому старые каналы работают и с графами GBS.
     /// </summary>
     [CreateAssetMenu(menuName = "Story/Events/Bool State Channel", fileName = "BoolStateChannel")]
     public class StoryBoolChannelSO : ScriptableObject
@@ -39,6 +43,9 @@ namespace Game.Scripts.Story
             m_HasRuntimeValue = true;
             m_CurrentValue = value;
             m_Changed?.Invoke(value);
+
+            // Мост на новую систему: графы GBS видят канал как флаг "Legacy/<имя ассета>".
+            StorySignals.SetFlag(StorySignals.LegacyKey(this), value);
         }
 
         /// <summary>

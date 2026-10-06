@@ -1,4 +1,5 @@
-﻿using Game.Scripts.Inventory;
+﻿using System;
+using Game.Scripts.Inventory;
 using Game.Scripts.Player.View;
 using Game.Scripts.Story;
 using JuicyDI;
@@ -10,7 +11,8 @@ namespace Game.Scripts.InputController
     /// <summary>
     /// Взаимодействие игрока с объектами: каждый кадр пускает короткий луч из камеры и, если он попал
     /// в коллайдер с <see cref="IInteraction"/>, показывает значок взаимодействия и разрешает
-    /// взаимодействие по кнопке E.
+    /// взаимодействие по кнопке E. После Interact оповещает <see cref="IInteractionListener"/> на том же
+    /// объекте (например StorySignalInteract - сигнал сюжету).
     ///
     /// Луч на 2 м стоит единицы микросекунд, поэтому его пускают постоянно, без предварительного
     /// триггера вокруг игрока: триггер не дешевле (физика обрабатывает все коллайдеры, пересекающие
@@ -82,10 +84,37 @@ namespace Game.Scripts.InputController
 
         private void TryInteraction()
         {
-            if (m_IsControlEnabled && m_CurrentInteractable != null)
+            if (!m_IsControlEnabled || m_CurrentInteractable == null)
             {
-                m_CurrentInteractable.Interact();
+                return;
             }
+
+            var interactable = m_CurrentInteractable;
+
+            interactable.Interact();
+            NotifyListeners(interactable);
+        }
+
+        /// <summary>
+        /// Слушатели взаимодействия (IInteractionListener) на том же объекте, что и IInteraction.
+        /// </summary>
+        private static void NotifyListeners(IInteraction interactable)
+        {
+            if (interactable is not Component component || component == null)
+            {
+                return;
+            }
+
+            if (component.TryGetComponent(out IInteractionListener interaction))
+            {
+                interaction.OnInteracted(interactable);
+            }
+            
+            // // Слушателей может быть несколько (например, StorySignalInteract с сигналом и с флагом).
+            // foreach (var listener in component.GetComponents<IInteractionListener>())
+            // {
+            //     listener.OnInteracted(interactable);
+            // }
         }
     }
 }

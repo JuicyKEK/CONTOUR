@@ -17,7 +17,7 @@ namespace GBS.Windows
         /// Версия окна. Видна в тулбаре - по ней сразу понятно, что Unity
         /// пересобрала скрипты и работает актуальная версия GBS.
         /// </summary>
-        public const string Version = "v2.7";
+        public const string Version = "v3.2";
 
         private const string DefaultFileName = "NewGBSGraph";
         private const string ToolbarStylePath = "Assets/GraphicalBranchingSystem/Scripts/Editor Default Resources/GBSView/GBSToolbarStyles.uss";
@@ -59,6 +59,11 @@ namespace GBS.Windows
             AddGraphView();
             AddToolbar();
             AddStyles();
+        }
+
+        private void OnDisable()
+        {
+            m_GraphView?.DisposeNodes();
         }
 
         private void AddGraphView()

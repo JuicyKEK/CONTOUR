@@ -21,6 +21,9 @@ EditorBuildSettings:
     path: Assets/Scenes/InfectionTestScene.unity
     guid: 9e1395682a6edc74c98e4c7e928bca0b
   - enabled: 1
+    path: Assets/Scenes/StoryTestScene.unity
+    guid: 2dfaa9da8f6cb734c9a34d23c34af4d9
+  - enabled: 1
     path: Assets/Game/Scenes/LoacationMain.unity
     guid: e2abf0100c2a5ea4ca99ae5ad407590e
   - enabled: 1

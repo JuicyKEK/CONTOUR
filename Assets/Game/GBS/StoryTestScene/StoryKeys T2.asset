@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50870e4b4156ca84e99d406e61c3ffcc, type: 3}
+  m_Name: StoryKeys T2
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Story.StoryKeyCatalogSO
+  m_Entries:
+  - Key: TakeTapeT_1_2
+    Kind: 2
+    Description: "\u0412\u0437\u044F\u0442\u0438\u0435 \u043A\u0430\u0441\u0441\u0435\u0442\u044B
+      1_1"

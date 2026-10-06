@@ -1,28 +1,55 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Game.Scripts.InputController;
-using Game.Scripts.Instructions.Interfaces;
 
 namespace Game.Scripts.Story
 {
     /// <summary>
-    /// Набор зависимостей и "доска состояний" (blackboard), которые прокидываются
-    /// в каждый StoryCondition/StoryAction при вызове. StoryManager собирает
-    /// зависимости через JuicyDI и передаёт этот контекст дальше по SO-графу,
-    /// поэтому сами SO не должны и не могут напрямую резолвить бины JDI.
+    /// Всё, что нужно действиям/условиям сюжета при выполнении: частые сервисы сцены (свойствами),
+    /// состояние сюжета (<see cref="State"/>) и доступ к любым другим бинам JuicyDI через
+    /// <see cref="Resolve{T}"/> - новый сервис не требует правок StoryContext.
+    /// Сами действия/условия не резолвят бины напрямую - только через контекст.
+    ///
+    /// Контекст GBS (с резолвером) не запоминает сервисы: каждое свойство берёт бин из JuicyDI в момент
+    /// обращения. Поэтому подсказка, камеры и т.д. находятся, даже если их сцена загрузилась позже
+    /// GBSStarter, и не остаются мёртвыми ссылками после её выгрузки.
+    /// Старый StoryManager передаёт сервисы в конструктор - тогда используются они.
     /// </summary>
     public class StoryContext
     {
-        public IInputActions InputActions { get; }
-        public IInputSelectionActions InputSelectionActions { get; }
-        public IReadOnlyList<IPlayerControlHandle> PlayerControlHandles { get; }
-        public IStoryHintView HintView { get; }
-        public ICutsceneDirector CutsceneDirector { get; }
-        public ICameraDirector CameraDirector { get; }
-        public IScreenFader ScreenFader { get; }
-        public IAudioTapeFoundRegistry AudioTapes { get; }
+        private readonly IInputActions m_InputActions;
+        private readonly IInputSelectionActions m_InputSelectionActions;
+        private readonly IReadOnlyList<IPlayerControlHandle> m_PlayerControlHandles;
+        private readonly IStoryHintView m_HintView;
+        private readonly ICutsceneDirector m_CutsceneDirector;
+        private readonly ICameraDirector m_CameraDirector;
+        private readonly IScreenFader m_ScreenFader;
+        private readonly IStoryServiceResolver m_Resolver;
 
-        private readonly Dictionary<string, object> m_Blackboard = new();
+        public IInputActions InputActions => m_InputActions ?? Resolve<IInputActions>();
+        public IInputSelectionActions InputSelectionActions => m_InputSelectionActions ?? Resolve<IInputSelectionActions>();
+        public IReadOnlyList<IPlayerControlHandle> PlayerControlHandles => m_PlayerControlHandles ?? ResolveAll<IPlayerControlHandle>();
+        public IStoryHintView HintView => m_HintView ?? Resolve<IStoryHintView>();
+        public ICutsceneDirector CutsceneDirector => m_CutsceneDirector ?? Resolve<ICutsceneDirector>();
+        public ICameraDirector CameraDirector => m_CameraDirector ?? Resolve<ICameraDirector>();
+        public IScreenFader ScreenFader => m_ScreenFader ?? Resolve<IScreenFader>();
 
+        /// <summary>
+        /// Состояние сюжета: флаги и сигналы по ключам (сохраняется вместе с прогрессом графов).
+        /// </summary>
+        public StoryState State { get; }
+
+        /// <summary>
+        /// Контекст GBS: все сервисы берутся из резолвера в момент обращения.
+        /// </summary>
+        public StoryContext(StoryState state, IStoryServiceResolver resolver)
+        {
+            State = state ?? new StoryState();
+            m_Resolver = resolver;
+        }
+
+        /// <summary>
+        /// Контекст старого StoryManager: сервисы переданы готовыми.
+        /// </summary>
         public StoryContext(
             IInputActions inputActions,
             IInputSelectionActions inputSelectionActions,
@@ -31,87 +58,68 @@ namespace Game.Scripts.Story
             ICutsceneDirector cutsceneDirector,
             ICameraDirector cameraDirector,
             IScreenFader screenFader,
-            IAudioTapeFoundRegistry audioTapes = null)
+            StoryState state = null,
+            IStoryServiceResolver resolver = null)
         {
-            InputActions = inputActions;
-            InputSelectionActions = inputSelectionActions;
-            PlayerControlHandles = playerControlHandles;
-            HintView = hintView;
-            CutsceneDirector = cutsceneDirector;
-            CameraDirector = cameraDirector;
-            ScreenFader = screenFader;
-            AudioTapes = audioTapes;
+            m_InputActions = inputActions;
+            m_InputSelectionActions = inputSelectionActions;
+            m_PlayerControlHandles = playerControlHandles;
+            m_HintView = hintView;
+            m_CutsceneDirector = cutsceneDirector;
+            m_CameraDirector = cameraDirector;
+            m_ScreenFader = screenFader;
+            State = state ?? new StoryState();
+            m_Resolver = resolver;
+        }
+
+        /// <summary>
+        /// Любой бин сцены (JuicyDI) или null, если его нет / контекст собран без резолвера (старый StoryManager).
+        /// </summary>
+        public T Resolve<T>() where T : class
+        {
+            return m_Resolver?.Resolve<T>();
+        }
+
+        /// <summary>
+        /// Все бины контракта на загруженных сценах.
+        /// </summary>
+        public List<T> ResolveAll<T>() where T : class
+        {
+            return m_Resolver?.ResolveAll<T>() ?? new List<T>();
         }
 
         public void SetControlEnabled(bool isEnabled)
         {
-            if (PlayerControlHandles == null)
+            var handles = PlayerControlHandles;
+
+            if (handles == null)
             {
                 return;
             }
 
-            for (int i = 0; i < PlayerControlHandles.Count; i++)
+            for (int i = 0; i < handles.Count; i++)
             {
-                PlayerControlHandles[i]?.SetControlEnabled(isEnabled);
+                handles[i]?.SetControlEnabled(isEnabled);
             }
         }
 
+        // Ниже - старый API "blackboard" (SetBlackboardFlagAction / BlackboardFlagCondition).
+        // Флаги теперь живут в State, поэтому видны и новым условиям графа, и сохраняются.
+
         public void SetFlag(string key, bool value)
         {
-            m_Blackboard[key] = value;
+            State.SetFlag(key, value);
         }
 
         public bool HasFlag(string key)
         {
-            return m_Blackboard.ContainsKey(key);
+            return State.HasValue(key);
         }
 
         public bool TryGetFlag(string key, out bool value)
         {
-            if (m_Blackboard.TryGetValue(key, out var raw) && raw is bool boolValue)
-            {
-                value = boolValue;
-                return true;
-            }
-
-            value = false;
-            return false;
-        }
-
-        /// <summary>
-        /// Снимок булевых флагов blackboard - используется системой сохранений GBS.
-        /// </summary>
-        public IEnumerable<KeyValuePair<string, bool>> GetBoolFlags()
-        {
-            foreach (var pair in m_Blackboard)
-            {
-                if (pair.Value is bool boolValue)
-                {
-                    yield return new KeyValuePair<string, bool>(pair.Key, boolValue);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Восстанавливает флаги из сейва (значения перезаписываются).
-        /// </summary>
-        public void RestoreFlags(IEnumerable<KeyValuePair<string, bool>> flags)
-        {
-            if (flags == null)
-            {
-                return;
-            }
-
-            foreach (var flag in flags)
-            {
-                m_Blackboard[flag.Key] = flag.Value;
-            }
-        }
-
-        public void ClearFlags()
-        {
-            m_Blackboard.Clear();
+            value = State.GetFlag(key);
+            return State.HasValue(key);
         }
     }
 }
-

@@ -1,37 +1,32 @@
 ﻿using GBS.Data;
+using GBS.Steps;
 using GBS.Utility;
-using Game.Scripts.Story;
 using UnityEditor.Experimental.GraphView;
 
 namespace GBS.Elements
 {
     /// <summary>
-    /// Нода-условие: оборачивает StoryCondition SO в булев сигнал.
+    /// Нода-условие: превращает ожидание условия в булев сигнал.
     /// Сработав, условие "защёлкивается" (остаётся истинным до сброса прогресса).
     /// </summary>
-    public class GBSConditionNode : GBSNode
+    public class GBSConditionNode : GBSDataNode<GBSConditionNodeData>
     {
-        private StoryCondition m_Condition;
-
         public override GBSNodeType NodeType => GBSNodeType.Condition;
-
         protected override string DefaultName => "Condition";
 
         public override void Draw()
         {
+            EnsureState();
+
             title = "CONDITION";
 
             var outPort = CreatePort(GBSPortId.Out, Direction.Output, Port.Capacity.Multi, typeof(bool), "Value");
             outputContainer.Add(outPort);
 
-            var conditionField = GBSElementUtility.CreateObjectField(
-                typeof(StoryCondition),
-                m_Condition,
-                callback => m_Condition = callback.newValue as StoryCondition);
-
             var container = GBSElementUtility.CreateColumn();
             container.style.minWidth = 0;
-            container.Add(conditionField);
+            container.Add(GBSManagedReferenceUI.CreateField(
+                SerializedState, NodePath + ".m_InlineCondition", typeof(GBSCondition), "Condition"));
 
             extensionContainer.Add(container);
 
@@ -39,26 +34,9 @@ namespace GBS.Elements
             RefreshPorts();
         }
 
-        public override void LoadFrom(GBSNodeData data)
+        protected override void OnStateCreated(GBSConditionNodeData data)
         {
-            base.LoadFrom(data);
-
-            if (data is GBSConditionNodeData conditionData)
-            {
-                m_Condition = conditionData.Condition;
-            }
-        }
-
-        public override GBSNodeData Save()
-        {
-            var data = new GBSConditionNodeData
-            {
-                Condition = m_Condition
-            };
-
-            PopulateBaseData(data);
-
-            return data;
+            GBSLegacyConverter.UpgradeConditionNode(data);
         }
     }
 }
