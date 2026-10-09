@@ -3453,6 +3453,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Controllers.NpcDocumentCheckBehaviour
   m_HasForgedDocuments: 0
+  m_DocumentsValidSignal: 
+  m_DocumentsForgedSignal: 
   m_OnDocumentsValidChannel: {fileID: 11400000, guid: c74a6b01b6edbe7418ca48c2cb585e31, type: 2}
   m_OnDocumentsForgedChannel: {fileID: 0}
 --- !u!4 &195185701
@@ -5302,7 +5304,7 @@ PrefabInstance:
       objectReference: {fileID: 826633082}
     - target: {fileID: 3877600903276417026, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_VersionIndex
-      value: 1359
+      value: 1365
       objectReference: {fileID: 0}
     - target: {fileID: 5916384971692633202, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_Mesh
@@ -17028,7 +17030,7 @@ PrefabInstance:
       objectReference: {fileID: 391926800}
     - target: {fileID: 3877600903276417026, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_VersionIndex
-      value: 1359
+      value: 1365
       objectReference: {fileID: 0}
     - target: {fileID: 5916384971692633202, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_Mesh
@@ -29471,6 +29473,8 @@ MonoBehaviour:
   m_AudioSource: {fileID: 1285469979}
   m_PatrolRoute: {fileID: 0}
   m_InitialState: 0
+  m_PlayerCaughtSignal: 
+  m_ChaseStartedSignal: 
   m_OnPlayerCaughtChannel: {fileID: 11400000, guid: 09dd5fad27dee6d4180db891cc1f335e, type: 2}
   m_OnChaseStartedChannel: {fileID: 0}
   m_OnPatrolRouteCompletedChannel: {fileID: 0}
@@ -37942,7 +37946,7 @@ PrefabInstance:
       objectReference: {fileID: 916325645}
     - target: {fileID: 3877600903276417026, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_VersionIndex
-      value: 1356
+      value: 1362
       objectReference: {fileID: 0}
     - target: {fileID: 5916384971692633202, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_Mesh
@@ -46162,7 +46166,7 @@ PrefabInstance:
       objectReference: {fileID: 354590456}
     - target: {fileID: 3877600903276417026, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_VersionIndex
-      value: 1359
+      value: 1365
       objectReference: {fileID: 0}
     - target: {fileID: 5916384971692633202, guid: 6ddbb5630df1ffa438101c408d3595ac, type: 3}
       propertyPath: m_Mesh
