@@ -85,6 +85,7 @@ namespace Game.Scripts.LocationScene.Runtime.Controllers
         private readonly ReactiveProperty<LocationDefinitionSO> m_CurrentLocation = new(null);
         private readonly Subject<LocationDefinitionSO> m_LocationLoaded = new();
         private readonly Subject<LocationDefinitionSO> m_LocationUnloaded = new();
+        private readonly Subject<Scene> m_SceneUnloading = new();
 
         private LocationDefinitionSO m_PendingLocation;
         private bool m_IsGameStarted;
@@ -95,6 +96,7 @@ namespace Game.Scripts.LocationScene.Runtime.Controllers
         public LocationDefinitionSO PendingLocation => m_PendingLocation;
         public Observable<LocationDefinitionSO> LocationLoaded => m_LocationLoaded;
         public Observable<LocationDefinitionSO> LocationUnloaded => m_LocationUnloaded;
+        public Observable<Scene> SceneUnloading => m_SceneUnloading;
 
         public bool IsLocationLoaded(LocationDefinitionSO location)
         {
@@ -254,6 +256,7 @@ namespace Game.Scripts.LocationScene.Runtime.Controllers
             m_CurrentLocation.Dispose();
             m_LocationLoaded.Dispose();
             m_LocationUnloaded.Dispose();
+            m_SceneUnloading.Dispose();
         }
 
         private bool CanHandleGate(LocationTransitionDefinitionSO transition, LocationDefinitionSO gateLocation)
@@ -454,8 +457,16 @@ namespace Game.Scripts.LocationScene.Runtime.Controllers
         private async UniTaskVoid UnloadAsync(SceneEntry entry)
         {
             var scene = SceneManager.GetSceneByPath(entry.Path);
-            var operation = scene.IsValid() && scene.isLoaded ? SceneManager.UnloadSceneAsync(scene) : null;
+            bool isLoaded = scene.IsValid() && scene.isLoaded;
             bool isInitialized = entry.IsInitialized;
+
+            // Объекты сцены ещё живы - подписчики успевают запомнить их состояние.
+            if (isLoaded && isInitialized)
+            {
+                m_SceneUnloading.OnNext(scene);
+            }
+
+            var operation = isLoaded ? SceneManager.UnloadSceneAsync(scene) : null;
 
             entry.IsInitialized = false;
 

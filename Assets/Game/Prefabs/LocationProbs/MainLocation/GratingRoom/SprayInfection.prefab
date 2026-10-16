@@ -4857,6 +4857,7 @@ GameObject:
   - component: {fileID: 2312197908261526833}
   - component: {fileID: 3289867085098235140}
   - component: {fileID: 7032453698118430647}
+  - component: {fileID: 6331279817099104775}
   m_Layer: 0
   m_Name: SprayInfection
   m_TagString: Untagged
@@ -4942,6 +4943,19 @@ MonoBehaviour:
   m_SoundClips:
   - {fileID: 8300000, guid: d425a8f6e1968084dba2b0cbfdc49ef5, type: 3}
   - {fileID: 8300000, guid: 676b1ed9e95d8f34782b9b96163db728, type: 3}
+--- !u!114 &6331279817099104775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2514960267876389912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b6d97ee779691344a7271aee2c114d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
+  m_StateId: 
 --- !u!1 &3925255610172975207
 GameObject:
   m_ObjectHideFlags: 0

@@ -8213,6 +8213,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: b7ce79626fb24176a2498cbc8a425eb6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -13896,6 +13900,10 @@ PrefabInstance:
     - target: {fileID: 5483161772076738919, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: 0e2d0481d3fd4ae28f88d37c6d1b981a
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -24285,6 +24293,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 21.18
       objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: 6f68aa1ceb5843f786e2fc8927edf436
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -33747,6 +33759,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: 409c829d9dc0474a81e0818406b68da7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -37104,6 +37120,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: c36888f4f4e749ad99d4e0979b9a4e19
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -37455,6 +37475,10 @@ PrefabInstance:
     - target: {fileID: 5483161772076738919, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 21.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: af8cea6d465247a7b40291c6bd09fb5a
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -38131,6 +38155,10 @@ PrefabInstance:
     - target: {fileID: 5483161772076738919, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: 3312f931bd8544d89c9e7549815436fa
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -42345,6 +42373,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: c57b5f97624642c6bf6b3dca72a76826
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -44881,6 +44913,10 @@ PrefabInstance:
     - target: {fileID: 5483161772076738919, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 21.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8724800804932885809, guid: 202357247b246ac4cb9ebaf51f491e4f, type: 3}
+      propertyPath: m_StateId
+      value: 5d2ee22c4b1f4d5ca48e88cacbed6c64
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

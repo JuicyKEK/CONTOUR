@@ -1,5 +1,6 @@
 using Game.Scripts.LocationScene.Runtime.Data;
 using R3;
+using UnityEngine.SceneManagement;
 
 namespace Game.Scripts.LocationScene.Runtime.Interfaces
 {
@@ -44,6 +45,12 @@ namespace Game.Scripts.LocationScene.Runtime.Interfaces
         /// Приходит только для локаций, о загрузке которых сообщалось в <see cref="LocationLoaded"/>.
         /// </summary>
         Observable<LocationDefinitionSO> LocationUnloaded { get; }
+
+        /// <summary>
+        /// Сцена локации или перехода сейчас начнёт выгружаться - её объекты ещё живы (например, чтобы
+        /// запомнить их состояние). Приходит только для сцен, бины которых были запущены.
+        /// </summary>
+        Observable<Scene> SceneUnloading { get; }
 
         /// <summary>
         /// Игрок задел триггер на конце перехода со стороны локации <paramref name="gateLocation"/>.

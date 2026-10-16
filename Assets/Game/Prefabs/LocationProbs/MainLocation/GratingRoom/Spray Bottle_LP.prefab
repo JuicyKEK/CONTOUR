@@ -101,6 +101,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 459066516786482070}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8724800804932885809}
   m_SourcePrefab: {fileID: 100100000, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
 --- !u!1 &5139673942634722269 stripped
 GameObject:
@@ -165,3 +168,16 @@ MonoBehaviour:
   m_SoundClips:
   - {fileID: 8300000, guid: d425a8f6e1968084dba2b0cbfdc49ef5, type: 3}
   - {fileID: 8300000, guid: 676b1ed9e95d8f34782b9b96163db728, type: 3}
+--- !u!114 &8724800804932885809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139673942634722269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b6d97ee779691344a7271aee2c114d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
+  m_StateId: 

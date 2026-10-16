@@ -1,4 +1,5 @@
-﻿using Game.Scripts.Instructions.Data;
+﻿using System;
+using Game.Scripts.Instructions.Data;
 using Game.Scripts.Instructions.Interfaces;
 using Game.Scripts.Inventory;
 using JuicyDI.Attributes;
@@ -13,8 +14,9 @@ namespace Game.Scripts.Instructions.Controllers
     /// настоящее имя появится в списке кассетного плеера вместо "?????".
     /// </summary>
     [JDIMonoController]
-    public class AudioTapePickup : MonoBehaviour, IInteraction
+    public class AudioTapePickup : MonoBehaviour, IInteraction, IPickupObject
     {
+        public event Action PickedUp;
         [Header("Кассета")]
         [Tooltip("Какую кассету подбирает этот объект.")]
         [SerializeField] private AudioTapeDefinitionSO m_TapeDefinition;
@@ -37,6 +39,7 @@ namespace Game.Scripts.Instructions.Controllers
             }
 
             m_Registry?.MarkTapeFound(m_TapeDefinition.TapeId);
+            PickedUp?.Invoke();
             gameObject.SetActive(false);
         }
     }

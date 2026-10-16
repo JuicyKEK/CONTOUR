@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 7942942263187629845}
   - component: {fileID: 4322732339513256714}
   - component: {fileID: 5349140916373857743}
+  - component: {fileID: 7147799739527306491}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -216,6 +217,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Controllers.AudioTapePickup
   m_TapeDefinition: {fileID: 11400000, guid: 776a466655b81f64eb723fc12341b6ea, type: 2}
+--- !u!114 &7147799739527306491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6446676570933489764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b6d97ee779691344a7271aee2c114d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
+  m_StateId: 
 --- !u!1 &6711514041043855715
 GameObject:
   m_ObjectHideFlags: 0

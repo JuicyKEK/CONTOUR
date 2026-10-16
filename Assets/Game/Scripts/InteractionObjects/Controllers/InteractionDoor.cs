@@ -14,16 +14,51 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
     [SerializeField] private bool _isLockedOnStart;
     [SerializeField] private bool _isOpenOnStart;
     
+    public bool IsRestoringState => _isRestoringState;
+
     private ReactiveProperty<bool> _isOpen;
     private ReactiveProperty<bool> _isLocked;
     private ReactiveProperty<DoorOpenerKind> _lastOpener;
     private Subject<Unit> _isTryingOpenLockedDoor = new Subject<Unit>();
-    
+    private bool _isRestoringState;
+
     private void Awake() //Переделать на сиквенсер как его починю
     {
-        _isOpen = new ReactiveProperty<bool>(_isOpenOnStart);
-        _isLocked = new ReactiveProperty<bool>(_isLockedOnStart);
-        _lastOpener = new ReactiveProperty<DoorOpenerKind>(DoorOpenerKind.Human);
+        EnsureState();
+    }
+
+    /// <summary>
+    /// Состояние создаётся один раз: сохранённое состояние может прийти раньше Awake (дверь на выключенном
+    /// объекте), и Awake не должен затереть его стартовыми значениями.
+    /// </summary>
+    private void EnsureState()
+    {
+        _isOpen ??= new ReactiveProperty<bool>(_isOpenOnStart);
+        _isLocked ??= new ReactiveProperty<bool>(_isLockedOnStart);
+        _lastOpener ??= new ReactiveProperty<DoorOpenerKind>(DoorOpenerKind.Human);
+    }
+
+    public void GetState(out bool isOpen, out bool isLocked)
+    {
+        EnsureState();
+        isOpen = _isOpen.Value;
+        isLocked = _isLocked.Value;
+    }
+
+    public void RestoreState(bool isOpen, bool isLocked)
+    {
+        EnsureState();
+        _isRestoringState = true;
+
+        try
+        {
+            _isLocked.Value = isLocked;
+            _isOpen.Value = isOpen;
+        }
+        finally
+        {
+            _isRestoringState = false;
+        }
     }
 
     public void Interact()

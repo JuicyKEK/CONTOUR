@@ -243,7 +243,7 @@ Do not keep `GBSStarter` and the legacy `StoryManager` in one scene.
 
 Saving is **not automatic** — only on demand, at checkpoints. The shared `GameSaveController` (one per
 scene) does it: `SaveGame()` goes through every mechanic taking part in saves (`ISaveParticipant`): the GBS
-story, audio tapes, infection zones, the player checkpoint, the inventory. A new mechanic joins the pool automatically — its JuicyDI bean just
+story, audio tapes, infection zones, the player checkpoint, the inventory, the state of location objects (doors, picked-up items, switches). A new mechanic joins the pool automatically — its JuicyDI bean just
 implements `ISaveParticipant`.
 
 How to save:

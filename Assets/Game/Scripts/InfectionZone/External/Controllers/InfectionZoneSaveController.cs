@@ -20,6 +20,13 @@ namespace Game.Scripts.InfectionZone.External.Controllers
     /// Сохранение вызывается общим контроллером сохранений (GameSaveController, ISaveParticipant) на
     /// чекпоинтах. Уровни зон, которых сейчас нет на сцене (другие локации), из файла не теряются.
     /// Для проверки в Play Mode методы доступны из контекстного меню компонента.
+    ///
+    /// Переходы между локациями: когда сцена с зоной выгружается, контроллер запоминает уровень зоны
+    /// в памяти, а когда сцена загружается снова - зона получает этот уровень вместо стартового (зона,
+    /// которой нет в памяти, но есть в файле, получает уровень из файла). В файл запомненные уровни
+    /// попадают при следующем сохранении игры вместе с остальными механиками. Сам переход в файл ничего
+    /// не пишет: иначе возврат к последнему сохранению (смерть) возвращал бы зоны к уровням, которых в
+    /// момент сохранения ещё не было, - сюжет откатился бы, а заражение нет.
     /// </summary>
     [JDIMonoController]
     [SequenceParticipant(15)]
@@ -29,20 +36,44 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         [SerializeField] private string m_FileName = "infection_zones.json";
         [Tooltip("Загружать сохранение при старте сцены.")]
         [SerializeField] private bool m_LoadOnStart = true;
+        [Tooltip("Писать в консоль, какой уровень зоны запомнен при выгрузке её сцены и какой восстановлен при загрузке.")]
+        [SerializeField] private bool m_LogZoneLevels = true;
 
         [Inject] private IInfectionZoneRegistry m_Registry;
 
         // Последние известные уровни всех зон (в т.ч. тех, что сейчас не на сцене), ключ - ZoneId.
         private readonly Dictionary<string, float> m_SavedLevels = new();
 
+        // Реестр, на события которого подписан контроллер (JuicyDI может переинжектить поле).
+        private IInfectionZoneRegistry m_SubscribedRegistry;
+
         public string SavePath => JsonSaveFile.GetPath(m_FileName);
         public bool HasSave => JsonSaveFile.Exists(m_FileName);
 
         public void MethodInit()
         {
+            // Зоны стартовых сцен уже зарегистрированы (их MethodInit идёт раньше) - им уровни выставит Load ниже.
+            // Подписка - для зон, чьи сцены догрузятся и выгрузятся во время игры.
+            if (m_Registry != null && m_SubscribedRegistry == null)
+            {
+                m_SubscribedRegistry = m_Registry;
+                m_SubscribedRegistry.ZoneRegistered += OnZoneRegistered;
+                m_SubscribedRegistry.ZoneUnregistering += OnZoneUnregistering;
+            }
+
             if (m_LoadOnStart)
             {
                 Load();
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (m_SubscribedRegistry != null)
+            {
+                m_SubscribedRegistry.ZoneRegistered -= OnZoneRegistered;
+                m_SubscribedRegistry.ZoneUnregistering -= OnZoneUnregistering;
+                m_SubscribedRegistry = null;
             }
         }
 
@@ -123,6 +154,45 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         private void LoadFromContextMenu()
         {
             Load();
+        }
+
+        /// <summary>
+        /// Сцена с зоной загрузилась: зона получает последний известный уровень вместо стартового.
+        /// Вызывается из MethodInit зоны - до её MethodStart, где применился бы стартовый уровень.
+        /// </summary>
+        private void OnZoneRegistered(IInfectionZone zone)
+        {
+            if (!m_SavedLevels.TryGetValue(zone.ZoneId, out float level))
+            {
+                return;
+            }
+
+            zone.RestoreInfection(level);
+            Log($"зона '{zone.ZoneId}' загрузилась - восстановлен уровень заражения {level:0.##}");
+        }
+
+        /// <summary>
+        /// Сцена с зоной выгружается: уровень зоны запоминается до её следующей загрузки или сохранения игры.
+        /// </summary>
+        private void OnZoneUnregistering(IInfectionZone zone)
+        {
+            // Выгружается всё ядро вместе с этим контроллером (возврат к сохранению, выход в меню) - запоминать некуда.
+            if (this == null || !gameObject.scene.isLoaded)
+            {
+                return;
+            }
+
+            float level = zone.InfectionLevel.CurrentValue;
+            m_SavedLevels[zone.ZoneId] = level;
+            Log($"зона '{zone.ZoneId}' выгружается - запомнен уровень заражения {level:0.##}");
+        }
+
+        private void Log(string message)
+        {
+            if (m_LogZoneLevels)
+            {
+                Debug.Log($"[InfectionZoneSaveController] {message}", this);
+            }
         }
     }
 }
