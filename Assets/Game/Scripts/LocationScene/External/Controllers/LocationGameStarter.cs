@@ -45,6 +45,8 @@ namespace Game.Scripts.LocationScene.External.Controllers
         [Header("Загрузка")]
         [Tooltip("Объект экрана загрузки: включён, пока грузится локация. Можно не назначать.")]
         [SerializeField] private GameObject m_LoadingScreen;
+        [Tooltip("Прогрев шейдеров за экраном загрузки (при первом старте за запуск игры). Можно не назначать.")]
+        [SerializeField] private ShaderWarmupController m_ShaderWarmup;
 
         private readonly List<LocationSceneStarter> m_SceneStarters = new();
 
@@ -80,6 +82,10 @@ namespace Game.Scripts.LocationScene.External.Controllers
 
         private async UniTaskVoid StartGameAsync(CancellationToken token)
         {
+            // Прогрев идёт параллельно с загрузкой локации, а экран загрузки убирается, только когда он закончится:
+            // иначе драйвер собирал бы шейдеры при первом показе объектов - фризами прямо в игре.
+            var shaderWarmup = m_ShaderWarmup != null ? m_ShaderWarmup.WarmUpAsync(token) : UniTask.CompletedTask;
+
             ResolveStartPoint(out var location, out string checkpointId);
 
             if (location != null)
@@ -116,6 +122,8 @@ namespace Game.Scripts.LocationScene.External.Controllers
             m_SceneStarters.Clear();
 
             m_LocationSceneController.CompleteStart();
+
+            await shaderWarmup;
             SetLoadingScreenVisible(false);
         }
 
