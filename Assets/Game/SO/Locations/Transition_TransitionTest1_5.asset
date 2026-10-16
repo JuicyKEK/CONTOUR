@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c819fa9111213d647927bb3e6d88c488, type: 3}
+  m_Name: Transition_TransitionTest1_5
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationScene.Runtime.Data.LocationTransitionDefinitionSO
+  m_Scene:
+    m_SceneAsset: {fileID: 102900000, guid: e5c8583efe61e8e41abeb75ce4e6344e, type: 3}
+    m_ScenePath: Assets/Scenes/TransitionBetweenTestScene1.5.unity
+  m_LocationA: {fileID: 11400000, guid: 82d357fee87d7e54b997c561fb7d78ae, type: 2}
+  m_LocationB: {fileID: 11400000, guid: cc70626662500bb43a7c674619056b8a, type: 2}
