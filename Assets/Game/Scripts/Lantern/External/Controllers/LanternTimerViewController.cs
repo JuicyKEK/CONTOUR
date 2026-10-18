@@ -1,11 +1,13 @@
 ﻿using Game.Scripts.Lantern.View;
+using JuicyDI.Attributes;
 using UnityEngine;
 
 namespace Game.Scripts.Lantern
 {
+    [JDIMonoController]
     public class LanternTimerViewController : MonoBehaviour
     {
-        [SerializeField] private LanternTimerView m_LanternTimerView;
+        [Inject] private LanternTimerView m_LanternTimerView;
 
         public void Init()
         {

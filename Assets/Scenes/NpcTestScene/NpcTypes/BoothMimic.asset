@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784cd218efad5574e8729bcc6cd1376e, type: 3}
+  m_Name: BoothMimic
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Data.NpcTypeDefinitionSO
+  m_TypeName: "\u041D\u0435\u044F\u0432\u043D\u044B\u0439 \u043C\u0438\u043C\u0438\u043A
+    \u0443 \u0431\u0443\u0434\u043A\u0438 (\u0442\u0435\u0441\u0442)"
+  m_AnimationSoundProfile: {fileID: 11400000, guid: 5cc6e540873a76d48814177f01370254, type: 2}
+  m_ViewDistance: 14
+  m_ViewHalfAngle: 80
+  m_RequireLineOfSight: 1
+  m_LineOfSightObstacles:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  m_EyeHeight: 1.6
+  m_AggressionMode: 1
+  m_StartsAggressive: 0
+  m_InfectionAggressionThreshold: 60
+  m_AngerRisePerSecond: 0.1
+  m_AngerDecayPerSecond: 0
+  m_AngerInfectionMultiplier: 3
+  m_InstantAggressionInfectionLevel: 101
+  m_AngerActions: []
+  m_AngerAfterCalm: 0
+  m_PatrolSpeed: 1.6
+  m_SearchSpeed: 2.8
+  m_ChaseSpeed: 4.4
+  m_PanicSpeed: 5
+  m_CatchDistance: 1.2
+  m_AttackKind: 1
+  m_AttackHitDelay: 0.4
+  m_AttackDuration: 2
+  m_AttackCooldown: 1.5
+  m_AfterHit: 0
+  m_LoseSightGiveUpDelay: 5
+  m_ChaseStopsOnlyByStory: 0
+  m_SearchRadius: 6
+  m_LocalSearchDuration: 15
+  m_SearchLookAroundMin: 1
+  m_SearchLookAroundMax: 3
+  m_ZoneSearchInfectionLevel: 70
+  m_ZoneSearchDuration: 60
+  m_ZoneSearchFallbackRadius: 25
+  m_CanOpenDoors: 1
+  m_KnockInterval: 2
+  m_DoorDetectionMask:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  m_DoorDetectionDistance: 1.5
+  m_DoorDetectionRadius: 0.4
+  m_LockedDoorGiveUpDelay: 5
+  m_PatrolDoorOpenerKind: 0
+  m_ChaseDoorOpenerKind: 0
+  m_WanderRadius: 6
+  m_WanderMinInterval: 3
+  m_WanderMaxInterval: 7
+  m_WanderChaseSuppressDuration: 6

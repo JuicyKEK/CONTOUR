@@ -15,6 +15,12 @@ public class ObjectToggler : MonoBehaviour
 
     public void ToggleActive()
     {
+        // Объект мог быть выключен ещё до Start (например, свет выключили из сохранения) - тогда Start не вызывался.
+        if (!m_TargetObject)
+        {
+            m_TargetObject = this.gameObject;
+        }
+
         if (m_TargetObject != null)
         {
             m_TargetObject.SetActive(!m_TargetObject.activeSelf);

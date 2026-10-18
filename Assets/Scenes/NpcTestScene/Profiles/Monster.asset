@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78c35314d066d4a84fcb1e8943ebc8, type: 3}
+  m_Name: Monster
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Data.NpcAnimationSoundProfileSO
+  m_Entries:
+  - Key: Kill
+    AnimatorTrigger: 
+    Sound: {fileID: 8300000, guid: e145182201cacd0499113c0d2e40b10d, type: 3}
+    LoopSound: 0
+  - Key: Transform
+    AnimatorTrigger: 
+    Sound: {fileID: 8300000, guid: 0b029ac776e5b3b4bbb29125f3bb7c93, type: 3}
+    LoopSound: 0
+  - Key: Rage
+    AnimatorTrigger: 
+    Sound: {fileID: 8300000, guid: 959f04e18f1bb4e498765dabb26455b1, type: 3}
+    LoopSound: 0
+  - Key: DoorLockedTry
+    AnimatorTrigger: 
+    Sound: {fileID: 8300000, guid: 4f514ebe122995247bc95a514148ad49, type: 3}
+    LoopSound: 0
+  - Key: Knock
+    AnimatorTrigger: 
+    Sound: {fileID: 8300000, guid: 4f514ebe122995247bc95a514148ad49, type: 3}
+    LoopSound: 0
+  m_FootstepsFromAnimation: 0
+  m_WalkSteps:
+  - {fileID: 8300000, guid: 4918a3ca0c06fd344b8f8f572b5a8234, type: 3}
+  - {fileID: 8300000, guid: 3ac1654a3b4505f4a97dcb435fc9d631, type: 3}
+  - {fileID: 8300000, guid: 6deb5ec04c996304389b5ef801f4c234, type: 3}
+  m_RunSteps:
+  - {fileID: 8300000, guid: 4918a3ca0c06fd344b8f8f572b5a8234, type: 3}
+  - {fileID: 8300000, guid: 3ac1654a3b4505f4a97dcb435fc9d631, type: 3}
+  - {fileID: 8300000, guid: 6deb5ec04c996304389b5ef801f4c234, type: 3}
+  m_RunSpeedThreshold: 3
+  m_WalkStepDistance: 0.7
+  m_RunStepDistance: 1.3
+  m_StepVolume: 0.8
+  m_Voices:
+  - State: 2
+    Clips:
+    - {fileID: 8300000, guid: 386a5dba6be6de24cbbf85c18d227121, type: 3}
+    Loop: 0
+    MinInterval: 4
+    MaxInterval: 8
+    Volume: 0.5
+  - State: 6
+    Clips:
+    - {fileID: 8300000, guid: 386a5dba6be6de24cbbf85c18d227121, type: 3}
+    Loop: 0
+    MinInterval: 1
+    MaxInterval: 2.5
+    Volume: 0.8
+  - State: 3
+    Clips:
+    - {fileID: 8300000, guid: 959f04e18f1bb4e498765dabb26455b1, type: 3}
+    Loop: 0
+    MinInterval: 2.5
+    MaxInterval: 4
+    Volume: 1
+  m_MinDistance: 1
+  m_MaxDistance: 20

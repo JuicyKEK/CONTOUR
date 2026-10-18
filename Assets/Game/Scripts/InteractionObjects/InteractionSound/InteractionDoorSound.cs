@@ -50,6 +50,12 @@ namespace Game.Scripts.InteractionObjects.Controllers
 
         private void PlaySoundOpener(bool isOpen)
         {
+            // Состояние пришло из сохранения - дверь не открывали, звука нет.
+            if (m_SoundPlay.IsRestoringState)
+            {
+                return;
+            }
+
             RandomizePitchSound();
 
             m_AudioSource.resource = isOpen ? m_SoundClipsOpen : m_SoundClipsClose;

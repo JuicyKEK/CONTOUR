@@ -1,70 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using JuicyDI.Attributes;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-// ReSharper disable once CheckNamespace
 
 namespace Game.Scripts.Instructions.View
 {
     /// <summary>
-    /// Данные одной строки кассеты для построения списка (см. <see cref="CassettePlayerView.BuildSections"/>).
+    /// Чисто визуальная панель кассетного плеера: тоглы страниц, сами страницы (ScrollView с разделами
+    /// и кассетами) и блок проигрывания - название кассеты, полоса прогресса с перемоткой и кнопки
+    /// паузы/Play. Ничего не решает сама - только предоставляет примитивы управления, вызывается из
+    /// <see cref="Controllers.CassettePlayerController"/> (получает вид через [Inject]).
+    ///
+    /// Блок проигрывания виден, пока открыта панель и выбрана кассета: после закрытия и открытия панели он
+    /// снова показывает ту же кассету - играющую, на паузе или доигравшую. Все его поля, кроме кнопки паузы,
+    /// можно не назначать. Если не назначена кнопка Play, кнопка паузы сама переключает паузу и Play.
     /// </summary>
-    public readonly struct CassetteTapeRowData
-    {
-        public readonly string TapeId;
-        public readonly string DisplayName;
-        public readonly bool IsFound;
-
-        public CassetteTapeRowData(string tapeId, string displayName, bool isFound)
-        {
-            TapeId = tapeId;
-            DisplayName = displayName;
-            IsFound = isFound;
-        }
-    }
-
-    /// <summary>
-    /// Данные одного раздела списка кассет для построения списка.
-    /// </summary>
-    public readonly struct CassetteSectionRowData
-    {
-        public readonly string DisplayName;
-        public readonly IReadOnlyList<CassetteTapeRowData> Tapes;
-
-        public CassetteSectionRowData(string displayName, IReadOnlyList<CassetteTapeRowData> tapes)
-        {
-            DisplayName = displayName;
-            Tapes = tapes;
-        }
-    }
-
-    /// <summary>
-    /// Чисто визуальная панель кассетного плеера: слева "макет" самого проигрывателя,
-    /// справа - список разделов с кассетами, по центру - кнопка паузы (видна только
-    /// когда что-то проигрывается). Ничего не решает сама - только предоставляет
-    /// примитивы управления, вызывается из <see cref="Controllers.CassettePlayerController"/>.
-    /// </summary>
+    [JDIMonoController]
     public class CassettePlayerView : MonoBehaviour
     {
         [Header("Корень панели")]
         [Tooltip("Корневой объект всей панели плеера (левая часть с макетом + правая часть со списком).")]
         [SerializeField] private GameObject m_Root;
 
-        [Header("Список разделов/кассет (правая часть)")]
+        [Header("Список страниц")]
+        [Tooltip("Контейнер, в который спавнятся тоглы страниц.")]
+        [SerializeField] private Transform m_PageButtonsContent;
+        [Tooltip("ToggleGroup тоглов страниц (обычно висит на контейнере тоглов).")]
+        [SerializeField] private ToggleGroup m_PageToggleGroup;
+        [Tooltip("Контейнер, в который спавнятся страницы (ScrollView). Видна только выбранная страница.")]
+        [SerializeField] private Transform m_PageContent;
+        [SerializeField] private CassettePageToggleView m_PageTogglePrefab;
+        [SerializeField] private CassettePageView m_PagePrefab;
+
+        [Header("Список разделов/кассет")]
         [SerializeField] private CassetteSectionRowView m_SectionRowPrefab;
-        [SerializeField] private Transform m_SectionsContainer;
         [SerializeField] private CassetteTapeRowView m_TapeRowPrefab;
 
-        [Header("Кнопка паузы (по центру, видна только во время проигрывания)")]
+        [Header("Проигрывание кассеты")]
+        [Tooltip("Общий объект блока проигрывания (название, полоса, кнопки). Скрыт, пока не выбрана ни одна " +
+                 "кассета. Можно не назначать - тогда скрываются только сами элементы.")]
+        [SerializeField] private GameObject m_PlaybackRoot;
+        [Tooltip("Название выбранной кассеты.")]
+        [SerializeField] private TMP_Text m_TapeTitleText;
+        [Tooltip("Полоса прогресса кассеты (Slider): показывает, сколько проиграно; перетаскиванием - перемотка.")]
+        [SerializeField] private Slider m_ProgressSlider;
+        [Tooltip("Кнопка паузы - видна, пока кассета играет.")]
         [SerializeField] private Button m_PauseButton;
+        [Tooltip("Кнопка Play - видна вместо паузы, когда кассета на паузе (продолжает с того же места) или " +
+                 "доиграла (запускает с начала).")]
+        [SerializeField] private Button m_PlayButton;
+        [Tooltip("Кнопка перемотки назад (на сколько секунд - задаёт CassettePlayerController).")]
+        [SerializeField] private Button m_SkipBackButton;
+        [Tooltip("Кнопка перемотки вперёд (на сколько секунд - задаёт CassettePlayerController).")]
+        [SerializeField] private Button m_SkipForwardButton;
 
-        private readonly List<CassetteSectionRowView> m_SectionRowPool = new();
-        private readonly List<CassetteTapeRowView> m_TapeRowPool = new();
-        private int m_UsedTapeRows;
+        private readonly List<CassettePageToggleView> m_PageToggles = new();
+        private readonly List<CassettePageView> m_Pages = new();
+
+        private Action<string> m_OnTapeClicked;
+        private Action<int> m_OnPageSelected;
+        private Action m_OnPauseClicked;
+        private Action m_OnPlayClicked;
+        private CassetteSeekSliderView m_SeekSlider;
+        private bool m_IsPlaying;
+        private int m_PageCount;
+        private int m_SelectedPageIndex = -1;
+
+        /// <summary>
+        /// Индекс выбранной страницы (-1, если страниц нет).
+        /// </summary>
+        public int SelectedPageIndex => m_SelectedPageIndex;
 
         private void Awake()
         {
-            SetPauseButtonVisible(false);
+            if (m_ProgressSlider != null && !m_ProgressSlider.TryGetComponent(out m_SeekSlider))
+            {
+                m_SeekSlider = m_ProgressSlider.gameObject.AddComponent<CassetteSeekSliderView>();
+            }
+
+            SetPlaybackVisible(false);
         }
 
         public void SetVisible(bool isVisible)
@@ -72,104 +88,241 @@ namespace Game.Scripts.Instructions.View
             if (m_Root != null)
             {
                 m_Root.SetActive(isVisible);
-                
-                if (!isVisible)
-                {
-                    SetPauseButtonVisible(false);
-                }
-            }
-        }
-
-        public void SetPauseButtonVisible(bool isVisible)
-        {
-            if (m_PauseButton != null)
-            {
-                m_PauseButton.gameObject.SetActive(isVisible);
-            }
-        }
-
-        public void SetPauseButtonAction(Action onPauseClicked)
-        {
-            if (m_PauseButton == null)
-            {
-                return;
-            }
-
-            m_PauseButton.onClick.RemoveAllListeners();
-
-            if (onPauseClicked != null)
-            {
-                m_PauseButton.onClick.AddListener(() => onPauseClicked());
             }
         }
 
         /// <summary>
-        /// Полностью перестраивает список разделов/кассет (вызывается при каждом открытии панели).
+        /// Немедленно пересчитывает вёрстку панели (после открытия/смены страницы, чтобы layout-группы
+        /// не отрисовали один кадр со старыми размерами).
         /// </summary>
-        public void BuildSections(IReadOnlyList<CassetteSectionRowData> sections, Action<string> onTapeClicked)
+        public void RebuildLayout()
         {
-            m_UsedTapeRows = 0;
-
-            for (int i = 0; i < m_SectionRowPool.Count; i++)
+            if (m_Root != null && m_Root.transform is RectTransform rootRect)
             {
-                m_SectionRowPool[i].gameObject.SetActive(false);
-            }
-
-            for (int sectionIndex = 0; sectionIndex < sections.Count; sectionIndex++)
-            {
-                var sectionData = sections[sectionIndex];
-                var sectionRow = GetSectionRow(sectionIndex);
-                sectionRow.gameObject.SetActive(true);
-                sectionRow.Setup(sectionData.DisplayName);
-
-                for (int tapeIndex = 0; tapeIndex < sectionData.Tapes.Count; tapeIndex++)
-                {
-                    var tapeData = sectionData.Tapes[tapeIndex];
-                    var tapeRow = GetTapeRow(sectionRow.TapesContainer);
-                    tapeRow.gameObject.SetActive(true);
-
-                    string tapeId = tapeData.TapeId;
-                    tapeRow.Setup(tapeData.DisplayName, tapeData.IsFound, () => onTapeClicked?.Invoke(tapeId));
-                }
-            }
-
-            // Прячем неиспользованные в этот раз строки кассет (пул переиспользуется целиком,
-            // без привязки к конкретному разделу, поэтому неиспользованный хвост пула гасим отдельно).
-            for (int i = m_UsedTapeRows; i < m_TapeRowPool.Count; i++)
-            {
-                m_TapeRowPool[i].gameObject.SetActive(false);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
             }
         }
 
-        private CassetteSectionRowView GetSectionRow(int index)
+        /// <summary>
+        /// Что делать по кнопкам паузы и Play, по перемотке полосой (доля от длины кассеты, 0..1) и по кнопкам
+        /// перемотки назад и вперёд.
+        /// </summary>
+        public void SetPlaybackActions(Action onPauseClicked, Action onPlayClicked, Action<float> onSeek,
+            Action onSkipBackClicked, Action onSkipForwardClicked)
         {
-            if (index >= m_SectionRowPool.Count)
+            SetButtonAction(m_SkipBackButton, onSkipBackClicked);
+            SetButtonAction(m_SkipForwardButton, onSkipForwardClicked);
+            m_OnPauseClicked = onPauseClicked;
+            m_OnPlayClicked = onPlayClicked;
+
+            if (m_PauseButton != null)
             {
-                m_SectionRowPool.Add(Instantiate(m_SectionRowPrefab, m_SectionsContainer));
+                m_PauseButton.onClick.RemoveAllListeners();
+                m_PauseButton.onClick.AddListener(OnPauseButtonClicked);
             }
 
-            return m_SectionRowPool[index];
+            if (m_PlayButton != null)
+            {
+                m_PlayButton.onClick.RemoveAllListeners();
+                m_PlayButton.onClick.AddListener(() => m_OnPlayClicked?.Invoke());
+            }
+
+            if (m_SeekSlider != null)
+            {
+                m_SeekSlider.Setup(onSeek);
+            }
         }
 
-        private CassetteTapeRowView GetTapeRow(Transform parent)
+        /// <summary>
+        /// Показывает или прячет весь блок проигрывания (название, полосу, кнопки).
+        /// </summary>
+        public void SetPlaybackVisible(bool isVisible)
         {
-            CassetteTapeRowView row;
-
-            if (m_UsedTapeRows >= m_TapeRowPool.Count)
+            if (m_PlaybackRoot != null)
             {
-                row = Instantiate(m_TapeRowPrefab, parent);
-                m_TapeRowPool.Add(row);
+                m_PlaybackRoot.SetActive(isVisible);
+            }
+
+            SetActive(m_TapeTitleText, isVisible);
+            SetActive(m_ProgressSlider, isVisible);
+            SetActive(m_SkipBackButton, isVisible);
+            SetActive(m_SkipForwardButton, isVisible);
+
+            if (isVisible)
+            {
+                SetPlaying(m_IsPlaying);
             }
             else
             {
-                row = m_TapeRowPool[m_UsedTapeRows];
-                row.transform.SetParent(parent, false);
+                SetActive(m_PauseButton, false);
+                SetActive(m_PlayButton, false);
+            }
+        }
+
+        public void SetTapeTitle(string title)
+        {
+            if (m_TapeTitleText != null)
+            {
+                m_TapeTitleText.text = title;
+            }
+        }
+
+        /// <summary>
+        /// Сколько проиграно (0..1). Пока игрок держит ползунок, полоса не обновляется.
+        /// </summary>
+        public void SetProgress(float progress)
+        {
+            if (m_SeekSlider != null)
+            {
+                m_SeekSlider.SetProgress(progress);
+            }
+        }
+
+        /// <summary>
+        /// Кассета играет - видна кнопка паузы; на паузе или доиграла - кнопка Play.
+        /// </summary>
+        public void SetPlaying(bool isPlaying)
+        {
+            m_IsPlaying = isPlaying;
+
+            if (m_PlayButton == null)
+            {
+                // Кнопки Play нет - кнопка паузы видна всегда и переключает паузу и Play.
+                SetActive(m_PauseButton, true);
+                return;
             }
 
-            m_UsedTapeRows++;
-            return row;
+            SetActive(m_PauseButton, isPlaying);
+            SetActive(m_PlayButton, !isPlaying);
+        }
+
+        private void OnPauseButtonClicked()
+        {
+            if (m_PlayButton == null && !m_IsPlaying)
+            {
+                m_OnPlayClicked?.Invoke();
+                return;
+            }
+
+            m_OnPauseClicked?.Invoke();
+        }
+
+        private static void SetButtonAction(Button button, Action onClicked)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            button.onClick.RemoveAllListeners();
+
+            if (onClicked != null)
+            {
+                button.onClick.AddListener(() => onClicked());
+            }
+        }
+
+        private static void SetActive(Component component, bool isActive)
+        {
+            if (component != null && component.gameObject.activeSelf != isActive)
+            {
+                component.gameObject.SetActive(isActive);
+            }
+        }
+
+        /// <summary>
+        /// Спавнит по тоглу и странице на каждую страницу и заполняет все страницы разделами и кассетами.
+        /// Вызывается один раз на старте - дальше страницы только обновляются через <see cref="RefreshPage"/>.
+        /// </summary>
+        /// <param name="onTapeClicked">Клик по найденной кассете (передаётся TapeId).</param>
+        /// <param name="onPageSelected">Игрок переключил страницу тоглом (передаётся индекс страницы).</param>
+        public void BuildPages(IReadOnlyList<CassettePageRowData> pages, Action<string> onTapeClicked,
+            Action<int> onPageSelected)
+        {
+            m_OnTapeClicked = onTapeClicked;
+            m_OnPageSelected = onPageSelected;
+            m_PageCount = pages?.Count ?? 0;
+
+            if (m_PageToggleGroup != null)
+            {
+                // Всегда выбрана ровно одна страница - повторный клик по активному тоглу не должен его снимать.
+                m_PageToggleGroup.allowSwitchOff = false;
+            }
+
+            for (int i = 0; i < m_PageCount; i++)
+            {
+                int pageIndex = i;
+                var pageData = pages[i];
+
+                var pageToggle = GetPageToggle(i);
+                pageToggle.gameObject.SetActive(true);
+                pageToggle.Setup(pageData.PageName, pageData.PageColor, m_PageToggleGroup,
+                    () => SelectPage(pageIndex, true));
+
+                GetPage(i).Build(pageData.Sections, m_OnTapeClicked);
+            }
+
+            for (int i = m_PageCount; i < m_PageToggles.Count; i++)
+            {
+                m_PageToggles[i].gameObject.SetActive(false);
+                m_Pages[i].SetVisible(false);
+            }
+
+            int selectedPageIndex = m_PageCount == 0 ? -1 : Mathf.Clamp(m_SelectedPageIndex, 0, m_PageCount - 1);
+            SelectPage(selectedPageIndex, false);
+        }
+
+        /// <summary>
+        /// Обновляет разделы и кассеты одной страницы (без спавна новых страниц).
+        /// </summary>
+        public void RefreshPage(int pageIndex, IReadOnlyList<CassetteSectionRowData> sections)
+        {
+            if (pageIndex < 0 || pageIndex >= m_PageCount)
+            {
+                return;
+            }
+
+            m_Pages[pageIndex].Build(sections, m_OnTapeClicked);
+        }
+
+        private void SelectPage(int pageIndex, bool notify)
+        {
+            m_SelectedPageIndex = pageIndex;
+
+            for (int i = 0; i < m_PageCount; i++)
+            {
+                bool isSelected = i == pageIndex;
+                m_Pages[i].SetVisible(isSelected);
+                m_PageToggles[i].SetIsOnWithoutNotify(isSelected);
+            }
+
+            if (notify && pageIndex >= 0)
+            {
+                m_OnPageSelected?.Invoke(pageIndex);
+            }
+        }
+
+        private CassettePageToggleView GetPageToggle(int index)
+        {
+            if (index >= m_PageToggles.Count)
+            {
+                m_PageToggles.Add(Instantiate(m_PageTogglePrefab, m_PageButtonsContent));
+            }
+
+            return m_PageToggles[index];
+        }
+
+        private CassettePageView GetPage(int index)
+        {
+            if (index >= m_Pages.Count)
+            {
+                var page = Instantiate(m_PagePrefab, m_PageContent);
+                page.Init(m_SectionRowPrefab, m_TapeRowPrefab);
+                m_Pages.Add(page);
+            }
+
+            return m_Pages[index];
         }
     }
 }
-
 

@@ -1,4 +1,5 @@
-﻿using Game.Scripts.InputController;
+﻿using System.Collections.Generic;
+using Game.Scripts.InputController;
 using Game.Scripts.Inventory.Controllers.Interfaces;
 using Game.Scripts.Inventory.External.Controllers.Interfaces;
 using Game.Scripts.Inventory.Runtime.Data;
@@ -10,11 +11,10 @@ namespace Game.Scripts.Inventory.Controllers
 {
     [JDIMonoController]
     [SequenceParticipant(100)]
-    public class InventoryController : MonoBehaviour, IInventoryAdd, IInventoryGetObject, ISequence
+    public class InventoryController : MonoBehaviour, IInventoryAdd, IInventoryGetObject, IInventoryContent, ISequence
     {
         [Inject] private IInputSelectionActions m_inputSelectionActions;
-        
-        [SerializeField] private InventoryViewController m_InventoryViewController;
+        [Inject] private InventoryViewController m_InventoryViewController;
         
         private IInventoryDataController m_InventoryDataController = new InventoryDataController();
         private int m_CurrentSellectObject;
@@ -77,6 +77,38 @@ namespace Game.Scripts.Inventory.Controllers
             }
             
             m_InventoryViewController.UpdateInventoryView(m_InventoryDataController.GetInventoryDataObjects());
+        }
+
+        public void GetItems(List<KeyValuePair<string, int>> result)
+        {
+            result.Clear();
+
+            var inventoryObjects = m_InventoryDataController.GetInventoryDataObjects().InventoryObjects;
+
+            if (inventoryObjects == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < inventoryObjects.Count; i++)
+            {
+                result.Add(new KeyValuePair<string, int>(inventoryObjects[i].Peek().ObjectKey, inventoryObjects[i].Count));
+            }
+        }
+
+        public void ClearItems()
+        {
+            var inventoryData = m_InventoryDataController.GetInventoryDataObjects();
+
+            // Список ячеек создаётся при первом добавлении предмета - пустой инвентарь чистить не нужно.
+            if (inventoryData.InventoryObjects == null)
+            {
+                return;
+            }
+
+            inventoryData.InventoryObjects.Clear();
+            m_CurrentSellectObject = 0;
+            m_InventoryViewController.UpdateInventoryView(inventoryData);
         }
 
         private void TrySelectedInventoryObject(int selectedIndex)

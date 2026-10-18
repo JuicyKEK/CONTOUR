@@ -17,7 +17,13 @@ namespace Game.Scripts.Story
 
         public async UniTask PlayAsync(PlayableAsset timeline, CancellationToken token)
         {
-            if (m_Director == null || timeline == null)
+            if (m_Director == null)
+            {
+                Debug.LogWarning($"[Story] CutsceneDirector: не назначен PlayableDirector - ролик '{(timeline != null ? timeline.name : "null")}' не проигран.", this);
+                return;
+            }
+
+            if (timeline == null)
             {
                 return;
             }

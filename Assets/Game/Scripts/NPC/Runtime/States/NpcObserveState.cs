@@ -1,11 +1,10 @@
 ﻿using Game.Scripts.NPC.Runtime.Core;
-using UnityEngine;
 
 namespace Game.Scripts.NPC.Runtime.States
 {
     /// <summary>
     /// Наблюдение: бот стоит на месте, но поворачивается лицом к игроку, пока
-    /// видит его (например охранник/симулякр, который просто следит взглядом,
+    /// видит его (например охранник/мимик, который просто следит взглядом,
     /// не приближаясь). Если у бота включена агрессия и игрок виден - автоматом
     /// уходит в Chase. Для мирных ботов (агрессия выключена) это чисто
     /// декоративное состояние - переход в Chase никогда не произойдёт.
@@ -18,32 +17,18 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override void Enter(NpcBlackboard blackboard)
         {
-            if (blackboard.Agent.isOnNavMesh)
-            {
-                blackboard.Agent.isStopped = true;
-            }
-
+            NpcNavigation.Halt(blackboard.Agent);
             blackboard.Controller.PlayAnimationSound("Observe");
         }
 
         public override NpcStateId? Tick(NpcBlackboard blackboard, float deltaTime)
         {
-            if (blackboard.CanSeePlayer)
+            if (blackboard.CanSeePlayer && blackboard.PlayerTransform != null)
             {
-                var toPlayer = blackboard.PlayerTransform.position - blackboard.Self.position;
-                toPlayer.y = 0f;
-
-                if (toPlayer.sqrMagnitude > 0.001f)
-                {
-                    var targetRotation = Quaternion.LookRotation(toPlayer.normalized);
-                    blackboard.Self.rotation = Quaternion.RotateTowards(
-                        blackboard.Self.rotation, targetRotation, RotationSpeedDegPerSec * deltaTime);
-                }
+                NpcNavigation.FaceTowards(blackboard.Self, blackboard.PlayerTransform.position, RotationSpeedDegPerSec, deltaTime);
             }
 
-            if (blackboard.AggressionSource != null
-                && blackboard.AggressionSource.IsAggressive.CurrentValue
-                && blackboard.CanSeePlayer)
+            if (blackboard.IsAggressive && blackboard.CanSeePlayer)
             {
                 return NpcStateId.Chase;
             }
@@ -53,11 +38,7 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override void Exit(NpcBlackboard blackboard)
         {
-            if (blackboard.Agent.isOnNavMesh)
-            {
-                blackboard.Agent.isStopped = false;
-            }
+            NpcNavigation.SetStopped(blackboard.Agent, false);
         }
     }
 }
-

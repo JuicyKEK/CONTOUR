@@ -28,8 +28,28 @@ namespace Game.Scripts.Story
     {
         [SerializeField] private StoryInputButton m_Button;
 
-        public override async UniTask WaitAsync(StoryContext context, CancellationToken token)
+        public override UniTask WaitAsync(StoryContext context, CancellationToken token)
         {
+            return StoryInput.WaitPressAsync(context.InputActions, m_Button, token);
+        }
+    }
+
+    /// <summary>
+    /// Ожидание нажатия кнопки через IInputActions (общий код для InputButtonCondition и условий графа GBS).
+    /// Примечание: IInputActions не предоставляет отписку от Action,
+    /// поэтому обработчик самоблокируется флагом isCompleted после первого срабатывания.
+    /// </summary>
+    public static class StoryInput
+    {
+        public static async UniTask WaitPressAsync(IInputActions inputActions, StoryInputButton button, CancellationToken token)
+        {
+            if (inputActions == null)
+            {
+                Debug.LogWarning("[Story] Ожидание кнопки: на сцене нет IInputActions.");
+                await UniTask.Never(token);
+                return;
+            }
+
             var completionSource = new UniTaskCompletionSource();
             bool isCompleted = false;
 
@@ -44,7 +64,7 @@ namespace Game.Scripts.Story
                 completionSource.TrySetResult();
             }
 
-            Subscribe(context.InputActions, Handler);
+            Subscribe(inputActions, button, Handler);
 
             using (token.Register(() =>
                    {
@@ -56,9 +76,9 @@ namespace Game.Scripts.Story
             }
         }
 
-        private void Subscribe(IInputActions inputActions, Action handler)
+        private static void Subscribe(IInputActions inputActions, StoryInputButton button, Action handler)
         {
-            switch (m_Button)
+            switch (button)
             {
                 case StoryInputButton.F:
                     inputActions.AddPressingButtonFAction(handler);

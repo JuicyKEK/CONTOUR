@@ -34,14 +34,31 @@ namespace Game.Scripts.InteractionObjects.View
             
             if (_door != null)
             {
-                _door.IsOpen.Subscribe(ChangeState)
+                // Положение на старте - сразу, без анимации: дверь могла загрузиться открытой из сохранения.
+                SetDoorStateInstant(_door.IsOpen.CurrentValue);
+
+                _door.IsOpen.Skip(1).Subscribe(ChangeState)
                     .AddTo(_disposables);
             }
         }
 
         public async void ChangeState(bool isOpen)
         {
+            // Состояние пришло из сохранения - дверь должна просто стоять открытой/закрытой.
+            if (_door != null && _door.IsRestoringState)
+            {
+                SetDoorStateInstant(isOpen);
+                return;
+            }
+
             await SetDoorStateAsync(isOpen);
+        }
+
+        private void SetDoorStateInstant(bool isOpen)
+        {
+            _cts?.Cancel();
+            _currentTween?.Kill();
+            transform.localRotation = isOpen ? _openRotation : _closedRotation;
         }
 
         private async UniTask SetDoorStateAsync(bool isOpen)

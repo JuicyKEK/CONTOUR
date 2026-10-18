@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: Intro
+  m_EditorClassIdentifier: Assembly-CSharp::GBS.Data.GBSGraphSO
+  m_GraphId: 665d79a2-6f53-488c-9fa0-82cf9d372805
+  m_GraphName: "NPC Test: \u043F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0430"
+  m_Nodes:
+  - rid: 155225072805609472
+  - rid: 155225072805609473
+  m_Edges:
+  - m_FromNodeId: 31786551-3fe5-4a88-82a6-13d0f97331ef
+    m_FromPortId: out
+    m_ToNodeId: 7abd6b78-bf65-42e0-9366-5c8426bef1a2
+    m_ToPortId: in
+  references:
+    version: 2
+    RefIds:
+    - rid: 155225072805609472
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 31786551-3fe5-4a88-82a6-13d0f97331ef
+        m_NodeName: Start
+        m_Position: {x: 0, y: 200}
+    - rid: 155225072805609473
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 7abd6b78-bf65-42e0-9366-5c8426bef1a2
+        m_NodeName: "\u041F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0430"
+        m_Position: {x: 300, y: 200}
+        m_OnCompleteActions:
+        - rid: 155225072805609474
+        m_OnCompleteEvents: []
+    - rid: 155225072805609474
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u0422\u0435\u0441\u0442\u043E\u0432\u0430\u044F \u0441\u0446\u0435\u043D\u0430
+          \u0431\u043E\u0442\u043E\u0432: \u0437\u0430\u043F\u0430\u0434 - \u0433\u0430\u0437\u043E\u0432\u0449\u0438\u043A,
+          \u0432\u043E\u0441\u0442\u043E\u043A - \u0431\u0443\u0434\u043A\u0430,
+          \u0441\u0435\u0432\u0435\u0440 - \u043C\u0430\u0441\u0442\u0435\u0440\u0441\u043A\u0430\u044F,
+          \u044E\u0433\u043E-\u0432\u043E\u0441\u0442\u043E\u043A - \u043C\u043E\u043D\u0441\u0442\u0440,
+          \u044E\u0433\u043E-\u0437\u0430\u043F\u0430\u0434 - \u043E\u0445\u043E\u0442\u043D\u0438\u043A."
+        m_UntilNodeExit: 0
+        m_Duration: 7
+        m_WaitUntilHidden: 0

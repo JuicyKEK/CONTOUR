@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using JuicyDI.Attributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,8 +10,9 @@ namespace Game.Scripts.InfectionZone.External.View
     /// Чисто визуальный HUD "Уровень заражения {Имя зоны}:" со слайдером (0..100) вверху экрана.
     /// Сам по себе ничего не решает "когда показывать" - только предоставляет примитивы
     /// (заголовок, мгновенная установка значения, анимация значения, fade всего блока),
-    /// которыми управляет <see cref="Controllers.InfectionLevelHudController"/>.
+    /// которыми управляет <see cref="Controllers.InfectionLevelHudController"/> (получает вид через [Inject]).
     /// </summary>
+    [JDIMonoController]
     public class InfectionLevelHudView : MonoBehaviour
     {
         [Header("Ссылки")]

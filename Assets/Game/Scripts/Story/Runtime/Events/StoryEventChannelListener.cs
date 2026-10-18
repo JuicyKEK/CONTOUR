@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JuicyDI.Attributes;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Game.Scripts.Story
@@ -12,11 +13,13 @@ namespace Game.Scripts.Story
     /// NPCMainLocationSpawner и выбрать его метод (например AddNpcToSpawnList),
     /// ровно так же, как если бы UnityEvent висел прямо на ноде сюжета.
     ///
-    /// Это позволяет не менять StoryAction/StoryNodeSO/StoryManager: SO-граф
-    /// продолжает работать только с ассетами, а связывание с конкретными
-    /// сценными объектами происходит здесь, на уровне сцены.
+    /// Устаревший способ: для новых шагов используйте StorySceneReactions (реакции по ключам,
+    /// без SO-ассета на каждый шаг). Для графов GBS этот слушатель работает как реакция сцены
+    /// с ключом "Legacy/&lt;имя ассета канала&gt;" - импортированный старый сюжет работает без
+    /// переделки сцены.
     /// </summary>
-    public class StoryEventChannelListener : MonoBehaviour
+    [JDIMonoController]
+    public class StoryEventChannelListener : MonoBehaviour, IStorySceneReactionSource
     {
         [SerializeField] private UnityEventAction m_Channel;
         [SerializeField] private UnityEvent m_OnRaised;
@@ -42,10 +45,20 @@ namespace Game.Scripts.Story
             m_Channel.Unsubscribe(HandleRaised);
         }
 
+        public int InvokeReaction(string key)
+        {
+            if (m_Channel == null || key != StorySignals.LegacyKey(m_Channel))
+            {
+                return 0;
+            }
+
+            HandleRaised();
+            return 1;
+        }
+
         private void HandleRaised()
         {
             m_OnRaised?.Invoke();
         }
     }
 }
-

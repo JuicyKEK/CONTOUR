@@ -1,33 +1,31 @@
-﻿using DG.Tweening;
+﻿using System;
+using DG.Tweening;
 using Game.Scripts.InfectionZone.External.View;
 using Game.Scripts.InfectionZone.Runtime.Interfaces;
-// ReSharper disable once RedundantUsingDirective
 using JuicyDI;
 using JuicyDI.Attributes;
-using JuicyDI.Context;
+using R3;
 using UnityEngine;
 
 namespace Game.Scripts.InfectionZone.External.Controllers
 {
     /// <summary>
     /// Управляет показом/скрытием HUD уровня заражения (см. <see cref="IInfectionLevelHud"/>).
-    /// Регистрируется как глобальный бин JuicyDI, чтобы триггеры зон на любой сцене могли
-    /// получить его через [Inject], не имея прямой ссылки на объект HUD.
+    /// Бин сцены JuicyDI: вид (<see cref="InfectionLevelHudView"/>) и трекер текущей зоны игрока
+    /// приходят через [Inject] - на сцене они должны быть в одном экземпляре.
     ///
     /// Два сценария показа:
-    ///  - <see cref="ShowCurrentLevel"/> - вход игрока в локацию: слайдер сразу выставляется
+    ///  - <see cref="ShowCurrentLevel"/> - игрок перешёл в другую зону (сам контроллер следит за
+    ///    <see cref="IPlayerInfectionZoneTracker.CurrentZone"/>): слайдер сразу выставляется
     ///    на текущий уровень заражения, анимации значения нет;
     ///  - <see cref="ShowLevelChange"/> - изменение заражения зоны (например очистка): слайдер
     ///    сначала показывает старое значение, затем плавно "утекает" к новому.
     /// В обоих случаях HUD появляется через fade, ждёт m_AutoHideDelay секунд и прячется.
     /// </summary>
-    [JDIMonoController(Context = typeof(GlobalBean))]
+    [JDIMonoController]
     [SequenceParticipant(100)]
     public class InfectionLevelHudController : MonoBehaviour, IInfectionLevelHud, ISequence
     {
-        [Header("Вид")]
-        [SerializeField] private InfectionLevelHudView m_View;
-
         [Header("Тайминги")]
         [Tooltip("Длительность плавного появления/скрытия всего блока HUD.")]
         [SerializeField] private float m_FadeDuration = 0.25f;
@@ -38,7 +36,11 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         [Tooltip("Сколько секунд HUD остаётся на экране (после появления/окончания анимации значения), прежде чем скрыться.")]
         [SerializeField] private float m_AutoHideDelay = 5f;
 
+        [Inject] private InfectionLevelHudView m_View;
+        [Inject] private IPlayerInfectionZoneTracker m_ZoneTracker;
+
         private Sequence m_Sequence;
+        private IDisposable m_CurrentZoneSubscription;
 
         public void MethodInit()
         {
@@ -49,10 +51,21 @@ namespace Game.Scripts.InfectionZone.External.Controllers
             // Прячем HUD сразу и без анимации - до первого реального вызова Show*
             // он не должен быть виден на экране.
             m_View.SetVisibleInstant(false);
+
+            // Без трекера на сцене JuicyDI уже написал ошибку резолва - не роняем остальной старт сцены.
+            if (m_ZoneTracker == null)
+            {
+                return;
+            }
+
+            // Игрок перешёл в другую зону - показываем её текущий уровень заражения.
+            m_CurrentZoneSubscription = m_ZoneTracker.CurrentZone
+                .Where(zone => zone != null)
+                .Subscribe(zone => ShowCurrentLevel(zone.DisplayName, zone.InfectionLevel.CurrentValue));
         }
 
         /// <summary>
-        /// Вход игрока в локацию - показываем текущий уровень заражения без анимации значения.
+        /// Вход игрока в зону - показываем текущий уровень заражения без анимации значения.
         /// </summary>
         public void ShowCurrentLevel(string zoneDisplayName, float level)
         {
@@ -87,8 +100,10 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         private void OnDestroy()
         {
             m_Sequence?.Kill();
+            m_CurrentZoneSubscription?.Dispose();
         }
     }
 }
+
 
 

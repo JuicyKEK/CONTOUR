@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using JuicyDI.Attributes;
+using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Game.Scripts.Lantern.View
 {
+    [JDIMonoController]
     public class LanternTimerView : MonoBehaviour
     {
         [SerializeField] private CanvasGroup m_LanternBarCG;

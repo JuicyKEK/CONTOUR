@@ -16,7 +16,9 @@ namespace Game.Scripts.InteractionObjects.View
         [SerializeField] private float duration = 0.1f;
         [SerializeField] private InteractionDoor _interactionDoor;
 
-        private Subject<Unit> m_IsPlaySound;
+        // Создаётся сразу: раньше не создавался вовсе - звук щеколды (SoundPlayer, подписанный на IsPlaySound)
+        // не играл, а подписка на null падала с NullReferenceException.
+        private readonly Subject<Unit> m_IsPlaySound = new();
         private Vector3 _closedLocalPos;
         private Vector3 _openLocalPos;
         private Collider _collider;
@@ -30,12 +32,32 @@ namespace Game.Scripts.InteractionObjects.View
 
         private void Start()
         {
-            _interactionDoor.IsLocked.Subscribe(SetLatchState).AddTo(_disposables);
             _collider = GetComponent<BoxCollider>();
-            SetLatchState(_interactionDoor.IsLocked.CurrentValue);
+
+            // Положение на старте - сразу, без анимации: дверь могла загрузиться запертой из сохранения.
+            SetLatchStateInstant(_interactionDoor.IsLocked.CurrentValue);
+
+            _interactionDoor.IsLocked.Skip(1).Subscribe(OnLockedChanged).AddTo(_disposables);
         }
 
-        
+        private void OnLockedChanged(bool isClosed)
+        {
+            // Состояние пришло из сохранения - защёлка должна просто стоять в нужном положении.
+            if (_interactionDoor.IsRestoringState)
+            {
+                SetLatchStateInstant(isClosed);
+                return;
+            }
+
+            SetLatchState(isClosed);
+        }
+
+        private void SetLatchStateInstant(bool isClosed)
+        {
+            _currentTween?.Kill();
+            transform.localPosition = isClosed ? _closedLocalPos : _openLocalPos;
+        }
+
         private void SetLatchState(bool isClosed)
         {
             _collider.enabled = false;
@@ -56,6 +78,7 @@ namespace Game.Scripts.InteractionObjects.View
         private void OnDestroy()
         {
             _disposables.Dispose();
+            m_IsPlaySound.Dispose();
         }
     }
 }

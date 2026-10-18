@@ -16,16 +16,22 @@ namespace Game.Scripts.Story
 
         public override async UniTask ExecuteAsync(StoryContext context, CancellationToken token)
         {
-            if (context.HintView == null)
+            var hintView = context.HintView;
+
+            if (hintView == null)
             {
                 return;
             }
 
-            var task = context.HintView.ShowAsync(m_Text, m_Duration, token);
+            var task = hintView.ShowAsync(m_Text, m_Duration, token);
 
             if (m_WaitUntilHidden)
             {
                 await task;
+            }
+            else
+            {
+                task.Forget();
             }
         }
     }

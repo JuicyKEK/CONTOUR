@@ -25,8 +25,11 @@ namespace Game.Scripts.Story
 
         public void SetActiveCamera(string key)
         {
-            if (m_Cameras == null)
+            // Неизвестный ключ выключил бы все камеры (чёрный экран) - ничего не трогаем.
+            if (!HasCamera(key))
             {
+                Debug.LogWarning($"[Story] CameraDirector: нет камеры с ключом '{key}'. " +
+                                 "Добавьте её в список Cameras (камеру игрока тоже, чтобы на неё можно было вернуться).", this);
                 return;
             }
 
@@ -39,6 +42,24 @@ namespace Game.Scripts.Story
 
                 entry.Camera.gameObject.SetActive(entry.Key == key);
             }
+        }
+
+        private bool HasCamera(string key)
+        {
+            if (m_Cameras == null)
+            {
+                return false;
+            }
+
+            foreach (var entry in m_Cameras)
+            {
+                if (entry?.Camera != null && entry.Key == key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

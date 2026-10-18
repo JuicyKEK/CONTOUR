@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Game.Scripts.InfectionZone.Runtime.Interfaces;
 using JuicyDI.Attributes;
 using UnityEngine;
@@ -14,6 +15,11 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
     public class InfectionZoneRegistry : MonoBehaviour, IInfectionZoneRegistry
     {
         private readonly Dictionary<string, IInfectionZone> m_ZonesById = new();
+
+        public IReadOnlyCollection<IInfectionZone> Zones => m_ZonesById.Values;
+
+        public event Action<IInfectionZone> ZoneRegistered;
+        public event Action<IInfectionZone> ZoneUnregistering;
 
         public IInfectionZone GetZone(string zoneId)
         {
@@ -40,6 +46,7 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
             }
 
             m_ZonesById.Add(zone.ZoneId, zone);
+            ZoneRegistered?.Invoke(zone);
         }
 
         public void UnregisterZone(IInfectionZone zone)
@@ -49,6 +56,14 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                 return;
             }
 
+            // Снимаем с учёта только ту зону, что зарегистрирована. Зона из сцены, которая догрузилась, но не
+            // запускалась (переход отменили), в реестр не попадала - её уничтожение не должно убрать зону с тем же Id.
+            if (!m_ZonesById.TryGetValue(zone.ZoneId, out var registeredZone) || !ReferenceEquals(registeredZone, zone))
+            {
+                return;
+            }
+
+            ZoneUnregistering?.Invoke(zone);
             m_ZonesById.Remove(zone.ZoneId);
         }
     }

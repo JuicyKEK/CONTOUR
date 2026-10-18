@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: NewGBSGraph
+  m_EditorClassIdentifier: 
+  m_GraphId: 84c7f0d8-79b0-472d-8998-768e1bc63004
+  m_GraphName: NewGBSGraph
+  m_Nodes:
+  - rid: 4597201109614329867
+  - rid: 4597201109614329868
+  - rid: 4597201109614329869
+  m_Edges:
+  - m_FromNodeId: 2a7cd2c0-3243-4811-9bc4-8a912134226c
+    m_FromPortId: out
+    m_ToNodeId: fc04ada3-3953-42d0-8b49-b4b2019205b8
+    m_ToPortId: in
+  - m_FromNodeId: fc04ada3-3953-42d0-8b49-b4b2019205b8
+    m_FromPortId: def5cac0-d094-4e96-bac9-dc83470c63a2
+    m_ToNodeId: a3632729-76ed-49e5-b8f9-79443c33f39f
+    m_ToPortId: in
+  references:
+    version: 2
+    RefIds:
+    - rid: 4597201109614329867
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 2a7cd2c0-3243-4811-9bc4-8a912134226c
+        m_NodeName: Start
+        m_Position: {x: 200, y: 221}
+    - rid: 4597201109614329868
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: a3632729-76ed-49e5-b8f9-79443c33f39f
+        m_NodeName: End
+        m_Position: {x: 1272, y: 182}
+        m_OnCompleteActions:
+        - rid: 4597201109614329870
+        m_OnCompleteEvents: []
+    - rid: 4597201109614329869
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: fc04ada3-3953-42d0-8b49-b4b2019205b8
+        m_NodeName: StoryNode
+        m_Position: {x: 725, y: 72}
+        m_Actions:
+        - rid: 4597201109614329871
+        m_Branches:
+        - m_Id: def5cac0-d094-4e96-bac9-dc83470c63a2
+          m_BranchName: Transition 1
+          m_InlineCondition:
+            rid: 4597201109614329872
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 4597201109614329870
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: 
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614329871
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: 
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 4597201109614329872
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 1

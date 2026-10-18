@@ -26,7 +26,10 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
     [SerializeField] private int _lockedShakeDirection = -1;
     [SerializeField] private UnityEvent _onOpen;
     
+    public bool IsMoving => _swingTween != null && _swingTween.IsActive() && !_swingTween.IsComplete();
+
     private Tween _currentTween;
+    private Tween _swingTween;
     private Quaternion _closedRotation;
     private Quaternion _openRotation;
     private Quaternion _monsterRotation;
@@ -49,7 +52,11 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
         if (_door != null)
         {
             _collider = GetComponent<Collider>();
-            _door.IsOpen.Subscribe(ChangeState)
+
+            // Положение на старте - сразу, без анимации: дверь могла загрузиться открытой из сохранения.
+            SetDoorStateInstant(_door.IsOpen.CurrentValue);
+
+            _door.IsOpen.Skip(1).Subscribe(ChangeState)
                 .AddTo(_disposables);
             _door.IsTryingOpenLockedDoor.Subscribe(_ => TryOpenDoor())
                 .AddTo(_disposables);
@@ -58,7 +65,26 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
 
     public async void ChangeState(bool isOpen)
     {
+        // Состояние пришло из сохранения - дверь должна просто стоять открытой/закрытой.
+        if (_door != null && _door.IsRestoringState)
+        {
+            SetDoorStateInstant(isOpen);
+            return;
+        }
+
         await SetDoorStateAsync(isOpen);
+    }
+
+    private void SetDoorStateInstant(bool isOpen)
+    {
+        _cts?.Cancel();
+        _currentTween?.Kill();
+        transform.localRotation = isOpen ? _openRotation : _closedRotation;
+
+        if (_collider != null)
+        {
+            _collider.enabled = true;
+        }
     }
 
     private async UniTask SetDoorStateAsync(bool isOpen)
@@ -91,6 +117,7 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
                 }
             })
             .SetEase(Ease.OutCubic);
+        _swingTween = _currentTween;
 
         try
         {

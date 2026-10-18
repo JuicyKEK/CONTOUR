@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba836bd9a0244ecfb1680ed6d7b20473, type: 3}
+  m_Name: AudioTapePage_P1
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Data.AudioTapePageSO
+  m_Sections:
+  - {fileID: 11400000, guid: 6428ce0c25340ca4dbc8dc16d743e40a, type: 2}
+  - {fileID: 11400000, guid: a5c431d3632029a4bb068711a0c24c7b, type: 2}
+  m_PageName: "\u0418\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0438"
+  m_PageColor: {r: 0.84388924, g: 1, b: 0.5801887, a: 1}

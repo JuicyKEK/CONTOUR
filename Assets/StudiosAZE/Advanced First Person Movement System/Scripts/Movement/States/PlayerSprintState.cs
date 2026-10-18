@@ -1,0 +1,86 @@
+namespace AZE.AdvancedFirstPerson
+{
+    public class PlayerSprintState : PlayerBaseState
+    {
+        public PlayerSprintState(PlayerMovementStateMachine ctx, PlayerStateFactory factory) : base(ctx, factory) { }
+
+        public override void EnterState()
+        {
+            ctx.TargetHeight = ctx.GetStandingHeight();
+            ctx.IsSprinting = true;
+        }
+
+        public override void UpdateState()
+        {
+            CheckSwitchStates();
+            ctx.HandleGravity();
+            ctx.HandleMovement(ctx.RunSpeed);
+        }
+
+        public override void ExitState() 
+        {
+            ctx.IsSprinting = false;
+        }
+
+        public override void CheckSwitchStates()
+        {
+            // Движение запрещено (игрока схватили, катсцена) - остановка без курсора мыши.
+            if (!ctx.IsCanMove)
+            {
+                ctx.SwitchState(factory.Stop);
+                return;
+            }
+
+            if (ctx.IsUseMouse)
+            {
+                ctx.SwitchState(factory.Mouse);
+                return;
+            }
+
+            if (!ctx.CanSprint)
+            {
+                ctx.SwitchState(factory.Walk);
+                return;
+            }
+
+            if (!ctx.IsGrounded)
+            {
+                ctx.SwitchState(factory.Air);
+            }
+
+            if (ctx.JumpBufferCounter > 0)
+            {
+                ctx.SwitchState(factory.Jump);
+                return;
+            }
+
+            if (ctx.InputHandler.JumpTriggered)
+            {
+                ctx.SwitchState(factory.Jump);
+            }
+
+            if (ctx.InputHandler.CrouchTriggered)
+            {
+                ctx.SwitchState(factory.Crouch);
+            }
+
+            if (ctx.InputHandler.DodgeTriggered && ctx.CanDodge())
+            {
+                ctx.SwitchState(factory.Dodge);
+                return;
+            }
+
+            if (!ctx.InputHandler.SprintPressed && ctx.InputHandler.MoveInput.magnitude > 0.1f)
+            {
+                ctx.SwitchState(factory.Walk);
+            }
+
+            if (ctx.InputHandler.MoveInput.magnitude < 0.1f)
+            {
+                ctx.SwitchState(factory.Idle);
+            }
+        }
+
+        public override void InitializeSubState() { }
+    }
+}

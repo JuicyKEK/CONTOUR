@@ -12,10 +12,10 @@ namespace Game.Scripts.Lantern
     {
         [Inject] private IInputActions m_InputActions;
         [Inject] private IInventoryGetObject m_Inventory;
-        
+        [Inject] private LanternTimerViewController m_LanternTimerViewController;
+
         [SerializeField] private string m_ObjectLanternKey = "Charge";
         [SerializeField] private LanternActivationController m_LanternLight;
-        [SerializeField] private LanternTimerViewController m_LanternTimerViewController;
 
         private ILanternPowerTimerServices m_LanternPowerTimerServices;
         private bool m_IsLanternActive;

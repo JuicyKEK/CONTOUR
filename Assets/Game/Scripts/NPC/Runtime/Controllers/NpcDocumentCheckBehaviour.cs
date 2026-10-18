@@ -20,8 +20,15 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [Tooltip("Если true - документы бота 'поддельные'/испорчены (мимик).")]
         [SerializeField] private bool m_HasForgedDocuments;
 
+        [Tooltip("Сигнал сюжета, когда документы в порядке.")]
+        [SerializeField, StoryKey(StoryKeyKind.Signal)] private string m_DocumentsValidSignal;
+
+        [Tooltip("Сигнал сюжета, когда документы поддельные/испорченные.")]
+        [SerializeField, StoryKey(StoryKeyKind.Signal)] private string m_DocumentsForgedSignal;
+
+        [Header("Устаревшие SO-каналы (используйте сигналы выше)")]
         [Tooltip("Раздаётся, когда документы в порядке.")]
-        [SerializeField] private StoryEventChannelSO m_OnDocumentsValidChannel; //TODO: Переделать, а то фигня получается
+        [SerializeField] private StoryEventChannelSO m_OnDocumentsValidChannel;
 
         [Tooltip("Раздаётся, когда документы поддельные/испорченные.")]
         [SerializeField] private StoryEventChannelSO m_OnDocumentsForgedChannel;
@@ -31,11 +38,13 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             if (m_HasForgedDocuments)
             {
                 controller.PlayAnimationSound("DocumentsForged");
+                StorySignals.Raise(m_DocumentsForgedSignal);
                 m_OnDocumentsForgedChannel?.Raise();
             }
             else
             {
                 controller.PlayAnimationSound("DocumentsValid");
+                StorySignals.Raise(m_DocumentsValidSignal);
                 m_OnDocumentsValidChannel?.Raise();
             }
         }

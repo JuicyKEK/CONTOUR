@@ -1,11 +1,12 @@
 ﻿using JuicyDI.Attributes;
+using JuicyDI.Demo.Scripts.Interfaces;
 using UnityEngine;
 
 namespace JuicyDI.Demo.Scripts
 {
     public class Test1JDILateInjectController
     {
-        [Inject] private Test1JDIMonoController _test1JDIMonoController;
+        [Inject] private ITest1JDIMonoInterface _test1JDIMonoController;
 
         public Test1JDILateInjectController(string text)
         {
