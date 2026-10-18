@@ -8,6 +8,7 @@ using Game.Scripts.NPC.Runtime.Core;
 using Game.Scripts.NPC.Runtime.Data;
 using Game.Scripts.NPC.Runtime.Interfaces;
 using Game.Scripts.NPC.Runtime.States;
+using Game.Scripts.Player.External.Controllers;
 using Game.Scripts.Story;
 using JuicyDI;
 using JuicyDI.Attributes;
@@ -86,11 +87,18 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [SerializeField] private UnityEvent m_OnPlayerKilled;
 
         [Header("Смерть игрока")]
-        [Tooltip("Когда бот убил игрока, вернуть игру к последнему сохранению (через IPlayerCheckpointService). " +
-                 "Выключите, если смерть показывает сюжет сам.")]
+        [Tooltip("Бот подошёл на расстояние удара (атака 'Убийство') - у игрока сразу отбирается управление (движение, " +
+                 "обзор, взаимодействие), камера поворачивается к боту, бот играет поедание ('Kill').")]
+        [SerializeField] private bool m_CapturePlayerOnKill = true;
+        [Tooltip("После поедания - затемнение экрана и возврат к последнему сохранению (через IPlayerCheckpointService). " +
+                 "Выключите, если смерть показывает сюжет сам (тогда он же возвращает управление: PlayerCaptureController.Release).")]
         [SerializeField] private bool m_ReturnToLastSaveOnKill = true;
-        [Tooltip("Через сколько секунд после убийства вернуться к сохранению (успеть показать поедание).")]
+        [Tooltip("Сколько секунд длится поедание до затемнения.")]
         [SerializeField, Min(0f)] private float m_ReturnToLastSaveDelay = 3f;
+        [Tooltip("Сколько секунд экран темнеет перед загрузкой.")]
+        [SerializeField, Min(0f)] private float m_KillFadeDuration = 1.2f;
+        [Tooltip("Сохранений нет (сцена запущена сама по себе, без ядра игры, - например тестовая) - перезагрузить сцену.")]
+        [SerializeField] private bool m_ReloadSceneWithoutSave = true;
         [Tooltip("Через сколько секунд после убийства бот возвращается к спокойному поведению (если сюжет не дал ему " +
                  "другую команду). 0 - стоит, пока не придёт команда. Нужно, когда смерть показывает сюжет без перезагрузки.")]
         [SerializeField, Min(0f)] private float m_CalmDownAfterKillDelay;
@@ -120,6 +128,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         private NpcStateMachine m_StateMachine;
         private NpcPerception m_Perception;
         private NpcAudioPlayer m_Audio;
+        private IPlayerCapture m_PlayerCapture;
         private ManualAggressionSource m_ManualAggressionSource; // валиден только при AggressionMode = Manual
         private AngerMeterAggressionSource m_AngerMeter;          // валиден только при AggressionMode = AngerMeter
         private float m_CurrentSpeed;
@@ -140,6 +149,11 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         public NpcSearchArea SearchArea => m_SearchArea;
         public NpcAppearance Appearance => m_Appearance;
         public NavMeshAgent Agent => m_Agent;
+
+        /// <summary>Игрока уже схватили (этот или другой бот) - новых атак нет.</summary>
+        public bool IsPlayerCaptured => PlayerCapture != null && PlayerCapture.IsCaptured;
+
+        private IPlayerCapture PlayerCapture => m_PlayerCapture ??= BinController.GetContext()?.GetBean<IPlayerCapture>();
 
         /// <summary>Сколько шагов бота прозвучало (для отладки и проверок).</summary>
         public int FootstepCount => m_Audio?.FootstepCount ?? 0;
@@ -707,16 +721,31 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         {
             KillCount++;
             LogDebug("убил игрока");
-            PlayAnimationSound("Kill");
+
+            if (m_CapturePlayerOnKill)
+            {
+                if (PlayerCapture != null)
+                {
+                    PlayerCapture.Capture(transform);
+                }
+                else
+                {
+                    Debug.LogWarning($"[NPC] {name}: у игрока нет PlayerCaptureController - управление при поимке не отобрано.", this);
+                }
+            }
+
             StorySignals.Raise(m_PlayerCaughtSignal);
             StorySignals.Raise(m_PlayerKilledSignal);
             m_OnPlayerCaughtChannel?.Raise();
             m_OnPlayerKilled?.Invoke();
             PlayerKilled?.Invoke();
 
+            // Поедание: бот стоит над игроком с действием 'Kill', пока не придёт другая команда (или перезагрузка).
+            PlayAction("Kill", 0f, NpcStateId.Perform);
+
             if (m_ReturnToLastSaveOnKill)
             {
-                ReturnToLastSaveAsync().Forget();
+                DeathSequenceAsync().Forget();
             }
 
             if (m_CalmDownAfterKillDelay > 0f)
@@ -730,8 +759,9 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             await UniTask.Delay(TimeSpan.FromSeconds(m_CalmDownAfterKillDelay), cancellationToken: destroyCancellationToken);
 
             // Пока бот "ел", сюжет мог дать ему другую команду - тогда её не перебиваем.
+            bool isEating = CurrentState == NpcStateId.Perform && m_Blackboard.PerformKey == "Kill";
             bool isStillAfterThisKill = KillCount == killNumber
-                                        && (CurrentState == NpcStateId.Idle || CurrentState == NpcStateId.Attack);
+                                        && (isEating || CurrentState == NpcStateId.Idle || CurrentState == NpcStateId.Attack);
 
             if (isActiveAndEnabled && isStillAfterThisKill)
             {
@@ -739,20 +769,33 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             }
         }
 
-        private async UniTaskVoid ReturnToLastSaveAsync()
+        /// <summary>
+        /// Смерть игрока: поедание -> затемнение экрана -> возврат к последнему сохранению
+        /// (без ядра игры с сохранениями - перезагрузка сцены).
+        /// </summary>
+        private async UniTaskVoid DeathSequenceAsync()
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(m_ReturnToLastSaveDelay), cancellationToken: destroyCancellationToken);
+            var token = destroyCancellationToken;
+            await UniTask.Delay(TimeSpan.FromSeconds(m_ReturnToLastSaveDelay), cancellationToken: token);
+            await NpcScreenFade.FadeOutAsync(m_KillFadeDuration, token);
 
             var checkpointService = BinController.GetContext()?.GetBean<IPlayerCheckpointService>();
 
-            if (checkpointService == null)
+            if (checkpointService != null)
+            {
+                checkpointService.ReturnToLastSave();
+                return;
+            }
+
+            if (!m_ReloadSceneWithoutSave)
             {
                 Debug.LogWarning($"[NPC] {name}: игрок убит, но в сцене нет IPlayerCheckpointService (PlayerCheckpointController ядра игры) - " +
                                  "вернуться к сохранению нельзя (например, сцена запущена сама по себе, без ядра).", this);
                 return;
             }
 
-            checkpointService.ReturnToLastSave();
+            LogDebug("сохранений нет - перезагружаю сцену");
+            NpcScreenFade.ReloadActiveScene();
         }
 
         public void RaiseReachedChaseStart()

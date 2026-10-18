@@ -11,6 +11,10 @@
         public override void UpdateState()
         {
             CheckSwitchStates();
+
+            // Плавно останавливается и падает, а не едет дальше с прежней скоростью.
+            ctx.HandleGravity();
+            ctx.HandleMovement(0f);
         }
 
         public override void ExitState()

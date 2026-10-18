@@ -1453,6 +1453,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 189791901}
+  - component: {fileID: 189791902}
   m_Layer: 0
   m_Name: "Latch (E - \u0449\u0435\u043A\u043E\u043B\u0434\u0430)"
   m_TagString: Untagged
@@ -1478,6 +1479,26 @@ Transform:
   - {fileID: 1258278704}
   m_Father: {fileID: 358898545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &189791902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189791900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &245581617
 GameObject:
   m_ObjectHideFlags: 0
@@ -3142,11 +3163,11 @@ Transform:
   - {fileID: 1829880377}
   - {fileID: 115621545}
   - {fileID: 1290686935}
-  - {fileID: 1501155984}
+  - {fileID: 707908108}
   - {fileID: 812571220}
   - {fileID: 315177392}
   - {fileID: 672796255}
-  - {fileID: 1841706269}
+  - {fileID: 1135964857}
   - {fileID: 368256395}
   - {fileID: 1578587778}
   m_Father: {fileID: 0}
@@ -3335,6 +3356,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 368256395}
+  - component: {fileID: 368256396}
   m_Layer: 0
   m_Name: "Latch (E - \u0449\u0435\u043A\u043E\u043B\u0434\u0430)"
   m_TagString: Untagged
@@ -3360,6 +3382,26 @@ Transform:
   - {fileID: 532842965}
   m_Father: {fileID: 358898545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &368256396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 368256394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &371515032
 GameObject:
   m_ObjectHideFlags: 0
@@ -5848,7 +5890,7 @@ Transform:
   m_GameObject: {fileID: 607450713}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -11, y: 0, z: 3.1}
+  m_LocalPosition: {x: -10.62, y: 0, z: 3.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7116,6 +7158,38 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 698140710}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &707908107
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 707908108}
+  m_Layer: 0
+  m_Name: Work_EntranceDoor_Frame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &707908108
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 707908107}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -0.8, y: 0, z: 14}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1501155984}
+  m_Father: {fileID: 358898545}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &720211874
 GameObject:
   m_ObjectHideFlags: 0
@@ -7601,22 +7675,13 @@ MonoBehaviour:
       m_Calls: []
   m_OnPlayerKilled:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 868043812}
-        m_TargetAssemblyTypeName: StoryEvent_FadeTeleport, Assembly-CSharp
-        m_MethodName: TriggerFadeTeleport
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_ReturnToLastSaveOnKill: 0
+      m_Calls: []
+  m_CapturePlayerOnKill: 1
+  m_ReturnToLastSaveOnKill: 1
   m_ReturnToLastSaveDelay: 3
-  m_CalmDownAfterKillDelay: 3
+  m_KillFadeDuration: 1.2
+  m_ReloadSceneWithoutSave: 1
+  m_CalmDownAfterKillDelay: 0
   m_OnPlayerCaughtChannel: {fileID: 0}
   m_OnChaseStartedChannel: {fileID: 0}
   m_OnPatrolRouteCompletedChannel: {fileID: 0}
@@ -8222,6 +8287,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 812571220}
+  - component: {fileID: 812571221}
   m_Layer: 0
   m_Name: "Latch (E - \u0449\u0435\u043A\u043E\u043B\u0434\u0430)"
   m_TagString: Untagged
@@ -8247,6 +8313,26 @@ Transform:
   - {fileID: 513446154}
   m_Father: {fileID: 358898545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &812571221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812571219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &817195076
 GameObject:
   m_ObjectHideFlags: 0
@@ -8342,21 +8428,12 @@ MonoBehaviour:
       m_Calls: []
   m_OnPlayerKilled:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 868043812}
-        m_TargetAssemblyTypeName: StoryEvent_FadeTeleport, Assembly-CSharp
-        m_MethodName: TriggerFadeTeleport
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_ReturnToLastSaveOnKill: 0
+      m_Calls: []
+  m_CapturePlayerOnKill: 1
+  m_ReturnToLastSaveOnKill: 1
   m_ReturnToLastSaveDelay: 3
+  m_KillFadeDuration: 1.2
+  m_ReloadSceneWithoutSave: 1
   m_CalmDownAfterKillDelay: 0
   m_OnPlayerCaughtChannel: {fileID: 0}
   m_OnChaseStartedChannel: {fileID: 0}
@@ -11820,6 +11897,38 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1135964856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1135964857}
+  m_Layer: 0
+  m_Name: Hunt_CorridorDoor_Frame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1135964857
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135964856}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -8.8, y: 0, z: -27}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1841706269}
+  m_Father: {fileID: 358898545}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1146999753
 GameObject:
   m_ObjectHideFlags: 0
@@ -14246,6 +14355,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1371275162}
+  - component: {fileID: 1371275163}
   m_Layer: 0
   m_Name: "Latch (E - \u0449\u0435\u043A\u043E\u043B\u0434\u0430)"
   m_TagString: Untagged
@@ -14271,6 +14381,26 @@ Transform:
   - {fileID: 1065213550}
   m_Father: {fileID: 358898545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1371275163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1371275161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1416243293
 GameObject:
   m_ObjectHideFlags: 0
@@ -15646,13 +15776,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501155977}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0.8, y: 0, z: 14}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 664058702}
-  m_Father: {fileID: 358898545}
+  m_Father: {fileID: 707908108}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1503023740
 GameObject:
@@ -18825,21 +18955,12 @@ MonoBehaviour:
       m_Calls: []
   m_OnPlayerKilled:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 868043812}
-        m_TargetAssemblyTypeName: StoryEvent_FadeTeleport, Assembly-CSharp
-        m_MethodName: TriggerFadeTeleport
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_ReturnToLastSaveOnKill: 0
+      m_Calls: []
+  m_CapturePlayerOnKill: 1
+  m_ReturnToLastSaveOnKill: 1
   m_ReturnToLastSaveDelay: 3
+  m_KillFadeDuration: 1.2
+  m_ReloadSceneWithoutSave: 1
   m_CalmDownAfterKillDelay: 0
   m_OnPlayerCaughtChannel: {fileID: 0}
   m_OnChaseStartedChannel: {fileID: 0}
@@ -19390,6 +19511,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1829880377}
+  - component: {fileID: 1829880378}
   m_Layer: 0
   m_Name: "Latch (E - \u0449\u0435\u043A\u043E\u043B\u0434\u0430)"
   m_TagString: Untagged
@@ -19415,6 +19537,26 @@ Transform:
   - {fileID: 1084145766}
   m_Father: {fileID: 358898545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1829880378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829880376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1841706262
 GameObject:
   m_ObjectHideFlags: 0
@@ -19700,13 +19842,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1841706262}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -8.8, y: 0, z: -27}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1237437608}
-  m_Father: {fileID: 358898545}
+  m_Father: {fileID: 1135964857}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1852397767
 GameObject:
@@ -19717,6 +19859,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1852397768}
+  - component: {fileID: 1852397769}
   m_Layer: 0
   m_Name: "Latch (E - \u0449\u0435\u043A\u043E\u043B\u0434\u0430)"
   m_TagString: Untagged
@@ -19742,6 +19885,26 @@ Transform:
   - {fileID: 14994806}
   m_Father: {fileID: 358898545}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1852397769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1852397767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e3fdca004f2d45fe8abbed571a8abd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshModifier
+  m_SerializedVersion: 0
+  m_OverrideArea: 0
+  m_Area: 0
+  m_OverrideGenerateLinks: 0
+  m_GenerateLinks: 0
+  m_IgnoreFromBuild: 1
+  m_ApplyToChildren: 1
+  m_AffectedAgents: ffffffff
 --- !u!1 &1860170545
 GameObject:
   m_ObjectHideFlags: 0
@@ -19887,22 +20050,13 @@ MonoBehaviour:
       m_Calls: []
   m_OnPlayerKilled:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 868043812}
-        m_TargetAssemblyTypeName: StoryEvent_FadeTeleport, Assembly-CSharp
-        m_MethodName: TriggerFadeTeleport
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_ReturnToLastSaveOnKill: 0
+      m_Calls: []
+  m_CapturePlayerOnKill: 1
+  m_ReturnToLastSaveOnKill: 1
   m_ReturnToLastSaveDelay: 3
-  m_CalmDownAfterKillDelay: 3
+  m_KillFadeDuration: 1.2
+  m_ReloadSceneWithoutSave: 1
+  m_CalmDownAfterKillDelay: 0
   m_OnPlayerCaughtChannel: {fileID: 0}
   m_OnChaseStartedChannel: {fileID: 0}
   m_OnPatrolRouteCompletedChannel: {fileID: 0}
@@ -20429,21 +20583,12 @@ MonoBehaviour:
       m_Calls: []
   m_OnPlayerKilled:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 868043812}
-        m_TargetAssemblyTypeName: StoryEvent_FadeTeleport, Assembly-CSharp
-        m_MethodName: TriggerFadeTeleport
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  m_ReturnToLastSaveOnKill: 0
+      m_Calls: []
+  m_CapturePlayerOnKill: 1
+  m_ReturnToLastSaveOnKill: 1
   m_ReturnToLastSaveDelay: 3
+  m_KillFadeDuration: 1.2
+  m_ReloadSceneWithoutSave: 1
   m_CalmDownAfterKillDelay: 0
   m_OnPlayerCaughtChannel: {fileID: 0}
   m_OnChaseStartedChannel: {fileID: 0}

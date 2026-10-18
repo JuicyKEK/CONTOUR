@@ -4,11 +4,11 @@ using Game.Scripts.NPC.Runtime.Data;
 namespace Game.Scripts.NPC.Runtime.States
 {
     /// <summary>
-    /// Атака: бот останавливается, поворачивается к игроку и играет "Attack". Через AttackHitDelay (замах)
-    /// удар попадает, если игрок всё ещё рядом: удар (игрок жив) или убийство - по NpcTypeDefinitionSO.AttackKind;
-    /// что дальше с игроком, решает сюжет (сигналы/события NpcController). Отбежал - промах, погоня дальше.
-    /// После удара бот по AfterHit стоит и ждёт команды, возвращается к спокойному поведению или гонится дальше;
-    /// после убийства - стоит (по умолчанию игру возвращает к последнему сохранению NpcController).
+    /// Атака: бот останавливается, поворачивается к игроку и играет "Attack".
+    ///  - Убийство (NpcTypeDefinitionSO.AttackKind): бот хватает игрока сразу, как подошёл на расстояние удара -
+    ///    убежать нельзя; дальше NpcController: управление у игрока отбирается, поедание, затемнение, загрузка.
+    ///  - Удар: через AttackHitDelay (замах) удар попадает, если игрок всё ещё рядом; отбежал - промах, погоня дальше.
+    ///    После удара бот по AfterHit стоит и ждёт команды, возвращается к спокойному поведению или гонится дальше.
     /// </summary>
     public class NpcAttackState : NpcState
     {
@@ -33,6 +33,23 @@ namespace Game.Scripts.NPC.Runtime.States
         public override NpcStateId? Tick(NpcBlackboard blackboard, float deltaTime)
         {
             var definition = blackboard.Definition;
+
+            // Убийство - хватает сразу: игрок уже на расстоянии удара (поэтому погоня и перешла в атаку).
+            if (definition.AttackKind == NpcAttackKind.Kill && !m_IsResolved)
+            {
+                m_IsResolved = true;
+
+                if (blackboard.DistanceToPlayer <= definition.CatchDistance + ReachTolerance && !blackboard.Controller.IsPlayerCaptured)
+                {
+                    m_IsLanded = true;
+                    // Бот переходит к поеданию (Perform 'Kill') прямо отсюда.
+                    blackboard.Controller.ApplyAttack();
+                    return null;
+                }
+
+                return NpcStateId.Chase;
+            }
+
             m_Time += deltaTime;
 
             if (blackboard.PlayerTransform != null && !m_IsLanded)

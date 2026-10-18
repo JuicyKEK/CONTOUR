@@ -26,7 +26,11 @@ namespace Game.Scripts.NPC.Runtime.States
             Zone
         }
 
+        private const float RepickAfterBlockDelay = 0.3f;
+
         private readonly List<Collider> m_ZoneAreas = new();
+        private readonly NpcLockedDoorAttempts m_DoorAttempts = new();
+        private float m_RepickAfterBlockTimer = -1f;
 
         private Phase m_Phase;
         private float m_PhaseTime;
@@ -46,6 +50,8 @@ namespace Game.Scripts.NPC.Runtime.States
             m_IsLookingAround = false;
             m_StuckTimer = 0f;
             m_StuckCheckPosition = blackboard.Self.position;
+            m_RepickAfterBlockTimer = -1f;
+            m_DoorAttempts.Reset();
             blackboard.Controller.PlayAnimationSound("Search");
             PickNextPoint(blackboard);
         }
@@ -77,6 +83,19 @@ namespace Game.Scripts.NPC.Runtime.States
                 return phaseResult;
             }
 
+            // Бот сдался у запертой двери: ждём, пока NavMesh вырежет проём, и ищем в другом месте.
+            if (m_RepickAfterBlockTimer >= 0f)
+            {
+                m_RepickAfterBlockTimer -= deltaTime;
+
+                if (m_RepickAfterBlockTimer < 0f)
+                {
+                    PickNextPoint(blackboard);
+                }
+
+                return null;
+            }
+
             if (m_IsLookingAround)
             {
                 m_LookAroundTimer -= deltaTime;
@@ -97,13 +116,22 @@ namespace Game.Scripts.NPC.Runtime.States
                 if (!door.IsLocked.CurrentValue && blackboard.Definition.CanOpenDoors)
                 {
                     door.TryOpenBy(blackboard.Controller.GetDoorOpener(false));
+                    m_DoorAttempts.Reset();
                 }
                 else
                 {
-                    // За запертую дверь не пройти - ищем в другом месте.
-                    PickNextPoint(blackboard);
+                    // Запертая дверь: несколько попыток, потом она помечается непроходимой - ищем в другом месте.
+                    if (m_DoorAttempts.Tick(blackboard, door, deltaTime))
+                    {
+                        m_RepickAfterBlockTimer = RepickAfterBlockDelay;
+                    }
+
                     return null;
                 }
+            }
+            else
+            {
+                m_DoorAttempts.Reset();
             }
 
             if (NpcNavigation.HasArrived(blackboard.Agent))

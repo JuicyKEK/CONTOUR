@@ -29,9 +29,19 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override NpcStateId Id => NpcStateId.Patrol;
 
+        private const float RerouteDelay = 0.3f;
+        private const float UnreachableRetryDelay = 3f;
+        private const float ReachableEndDistance = 1.5f;
+
+        private readonly NpcLockedDoorAttempts m_DoorAttempts = new();
+
         private bool m_HasRaisedRouteCompleted;
         private bool m_IsDwelling;
         private float m_DwellTimer;
+        private float m_RerouteTimer = -1f;
+        private float m_UnreachableRetryTimer = -1f;
+        private bool m_IsCheckingReachability;
+        private int m_SkippedPoints;
 
         public override void Enter(NpcBlackboard blackboard)
         {
@@ -40,6 +50,10 @@ namespace Game.Scripts.NPC.Runtime.States
             blackboard.DoorKnockTimer = 0f;
             m_HasRaisedRouteCompleted = false;
             m_IsDwelling = false;
+            m_RerouteTimer = -1f;
+            m_UnreachableRetryTimer = -1f;
+            m_SkippedPoints = 0;
+            m_DoorAttempts.Reset();
 
             if (blackboard.PatrolResumeNearest)
             {
@@ -95,6 +109,25 @@ namespace Game.Scripts.NPC.Runtime.States
                 return null;
             }
 
+            // Бот сдался у запертой двери: ждём, пока NavMesh вырежет проём, и строим путь заново.
+            if (m_RerouteTimer >= 0f)
+            {
+                m_RerouteTimer -= deltaTime;
+
+                if (m_RerouteTimer < 0f)
+                {
+                    m_SkippedPoints = 0;
+                    MoveToCurrentPoint(blackboard);
+                }
+
+                return null;
+            }
+
+            if (CheckReachability(blackboard, deltaTime))
+            {
+                return null;
+            }
+
             if (HandleDoor(blackboard, currentPoint, deltaTime))
             {
                 return null;
@@ -113,15 +146,13 @@ namespace Game.Scripts.NPC.Runtime.States
         /// </summary>
         private bool HandleDoor(NpcBlackboard blackboard, NpcPatrolPoint point, float deltaTime)
         {
-            var door = point.ResolveDoor();
+            var assignedDoor = point.ResolveDoor();
+            bool isAssignedDoor = assignedDoor != null && !assignedDoor.IsOpen.CurrentValue;
+            var door = isAssignedDoor ? assignedDoor : NpcDoorNavigator.DetectDoorAhead(blackboard);
 
             if (door == null || door.IsOpen.CurrentValue)
             {
-                door = NpcDoorNavigator.DetectDoorAhead(blackboard);
-            }
-
-            if (door == null || door.IsOpen.CurrentValue)
-            {
+                m_DoorAttempts.Reset();
                 NpcNavigation.SetStopped(blackboard.Agent, false);
                 return false;
             }
@@ -131,11 +162,95 @@ namespace Game.Scripts.NPC.Runtime.States
                 // Дверь не заперта, но ещё закрыта - открываем на ходу (коллайдер сам
                 // отключается на время анимации открытия во View) и идём дальше.
                 door.TryOpenBy(blackboard.Controller.GetDoorOpener(false));
+                m_DoorAttempts.Reset();
                 NpcNavigation.SetStopped(blackboard.Agent, false);
                 return false;
             }
 
-            HandleLockedDoor(blackboard, door, deltaTime);
+            // Дверь, заданная точке маршрута, - часть сценария: бот стучит и ждёт, пока её откроют.
+            if (isAssignedDoor)
+            {
+                HandleLockedDoor(blackboard, door, deltaTime);
+                return true;
+            }
+
+            // Запертая дверь на пути: несколько попыток, потом - обход.
+            if (m_DoorAttempts.Tick(blackboard, door, deltaTime))
+            {
+                m_RerouteTimer = RerouteDelay;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Точка маршрута стала недостижимой (за дверью, которую пометили запертой) - пропускаем её.
+        /// true - бот занят этим (ждёт или идёт к другой точке).
+        /// </summary>
+        private bool CheckReachability(NpcBlackboard blackboard, float deltaTime)
+        {
+            if (m_UnreachableRetryTimer >= 0f)
+            {
+                m_UnreachableRetryTimer -= deltaTime;
+
+                if (m_UnreachableRetryTimer < 0f)
+                {
+                    m_SkippedPoints = 0;
+                    MoveToCurrentPoint(blackboard);
+                }
+
+                return true;
+            }
+
+            var agent = blackboard.Agent;
+
+            if (!m_IsCheckingReachability || !NpcNavigation.IsReady(agent) || agent.pathPending)
+            {
+                return false;
+            }
+
+            m_IsCheckingReachability = false;
+            var route = blackboard.PatrolRoute;
+            var target = route.Points[blackboard.CurrentPatrolIndex].Point;
+
+            bool isReachable = target == null
+                               || agent.pathStatus == UnityEngine.AI.NavMeshPathStatus.PathComplete
+                               || (agent.hasPath && (agent.pathEndPosition - target.position).sqrMagnitude <= ReachableEndDistance * ReachableEndDistance);
+
+            if (isReachable)
+            {
+                m_SkippedPoints = 0;
+                return false;
+            }
+
+            m_SkippedPoints++;
+
+            if (m_SkippedPoints >= route.Points.Count)
+            {
+                // Ни одна точка не достижима (всё за запертыми дверями) - стоим и пробуем снова.
+                NpcNavigation.Halt(agent);
+                m_UnreachableRetryTimer = UnreachableRetryDelay;
+                blackboard.Controller.LogDebug("ни одна точка маршрута сейчас недостижима - жду");
+                return true;
+            }
+
+            int next = blackboard.CurrentPatrolIndex + 1;
+
+            if (next >= route.Points.Count)
+            {
+                if (!route.Loop)
+                {
+                    m_HasRaisedRouteCompleted = true;
+                    NpcNavigation.Halt(agent);
+                    return true;
+                }
+
+                next = 0;
+            }
+
+            blackboard.Controller.LogDebug($"точка маршрута {blackboard.CurrentPatrolIndex} недостижима - иду к следующей");
+            blackboard.CurrentPatrolIndex = next;
+            MoveToCurrentPoint(blackboard);
             return true;
         }
 
@@ -281,7 +396,7 @@ namespace Game.Scripts.NPC.Runtime.States
             if (point.Point != null)
             {
                 NpcNavigation.SetStopped(blackboard.Agent, false);
-                NpcNavigation.TrySetDestination(blackboard.Agent, point.Point.position);
+                m_IsCheckingReachability = NpcNavigation.TrySetDestination(blackboard.Agent, point.Point.position);
             }
         }
 

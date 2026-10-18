@@ -82,7 +82,8 @@ namespace Game.Scripts.NPC.Runtime.States
                 return null;
             }
 
-            if (!NpcNavigation.HasArrived(blackboard.Agent, 0.25f) || !IsNearTarget(blackboard))
+            // Встаём точно в точку (у окна, у ворот): допуск - только stoppingDistance агента и 5 см.
+            if (!NpcNavigation.HasArrived(blackboard.Agent, 0.05f) || !IsNearTarget(blackboard))
             {
                 return null;
             }

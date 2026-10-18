@@ -175,6 +175,9 @@ namespace Game.Scripts.NPC.Runtime.Data
         [SerializeField] private float m_DoorDetectionRadius = 0.4f;
         [Tooltip("Сколько секунд бот, преследуя игрока, пытается открыть запертую дверь, прежде чем перейти к поиску игрока.")]
         [SerializeField] private float m_LockedDoorGiveUpDelay = 5f;
+        [Tooltip("Вне погони (обход, поиск): сколько раз бот дёргает запертую дверь, прежде чем пометить её непроходимой " +
+                 "и искать другой путь. Двери, заданные точке маршрута (DoorToPass), бот ждёт, пока их откроют.")]
+        [SerializeField, Min(1)] private int m_LockedDoorTriesWhenCalm = 2;
         [Tooltip("Какой анимацией/звуком открытия пользоваться, когда бот открывает дверь спокойно (обычно Human). " +
                  "Если у бота есть NpcAppearance - берётся из текущего облика.")]
         [SerializeField] private DoorOpenerKind m_PatrolDoorOpenerKind = DoorOpenerKind.Human;
@@ -242,6 +245,7 @@ namespace Game.Scripts.NPC.Runtime.Data
         public float DoorDetectionDistance => m_DoorDetectionDistance;
         public float DoorDetectionRadius => m_DoorDetectionRadius;
         public float LockedDoorGiveUpDelay => m_LockedDoorGiveUpDelay;
+        public int LockedDoorTriesWhenCalm => Mathf.Max(1, m_LockedDoorTriesWhenCalm);
         public DoorOpenerKind PatrolDoorOpenerKind => m_PatrolDoorOpenerKind;
         public DoorOpenerKind ChaseDoorOpenerKind => m_ChaseDoorOpenerKind;
 

@@ -15,34 +15,32 @@ MonoBehaviour:
   m_GraphId: 665d79a2-6f53-488c-9fa0-82cf9d372805
   m_GraphName: "NPC Test: \u043F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0430"
   m_Nodes:
-  - rid: 155225068860080212
-  - rid: 155225068860080213
+  - rid: 155225072805609472
+  - rid: 155225072805609473
   m_Edges:
-  - m_FromNodeId: e83a440b-1d06-4c02-8090-61768e8ef0c1
+  - m_FromNodeId: 31786551-3fe5-4a88-82a6-13d0f97331ef
     m_FromPortId: out
-    m_ToNodeId: 15947248-51c4-4e00-9d21-8b74f9d55f54
+    m_ToNodeId: 7abd6b78-bf65-42e0-9366-5c8426bef1a2
     m_ToPortId: in
   references:
     version: 2
     RefIds:
-    - rid: 155225068860080212
+    - rid: 155225072805609472
       type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
       data:
-        m_Id: e83a440b-1d06-4c02-8090-61768e8ef0c1
+        m_Id: 31786551-3fe5-4a88-82a6-13d0f97331ef
         m_NodeName: Start
         m_Position: {x: 0, y: 200}
-    - rid: 155225068860080213
-      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+    - rid: 155225072805609473
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
       data:
-        m_Id: 15947248-51c4-4e00-9d21-8b74f9d55f54
+        m_Id: 7abd6b78-bf65-42e0-9366-5c8426bef1a2
         m_NodeName: "\u041F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0430"
         m_Position: {x: 300, y: 200}
-        m_Actions:
-        - rid: 155225068860080214
-        m_Branches: []
-        m_OnEnterActions: []
-        m_OnEnterEvents: []
-    - rid: 155225068860080214
+        m_OnCompleteActions:
+        - rid: 155225072805609474
+        m_OnCompleteEvents: []
+    - rid: 155225072805609474
       type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
       data:
         m_Text: "\u0422\u0435\u0441\u0442\u043E\u0432\u0430\u044F \u0441\u0446\u0435\u043D\u0430

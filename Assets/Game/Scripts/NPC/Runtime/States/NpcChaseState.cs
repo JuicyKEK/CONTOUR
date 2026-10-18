@@ -45,6 +45,9 @@ namespace Game.Scripts.NPC.Runtime.States
 
             blackboard.DoorKnockTimer = 0f;
             blackboard.DoorBlockedTimer = 0f;
+            // Отсчёт "потерял из виду" - с начала погони: иначе погоня по команде сюжета у бота, который давно
+            // не видел игрока, сразу сменялась бы поиском.
+            blackboard.TimeSincePlayerLastSeen = 0f;
             m_RepathTimer = 0f;
 
             if (blackboard.IsHunting || blackboard.CanSeePlayer || !blackboard.HasLastKnownPlayerPosition)
@@ -118,7 +121,8 @@ namespace Game.Scripts.NPC.Runtime.States
 
         private static bool CanAttack(NpcBlackboard blackboard)
         {
-            if (blackboard.AttackCooldownTimer > 0f || blackboard.PlayerTransform == null)
+            // Игрока уже схватил другой бот - не нападаем.
+            if (blackboard.AttackCooldownTimer > 0f || blackboard.PlayerTransform == null || blackboard.Controller.IsPlayerCaptured)
             {
                 return false;
             }
@@ -190,6 +194,8 @@ namespace Game.Scripts.NPC.Runtime.States
 
             if (!blackboard.IsHunting && blackboard.DoorBlockedTimer >= blackboard.Definition.LockedDoorGiveUpDelay)
             {
+                // Дальше - поиск по эту сторону: дверь помечается непроходимой, точки поиска за ней не выбираются.
+                Controllers.NpcDoorNavBlocker.Block(door);
                 blackboard.DoorBlockedTimer = 0f;
                 blackboard.DoorKnockTimer = 0f;
                 NpcNavigation.SetStopped(blackboard.Agent, false);
