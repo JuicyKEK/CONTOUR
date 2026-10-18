@@ -21,6 +21,7 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
     private ReactiveProperty<DoorOpenerKind> _lastOpener;
     private Subject<Unit> _isTryingOpenLockedDoor = new Subject<Unit>();
     private bool _isRestoringState;
+    private IInteractionDoorView[] _views;
 
     private void Awake() //Переделать на сиквенсер как его починю
     {
@@ -97,8 +98,32 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
         return true;
     }
     
+    /// <summary>
+    /// Щеколда: задвигает или отодвигает. Задвинуть можно только закрытую дверь - пока дверь открыта
+    /// или створка ещё закрывается, нажатие ничего не меняет. Отодвинуть можно всегда.
+    /// </summary>
     public void Lock()
     {
+        if (!_isLocked.Value && (_isOpen.Value || IsLeafMoving()))
+        {
+            return;
+        }
+
         _isLocked.Value = !_isLocked.Value;
+    }
+
+    private bool IsLeafMoving()
+    {
+        _views ??= GetComponents<IInteractionDoorView>();
+
+        foreach (IInteractionDoorView view in _views)
+        {
+            if (view.IsMoving)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

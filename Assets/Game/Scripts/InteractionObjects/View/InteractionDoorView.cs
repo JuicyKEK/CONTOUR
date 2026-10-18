@@ -33,7 +33,10 @@ namespace Game.Scripts.InteractionObjects.Controllers
         [SerializeField] private int _lockedShakecount = 2;
         [SerializeField] private int _lockedShakeDirection = -1;
 
+        public bool IsMoving => _swingTween != null && _swingTween.IsActive() && !_swingTween.IsComplete();
+
         private Tween _currentTween;
+        private Tween _swingTween;
         private Quaternion _closedRotation;
 
         private CancellationTokenSource _cts;
@@ -127,6 +130,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
                     }
                 })
                 .SetEase(curve);
+            _swingTween = _currentTween;
 
             try
             {
