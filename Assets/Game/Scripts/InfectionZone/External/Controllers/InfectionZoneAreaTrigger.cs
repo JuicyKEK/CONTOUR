@@ -38,6 +38,12 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         private IInfectionZone m_Zone;
         private int m_PlayerOverlapCount;
 
+        /// <summary>
+        /// Зона, территорию которой покрывает этот триггер (например боты по ней определяют свою зону
+        /// и ищут игрока по всей зоне).
+        /// </summary>
+        public IInfectionZone Zone => m_Zone ?? m_ZoneSource as IInfectionZone;
+
         private void Reset()
         {
             var trigger = GetComponent<Collider>();

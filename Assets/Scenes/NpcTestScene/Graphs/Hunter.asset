@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: Hunter
+  m_EditorClassIdentifier: Assembly-CSharp::GBS.Data.GBSGraphSO
+  m_GraphId: fa6799cf-de74-49f5-bdd8-fff69b158401
+  m_GraphName: "NPC Test: \u043E\u0445\u043E\u0442\u043D\u0438\u043A"
+  m_Nodes:
+  - rid: 155225068860080195
+  - rid: 155225068860080196
+  - rid: 155225068860080197
+  - rid: 155225068860080198
+  - rid: 155225068860080199
+  m_Edges:
+  - m_FromNodeId: 6aa07800-4547-47ec-a39c-05d58eac9ef4
+    m_FromPortId: out
+    m_ToNodeId: f475fb2e-3722-445d-957e-5897defd9e01
+    m_ToPortId: in
+  - m_FromNodeId: f475fb2e-3722-445d-957e-5897defd9e01
+    m_FromPortId: 18f7b3c2-90be-4ae0-9e94-8fca2b9ad740
+    m_ToNodeId: 539dcdab-b28a-4061-bd3e-ed3b3644d29c
+    m_ToPortId: in
+  - m_FromNodeId: 539dcdab-b28a-4061-bd3e-ed3b3644d29c
+    m_FromPortId: e611b86a-b863-4dc5-8bf8-8ed576b52c19
+    m_ToNodeId: 238efe56-589d-45a2-9ccc-9e4d3e888db5
+    m_ToPortId: in
+  - m_FromNodeId: 539dcdab-b28a-4061-bd3e-ed3b3644d29c
+    m_FromPortId: 58148582-65fe-4755-9b21-6ff37ced7203
+    m_ToNodeId: c541b6fb-f345-4814-af43-a4af6c8a5950
+    m_ToPortId: in
+  - m_FromNodeId: 238efe56-589d-45a2-9ccc-9e4d3e888db5
+    m_FromPortId: bed69e17-801a-4f26-a98a-2f7ecc6ad2f1
+    m_ToNodeId: f475fb2e-3722-445d-957e-5897defd9e01
+    m_ToPortId: in
+  - m_FromNodeId: c541b6fb-f345-4814-af43-a4af6c8a5950
+    m_FromPortId: e1d7ac7d-61f6-4ee7-aa82-a528f6ac162d
+    m_ToNodeId: f475fb2e-3722-445d-957e-5897defd9e01
+    m_ToPortId: in
+  references:
+    version: 2
+    RefIds:
+    - rid: 155225068860080195
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 6aa07800-4547-47ec-a39c-05d58eac9ef4
+        m_NodeName: Start
+        m_Position: {x: 0, y: 200}
+    - rid: 155225068860080196
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: f475fb2e-3722-445d-957e-5897defd9e01
+        m_NodeName: "\u0416\u0434\u0451\u0442"
+        m_Position: {x: 300, y: 200}
+        m_Actions:
+        - rid: 155225068860080200
+        m_Branches:
+        - m_Id: 18f7b3c2-90be-4ae0-9e94-8fca2b9ad740
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A \u0432\u043E\u0448\u0451\u043B
+            \u0432 \u043A\u043E\u0440\u0438\u0434\u043E\u0440"
+          m_InlineCondition:
+            rid: 155225068860080201
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225068860080197
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 539dcdab-b28a-4061-bd3e-ed3b3644d29c
+        m_NodeName: "\u0421\u044E\u0436\u0435\u0442\u043D\u0430\u044F \u043F\u043E\u0433\u043E\u043D\u044F"
+        m_Position: {x: 650, y: 200}
+        m_Actions:
+        - rid: 155225068860080202
+        - rid: 155225068860080203
+        m_Branches:
+        - m_Id: e611b86a-b863-4dc5-8bf8-8ed576b52c19
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A \u0432 \u0437\u0435\u043B\u0451\u043D\u043E\u0439
+            \u0437\u043E\u043D\u0435"
+          m_InlineCondition:
+            rid: 155225068860080204
+          m_Condition: {fileID: 0}
+        - m_Id: 58148582-65fe-4755-9b21-6ff37ced7203
+          m_BranchName: "\u0423\u0431\u0438\u043B"
+          m_InlineCondition:
+            rid: 155225068860080205
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225068860080198
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 238efe56-589d-45a2-9ccc-9e4d3e888db5
+        m_NodeName: "\u041F\u043E\u0442\u0435\u0440\u044F\u043B \u0438\u043D\u0442\u0435\u0440\u0435\u0441"
+        m_Position: {x: 1000, y: 200}
+        m_Actions:
+        - rid: 155225068860080206
+        - rid: 155225068860080207
+        - rid: 155225068860080208
+        m_Branches:
+        - m_Id: bed69e17-801a-4f26-a98a-2f7ecc6ad2f1
+          m_BranchName: "\u0414\u043E\u043C\u0430"
+          m_InlineCondition:
+            rid: 155225068860080209
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225068860080199
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: c541b6fb-f345-4814-af43-a4af6c8a5950
+        m_NodeName: "\u041F\u043E\u0439\u043C\u0430\u043B"
+        m_Position: {x: 1000, y: 550}
+        m_Actions:
+        - rid: 155225068860080210
+        m_Branches:
+        - m_Id: e1d7ac7d-61f6-4ee7-aa82-a528f6ac162d
+          m_BranchName: "\u0414\u043E\u043C\u0430"
+          m_InlineCondition:
+            rid: 155225068860080211
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225068860080200
+      type: {class: NpcSetState, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_Command: 0
+    - rid: 155225068860080201
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: NpcTest_HuntStart
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225068860080202
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041E\u0445\u043E\u0442\u043D\u0438\u043A \u0437\u043D\u0430\u0435\u0442,
+          \u0433\u0434\u0435 \u0442\u044B. \u0411\u0435\u0433\u0438 \u0432 \u0437\u0435\u043B\u0451\u043D\u0443\u044E
+          \u0437\u043E\u043D\u0443!"
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 155225068860080203
+      type: {class: NpcSetState, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_Command: 4
+    - rid: 155225068860080204
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: NpcTest_HuntStop
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225068860080205
+      type: {class: NpcKilledPlayer, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data: 
+    - rid: 155225068860080206
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041E\u0445\u043E\u0442\u043D\u0438\u043A \u043F\u043E\u0442\u0435\u0440\u044F\u043B
+          \u0438\u043D\u0442\u0435\u0440\u0435\u0441 \u0438 \u0443\u0445\u043E\u0434\u0438\u0442
+          \u043A \u0441\u0435\u0431\u0435."
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 155225068860080207
+      type: {class: NpcSetState, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_Command: 6
+    - rid: 155225068860080208
+      type: {class: NpcMoveToPoint, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_PointKey: Home
+        m_Pace: 0
+        m_FacePointRotation: 1
+        m_WaitForArrival: 0
+    - rid: 155225068860080209
+      type: {class: NpcArrived, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_PointKey: Home
+    - rid: 155225068860080210
+      type: {class: NpcMoveToPoint, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_PointKey: Home
+        m_Pace: 0
+        m_FacePointRotation: 1
+        m_WaitForArrival: 0
+    - rid: 155225068860080211
+      type: {class: NpcArrived, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_PointKey: Home
