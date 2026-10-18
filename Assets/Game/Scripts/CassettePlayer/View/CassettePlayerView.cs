@@ -13,8 +13,8 @@ namespace Game.Scripts.Instructions.View
     /// паузы/Play. Ничего не решает сама - только предоставляет примитивы управления, вызывается из
     /// <see cref="Controllers.CassettePlayerController"/> (получает вид через [Inject]).
     ///
-    /// Блок проигрывания появляется, когда выбрана первая кассета, и дальше не пропадает - ни после паузы,
-    /// ни когда кассета доиграла, ни после закрытия и открытия панели. Все его поля, кроме кнопки паузы,
+    /// Блок проигрывания виден, пока открыта панель и выбрана кассета: после закрытия и открытия панели он
+    /// снова показывает ту же кассету - играющую, на паузе или доигравшую. Все его поля, кроме кнопки паузы,
     /// можно не назначать. Если не назначена кнопка Play, кнопка паузы сама переключает паузу и Play.
     /// </summary>
     [JDIMonoController]
@@ -51,6 +51,10 @@ namespace Game.Scripts.Instructions.View
         [Tooltip("Кнопка Play - видна вместо паузы, когда кассета на паузе (продолжает с того же места) или " +
                  "доиграла (запускает с начала).")]
         [SerializeField] private Button m_PlayButton;
+        [Tooltip("Кнопка перемотки назад (на сколько секунд - задаёт CassettePlayerController).")]
+        [SerializeField] private Button m_SkipBackButton;
+        [Tooltip("Кнопка перемотки вперёд (на сколько секунд - задаёт CassettePlayerController).")]
+        [SerializeField] private Button m_SkipForwardButton;
 
         private readonly List<CassettePageToggleView> m_PageToggles = new();
         private readonly List<CassettePageView> m_Pages = new();
@@ -100,10 +104,14 @@ namespace Game.Scripts.Instructions.View
         }
 
         /// <summary>
-        /// Что делать по кнопкам паузы и Play и по перемотке полосой (доля от длины кассеты, 0..1).
+        /// Что делать по кнопкам паузы и Play, по перемотке полосой (доля от длины кассеты, 0..1) и по кнопкам
+        /// перемотки назад и вперёд.
         /// </summary>
-        public void SetPlaybackActions(Action onPauseClicked, Action onPlayClicked, Action<float> onSeek)
+        public void SetPlaybackActions(Action onPauseClicked, Action onPlayClicked, Action<float> onSeek,
+            Action onSkipBackClicked, Action onSkipForwardClicked)
         {
+            SetButtonAction(m_SkipBackButton, onSkipBackClicked);
+            SetButtonAction(m_SkipForwardButton, onSkipForwardClicked);
             m_OnPauseClicked = onPauseClicked;
             m_OnPlayClicked = onPlayClicked;
 
@@ -137,6 +145,8 @@ namespace Game.Scripts.Instructions.View
 
             SetActive(m_TapeTitleText, isVisible);
             SetActive(m_ProgressSlider, isVisible);
+            SetActive(m_SkipBackButton, isVisible);
+            SetActive(m_SkipForwardButton, isVisible);
 
             if (isVisible)
             {
@@ -195,6 +205,21 @@ namespace Game.Scripts.Instructions.View
             }
 
             m_OnPauseClicked?.Invoke();
+        }
+
+        private static void SetButtonAction(Button button, Action onClicked)
+        {
+            if (button == null)
+            {
+                return;
+            }
+
+            button.onClick.RemoveAllListeners();
+
+            if (onClicked != null)
+            {
+                button.onClick.AddListener(() => onClicked());
+            }
         }
 
         private static void SetActive(Component component, bool isActive)

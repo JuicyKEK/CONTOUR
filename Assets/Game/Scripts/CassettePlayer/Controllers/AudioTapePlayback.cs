@@ -192,6 +192,25 @@ namespace Game.Scripts.Instructions.Controllers
         }
 
         /// <summary>
+        /// Перематывает выбранную кассету на <paramref name="seconds"/> секунд вперёд (больше нуля) или назад
+        /// (меньше нуля). Доигравшую кассету вперёд перематывать некуда; назад - она встаёт на паузу в новом месте.
+        /// </summary>
+        public void SeekBy(float seconds)
+        {
+            if (m_CurrentTapeClip == null || Length <= 0f)
+            {
+                return;
+            }
+
+            if (m_State == AudioTapePlaybackState.Finished && seconds > 0f)
+            {
+                return;
+            }
+
+            Seek((Position + seconds) / Length);
+        }
+
+        /// <summary>
         /// Вызывается каждый кадр: замечает, что аудио кассеты доиграло до конца.
         /// </summary>
         public void Tick()

@@ -21,11 +21,12 @@ namespace Game.Scripts.Instructions.Controllers
     /// Важно: повторное нажатие TAB (закрытие панели) НЕ останавливает проигрывание -
     /// кассета продолжает играть в фоне.
     ///
-    /// Блок проигрывания (название кассеты, полоса прогресса, кнопки паузы/Play) появляется, когда игрок
-    /// выбрал кассету, и дальше не пропадает - ни после паузы, ни когда кассета доиграла, ни после закрытия
-    /// и открытия панели. Пауза - кассета стоит, вместо паузы кнопка Play, которая продолжает с того же
-    /// места. Доиграла - тоже кнопка Play, но она запускает кассету с начала. Полосой прогресса кассету
-    /// можно перемотать в любое место (и доигравшую тоже - тогда Play продолжит с этого места).
+    /// Блок проигрывания (название кассеты, полоса прогресса, кнопки паузы/Play и перемотки) виден, пока
+    /// панель открыта и игрок уже выбирал кассету; при закрытии панели прячется, при открытии снова
+    /// показывает ту же кассету - играющую, на паузе или доигравшую. Пауза - кассета стоит, вместо паузы
+    /// кнопка Play, которая продолжает с того же места. Доиграла - тоже кнопка Play, но она запускает
+    /// кассету с начала. Полосой прогресса и кнопками перемотки кассету можно перемотать (и доигравшую
+    /// тоже - тогда Play продолжит с нового места).
     /// </summary>
     [JDIMonoController]
     [SequenceParticipant(120)]
@@ -42,6 +43,8 @@ namespace Game.Scripts.Instructions.Controllers
         [Tooltip("Сколько секунд звук перемотки играет минимум, даже если аудио кассеты уже загружено " +
                  "(чтобы звук нажатия кнопки успел проиграться).")]
         [SerializeField, Min(0f)] private float m_MinRewindDuration = 1f;
+        [Tooltip("На сколько секунд перематывают кнопки перемотки назад и вперёд.")]
+        [SerializeField, Min(1f)] private float m_SkipSeconds = 10f;
 
         // Вид панели и 3D-модель плеера на сцене в одном экземпляре - приходят через DI.
         [Inject] private CassettePlayerView m_View;
@@ -69,7 +72,8 @@ namespace Game.Scripts.Instructions.Controllers
             CollectPagesAndTapes();
             RegistryCaseToStart();
             m_InputActions.AddPressingButtonTabAction(ToggleOpen);
-            m_View.SetPlaybackActions(PausePlayback, ResumePlayback, SeekPlayback);
+            m_View.SetPlaybackActions(PausePlayback, ResumePlayback, SeekPlayback,
+                () => SkipPlayback(-m_SkipSeconds), () => SkipPlayback(m_SkipSeconds));
             m_View.BuildPages(BuildPagesData(), PlayTape, OnPageSelected);
             m_View.SetVisible(false);
             RefreshPlaybackView();
@@ -214,7 +218,9 @@ namespace Game.Scripts.Instructions.Controllers
 
             // Панель закрывается, но проигрывание НЕ останавливается - кассета продолжает
             // играть в фоне, пока её не остановят кнопкой паузы или она не закончится сама.
+            // Блок проигрывания прячется вместе с панелью и снова появляется при её открытии.
             m_View.SetVisible(false);
+            m_View.SetPlaybackVisible(false);
 
             if (m_PlayerMoveController != null)
             {
@@ -350,9 +356,15 @@ namespace Game.Scripts.Instructions.Controllers
             RefreshPlaybackView();
         }
 
+        private void SkipPlayback(float seconds)
+        {
+            m_Playback.SeekBy(seconds);
+            RefreshPlaybackView();
+        }
+
         private void RefreshPlaybackView()
         {
-            if (m_CurrentTape == null)
+            if (m_CurrentTape == null || !m_IsOpen)
             {
                 m_View.SetPlaybackVisible(false);
                 return;

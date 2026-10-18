@@ -14,6 +14,10 @@ namespace AZE.AdvancedFirstPerson
         public override void UpdateState()
         {
             CheckSwitchStates();
+
+            // Без этого персонаж шёл бы дальше со скоростью, с которой в это состояние вошёл.
+            ctx.HandleGravity();
+            ctx.HandleMovement(0f);
         }
 
         public override void ExitState()
