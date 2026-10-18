@@ -24,6 +24,12 @@ namespace AZE.AdvancedFirstPerson
 
         public override void CheckSwitchStates()
         {
+            if (!ctx.IsCanMove || ctx.IsUseMouse)
+            {
+                ctx.SwitchState(factory.Mouse);
+                return;
+            }
+
             if (!ctx.CanSprint)
             {
                 ctx.SwitchState(factory.Walk);

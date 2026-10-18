@@ -19,9 +19,14 @@ namespace Game.Scripts.Instructions.Controllers
     /// (и при переключении страницы) обновляется только выбранная страница.
     ///
     /// Важно: повторное нажатие TAB (закрытие панели) НЕ останавливает проигрывание -
-    /// кассета продолжает играть в фоне. Остановить её можно либо кнопкой паузы по центру
-    /// панели (видна только пока что-то играет), либо она останавливается сама, когда
-    /// аудиофайл заканчивается.
+    /// кассета продолжает играть в фоне.
+    ///
+    /// Блок проигрывания (название кассеты, полоса прогресса, кнопки паузы/Play и перемотки) виден, пока
+    /// панель открыта и игрок уже выбирал кассету; при закрытии панели прячется, при открытии снова
+    /// показывает ту же кассету - играющую, на паузе или доигравшую. Пауза - кассета стоит, вместо паузы
+    /// кнопка Play, которая продолжает с того же места. Доиграла - тоже кнопка Play, но она запускает
+    /// кассету с начала. Полосой прогресса и кнопками перемотки кассету можно перемотать (и доигравшую
+    /// тоже - тогда Play продолжит с нового места).
     /// </summary>
     [JDIMonoController]
     [SequenceParticipant(120)]
@@ -38,6 +43,8 @@ namespace Game.Scripts.Instructions.Controllers
         [Tooltip("Сколько секунд звук перемотки играет минимум, даже если аудио кассеты уже загружено " +
                  "(чтобы звук нажатия кнопки успел проиграться).")]
         [SerializeField, Min(0f)] private float m_MinRewindDuration = 1f;
+        [Tooltip("На сколько секунд перематывают кнопки перемотки назад и вперёд.")]
+        [SerializeField, Min(1f)] private float m_SkipSeconds = 10f;
 
         // Вид панели и 3D-модель плеера на сцене в одном экземпляре - приходят через DI.
         [Inject] private CassettePlayerView m_View;
@@ -51,8 +58,9 @@ namespace Game.Scripts.Instructions.Controllers
         private readonly List<AudioTapePageSO> m_ActivePages = new();
         private readonly Dictionary<string, AudioTapeDefinitionSO> m_TapesById = new();
         private bool m_IsOpen;
-        private bool m_WasPlayingLastFrame;
         private AudioTapePlayback m_Playback;
+        // Кассета, выбранная последней, - её показывает блок проигрывания (null - ещё ничего не выбирали).
+        private AudioTapeDefinitionSO m_CurrentTape;
 
         public void MethodInit()
         {
@@ -64,10 +72,11 @@ namespace Game.Scripts.Instructions.Controllers
             CollectPagesAndTapes();
             RegistryCaseToStart();
             m_InputActions.AddPressingButtonTabAction(ToggleOpen);
-            m_View.SetPauseButtonAction(StopPlayback);
+            m_View.SetPlaybackActions(PausePlayback, ResumePlayback, SeekPlayback,
+                () => SkipPlayback(-m_SkipSeconds), () => SkipPlayback(m_SkipSeconds));
             m_View.BuildPages(BuildPagesData(), PlayTape, OnPageSelected);
             m_View.SetVisible(false);
-            m_View.SetPauseButtonVisible(false);
+            RefreshPlaybackView();
         }
 
         /// <summary>
@@ -154,25 +163,22 @@ namespace Game.Scripts.Instructions.Controllers
 
         /// <summary>
         /// Вызывается общей системой обновления (см. <see cref="IUpdateSequence"/>).
-        /// Пока панель открыта - следит за естественным окончанием аудиофайла и прячет
-        /// кнопку паузы, когда проигрывание закончилось само по себе (перемотка перед кассетой
-        /// проигрыванием считается, даже если звук перемотки уже кончился, а аудио ещё грузится).
+        /// Всегда - замечает, что кассета доиграла (в том числе при закрытой панели).
+        /// Пока панель открыта - обновляет полосу прогресса и кнопку паузы/Play.
         /// </summary>
         public void CustomUpdate()
         {
-            if (!m_IsOpen || m_Playback == null)
+            if (m_Playback == null)
             {
                 return;
             }
 
-            bool isPlayingNow = m_Playback.IsActive;
+            m_Playback.Tick();
 
-            if (m_WasPlayingLastFrame && !isPlayingNow)
+            if (m_IsOpen)
             {
-                m_View.SetPauseButtonVisible(false);
+                RefreshPlaybackView();
             }
-
-            m_WasPlayingLastFrame = isPlayingNow;
         }
 
         private void ToggleOpen()
@@ -193,8 +199,7 @@ namespace Game.Scripts.Instructions.Controllers
 
             RefreshPage(m_View.SelectedPageIndex);
             m_View.SetVisible(true);
-            m_View.SetPauseButtonVisible(m_Playback.IsActive);
-            m_WasPlayingLastFrame = m_Playback.IsActive;
+            RefreshPlaybackView();
 
             if (m_PlayerMoveController != null)
             {
@@ -213,7 +218,9 @@ namespace Game.Scripts.Instructions.Controllers
 
             // Панель закрывается, но проигрывание НЕ останавливается - кассета продолжает
             // играть в фоне, пока её не остановят кнопкой паузы или она не закончится сама.
+            // Блок проигрывания прячется вместе с панелью и снова появляется при её открытии.
             m_View.SetVisible(false);
+            m_View.SetPlaybackVisible(false);
 
             if (m_PlayerMoveController != null)
             {
@@ -310,18 +317,63 @@ namespace Game.Scripts.Instructions.Controllers
             }
 
             // Сначала звук нажатия/перемотки, само аудио кассеты - после асинхронной загрузки.
+            m_CurrentTape = tape;
             m_Playback.Play(tape.Clip);
-
-            m_View.SetPauseButtonVisible(true);
-            m_WasPlayingLastFrame = true;
+            RefreshPlaybackView();
         }
 
-        private void StopPlayback()
+        private void PausePlayback()
         {
-            m_Playback.Stop();
+            m_Playback.Pause();
+            RefreshPlaybackView();
+        }
 
-            m_View.SetPauseButtonVisible(false);
-            m_WasPlayingLastFrame = false;
+        /// <summary>
+        /// Кнопка Play: кассета на паузе - продолжает с того же места; доиграла - запускает с начала.
+        /// </summary>
+        private void ResumePlayback()
+        {
+            if (m_CurrentTape == null || m_CurrentTape.Clip == null)
+            {
+                return;
+            }
+
+            if (m_Playback.State == AudioTapePlaybackState.Paused)
+            {
+                m_Playback.Resume();
+            }
+            else if (!m_Playback.IsActive)
+            {
+                m_Playback.Play(m_CurrentTape.Clip);
+            }
+
+            RefreshPlaybackView();
+        }
+
+        private void SeekPlayback(float progress)
+        {
+            m_Playback.Seek(progress);
+            RefreshPlaybackView();
+        }
+
+        private void SkipPlayback(float seconds)
+        {
+            m_Playback.SeekBy(seconds);
+            RefreshPlaybackView();
+        }
+
+        private void RefreshPlaybackView()
+        {
+            if (m_CurrentTape == null || !m_IsOpen)
+            {
+                m_View.SetPlaybackVisible(false);
+                return;
+            }
+
+            m_View.SetTapeTitle(m_CurrentTape.DisplayName);
+            m_View.SetPlaying(m_Playback.IsActive);
+            m_View.SetProgress(m_Playback.Progress);
+            m_View.SetPlaybackVisible(true);
         }
 
         private void OnDestroy()

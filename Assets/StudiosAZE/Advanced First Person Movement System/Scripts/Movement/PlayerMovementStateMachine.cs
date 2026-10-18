@@ -187,7 +187,9 @@ namespace AZE.AdvancedFirstPerson
 
         public void HandleMovement(float speed)
         {
-            Vector2 input = InputHandler.MoveInput;
+            // Пока открыто окно (курсор мыши) или движение запрещено, клавиши движения не действуют:
+            // персонаж плавно останавливается, а не идёт дальше с прежней скоростью.
+            Vector2 input = _isUseMouse || !_isCanMove ? Vector2.zero : InputHandler.MoveInput;
             Vector3 moveDir = (transform.right * input.x + transform.forward * input.y).normalized;
 
             float targetSpeed = (input.magnitude < 0.1f) ? 0f : speed;
