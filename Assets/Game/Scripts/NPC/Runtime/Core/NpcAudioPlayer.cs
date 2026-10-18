@@ -35,6 +35,9 @@ namespace Game.Scripts.NPC.Runtime.Core
 
         public NpcAnimationSoundProfileSO Profile => m_Profile;
 
+        /// <summary>Сколько шагов прозвучало (для отладки и проверок).</summary>
+        public int FootstepCount { get; private set; }
+
         public void SetProfile(NpcAnimationSoundProfileSO profile)
         {
             m_Profile = profile;
@@ -160,6 +163,7 @@ namespace Game.Scripts.NPC.Runtime.Core
 
             m_FootstepSource.pitch = Random.Range(0.92f, 1.08f);
             m_FootstepSource.PlayOneShot(clip, m_Profile.StepVolume);
+            FootstepCount++;
         }
 
         private void TickFootsteps(Vector3 position, float speed)

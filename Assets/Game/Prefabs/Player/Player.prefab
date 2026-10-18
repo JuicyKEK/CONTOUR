@@ -1066,11 +1066,11 @@ GameObject:
   - component: {fileID: 9140438488627603957}
   - component: {fileID: 8937629193170136071}
   - component: {fileID: 1037144469725984998}
-  - component: {fileID: 559783886886306478}
   - component: {fileID: 1867603601935913961}
   - component: {fileID: 4473587456081716355}
   - component: {fileID: 1599558884546896224}
   - component: {fileID: 3727907854570265209}
+  - component: {fileID: 4161319651184818089}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1137,31 +1137,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Controllers.PlayerLocator
   m_PlayerTransform: {fileID: 3297267000394636085}
   m_PlayerTag: Player
---- !u!114 &559783886886306478
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5659440458517913730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 099de19de1a04c3a9f9e01a615d8024d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Audio.SoundPlayer
-  m_SoundPlayerObject: {fileID: 5659440458517913730}
-  m_AudioSource: {fileID: 0}
-  m_IsRandomPitchSound: 1
-  m_MinPitch: 0.5
-  m_MaxPitch: 1.5
-  m_MinVolume: 1
-  m_MaxVolume: 1.5
-  m_IsSelectRandomSound: 0
-  m_SoundClips:
-  - {fileID: 8300000, guid: 3ac1654a3b4505f4a97dcb435fc9d631, type: 3}
-  - {fileID: 8300000, guid: 6deb5ec04c996304389b5ef801f4c234, type: 3}
-  - {fileID: 8300000, guid: 3ac1654a3b4505f4a97dcb435fc9d631, type: 3}
-  - {fileID: 8300000, guid: 6deb5ec04c996304389b5ef801f4c234, type: 3}
 --- !u!114 &1867603601935913961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1261,6 +1236,34 @@ MonoBehaviour:
   BottomClamp: 75
   CameraTransform: {fileID: 5771131324818504309}
   inputHandler: {fileID: 1867603601935913961}
+--- !u!114 &4161319651184818089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5659440458517913730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c209cda00a12b245a27efddc23ff900, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Audio.Footsteps.PlayerFootsteps
+  m_Movement: {fileID: 1599558884546896224}
+  m_AudioSource: {fileID: 2219186924173048405}
+  m_Library: {fileID: 11400000, guid: 837bd4b3809daa54980852c2e558b579, type: 2}
+  m_WalkStepLength: 1.2
+  m_SprintStepLength: 1.8
+  m_CrouchStepLength: 0.8
+  m_WalkVolume: 0.8
+  m_SprintVolume: 1
+  m_CrouchVolume: 0.35
+  m_LandingVolume: 1
+  m_MinSpeed: 0.3
+  m_MinAirTimeForLanding: 0.25
+  m_GroundMask:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  m_GroundProbeDistance: 1
 --- !u!1 &6115051667029684154
 GameObject:
   m_ObjectHideFlags: 0

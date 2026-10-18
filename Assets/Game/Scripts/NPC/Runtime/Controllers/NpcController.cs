@@ -141,6 +141,9 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         public NpcAppearance Appearance => m_Appearance;
         public NavMeshAgent Agent => m_Agent;
 
+        /// <summary>Сколько шагов бота прозвучало (для отладки и проверок).</summary>
+        public int FootstepCount => m_Audio?.FootstepCount ?? 0;
+
         /// <summary>Шкала злости 0..1 (только для режима "Шкала злости", иначе 0).</summary>
         public float Anger => m_AngerMeter?.Anger.CurrentValue ?? 0f;
 

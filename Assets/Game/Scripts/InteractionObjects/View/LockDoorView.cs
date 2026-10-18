@@ -16,7 +16,9 @@ namespace Game.Scripts.InteractionObjects.View
         [SerializeField] private float duration = 0.1f;
         [SerializeField] private InteractionDoor _interactionDoor;
 
-        private Subject<Unit> m_IsPlaySound;
+        // Создаётся сразу: раньше не создавался вовсе - звук щеколды (SoundPlayer, подписанный на IsPlaySound)
+        // не играл, а подписка на null падала с NullReferenceException.
+        private readonly Subject<Unit> m_IsPlaySound = new();
         private Vector3 _closedLocalPos;
         private Vector3 _openLocalPos;
         private Collider _collider;
@@ -76,6 +78,7 @@ namespace Game.Scripts.InteractionObjects.View
         private void OnDestroy()
         {
             _disposables.Dispose();
+            m_IsPlaySound.Dispose();
         }
     }
 }
