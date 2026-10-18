@@ -91,6 +91,46 @@ namespace Game.Scripts.Utilities.Save
             return true;
         }
 
+        /// <summary>
+        /// Есть ли хотя бы один файл сохранения. Для мест, где механик-участников сохранения ещё нет
+        /// (например, кнопка "Загрузить игру" в главном меню).
+        /// </summary>
+        public static bool HasAnySave()
+        {
+            try
+            {
+                return Directory.Exists(FolderPath) && Directory.GetFiles(FolderPath, "*.json").Length > 0;
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"[JsonSaveFile] Не удалось прочитать папку сохранений '{FolderPath}': {exception}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Удаляет все файлы сохранений (новая игра из главного меню).
+        /// </summary>
+        public static void DeleteAll(Object context = null)
+        {
+            try
+            {
+                if (!Directory.Exists(FolderPath))
+                {
+                    return;
+                }
+
+                foreach (var file in Directory.GetFiles(FolderPath))
+                {
+                    File.Delete(file);
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"[JsonSaveFile] Не удалось удалить сохранения в '{FolderPath}': {exception}", context);
+            }
+        }
+
         public static void Delete(string fileName, Object context = null)
         {
             string path = GetPath(fileName);

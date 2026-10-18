@@ -3124,6 +3124,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Controllers.NpcDocumentCheckBehaviour
   m_HasForgedDocuments: 0
+  m_DocumentsValidSignal: 
+  m_DocumentsForgedSignal: 
   m_OnDocumentsValidChannel: {fileID: 11400000, guid: c74a6b01b6edbe7418ca48c2cb585e31, type: 2}
   m_OnDocumentsForgedChannel: {fileID: 0}
 --- !u!4 &195185701
@@ -27923,6 +27925,8 @@ MonoBehaviour:
   m_AudioSource: {fileID: 1285469979}
   m_PatrolRoute: {fileID: 2545225901676323503}
   m_InitialState: 0
+  m_PlayerCaughtSignal: 
+  m_ChaseStartedSignal: 
   m_OnPlayerCaughtChannel: {fileID: 11400000, guid: 09dd5fad27dee6d4180db891cc1f335e, type: 2}
   m_OnChaseStartedChannel: {fileID: 0}
   m_OnPatrolRouteCompletedChannel: {fileID: 0}
@@ -47278,10 +47282,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4958246201866279341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 494.54, y: -92.3245}
-  m_SizeDelta: {x: 949.08, y: 76.649}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 76.649}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2099216184422949160
 GameObject:
@@ -47957,9 +47961,11 @@ MonoBehaviour:
   m_Points:
   - Point: {fileID: 7985850281456821915}
     DoorToPass: {fileID: 8091052741725900880}
+    ArrivalSignal: 
     ArrivalEventChannel: {fileID: 0}
   - Point: {fileID: 1971825667104760718}
     DoorToPass: {fileID: 0}
+    ArrivalSignal: 
     ArrivalEventChannel: {fileID: 11400000, guid: 37c29fcf9662df349aa28703916652fb, type: 2}
   m_Loop: 0
 --- !u!1 &2546424888502503485
@@ -53548,6 +53554,7 @@ MonoBehaviour:
   m_Points:
   - Point: {fileID: 3682457507393851004}
     DoorToPass: {fileID: 4507746108992411128}
+    ArrivalSignal: 
     ArrivalEventChannel: {fileID: 11400000, guid: 70c8513faa706a34884528c534c3a46b, type: 2}
   m_Loop: 0
 --- !u!1 &6519487512880403878

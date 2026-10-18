@@ -30,12 +30,32 @@ namespace Game.Scripts.InteractionObjects.View
 
         private void Start()
         {
-            _interactionDoor.IsLocked.Subscribe(SetLatchState).AddTo(_disposables);
             _collider = GetComponent<BoxCollider>();
-            SetLatchState(_interactionDoor.IsLocked.CurrentValue);
+
+            // Положение на старте - сразу, без анимации: дверь могла загрузиться запертой из сохранения.
+            SetLatchStateInstant(_interactionDoor.IsLocked.CurrentValue);
+
+            _interactionDoor.IsLocked.Skip(1).Subscribe(OnLockedChanged).AddTo(_disposables);
         }
 
-        
+        private void OnLockedChanged(bool isClosed)
+        {
+            // Состояние пришло из сохранения - защёлка должна просто стоять в нужном положении.
+            if (_interactionDoor.IsRestoringState)
+            {
+                SetLatchStateInstant(isClosed);
+                return;
+            }
+
+            SetLatchState(isClosed);
+        }
+
+        private void SetLatchStateInstant(bool isClosed)
+        {
+            _currentTween?.Kill();
+            transform.localPosition = isClosed ? _closedLocalPos : _openLocalPos;
+        }
+
         private void SetLatchState(bool isClosed)
         {
             _collider.enabled = false;

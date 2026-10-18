@@ -18,7 +18,10 @@ namespace Game.Scripts.Story
         Flag = 2,
 
         /// <summary>Реакция сцены на сюжет (UnityEvent в StorySceneReactions).</summary>
-        Reaction = 3
+        Reaction = 3,
+
+        /// <summary>Чекпоинт игрока на локации (LocationCheckpoint на сцене).</summary>
+        Checkpoint = 4
     }
 
     /// <summary>

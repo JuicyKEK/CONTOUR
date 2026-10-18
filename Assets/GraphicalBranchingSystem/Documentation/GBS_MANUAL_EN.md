@@ -128,6 +128,8 @@ ignored; no connected inputs → `false`; `Not` inverts the first connected inpu
 | `Story State/Raise Signal` | Key | Signal (e.g. wake a branch of another graph) |
 | `Scene/Invoke Scene Reaction` | Key | Invoke scene reactions with the key (`StorySceneReactions`) |
 | `Save/Save Game` | — | Checkpoint: save the whole game via `GameSaveController` (see section 10) |
+| `Save/Set Player Checkpoint` | Checkpoint Id | Set the player checkpoint — the `LocationCheckpoint` with this key: the player appears there when the game is loaded and after death. The checkpoint may be in a location that is not loaded right now. The action itself writes nothing to the file — the checkpoint is saved by `Save Game`, so put it before that action. If no checkpoint is set, the default checkpoint of a location becomes the player checkpoint when the player moves into that location |
+| `Save/Load Last Save` | — | Return the game to the last save (player death): the game restarts from the saved location and checkpoint |
 | `Audio Tapes/Mark Tape Completed` | Tape | Mark an audio tape task as completed |
 | `Legacy/...` | asset | Old `StoryAction` / `GBSEvent` SO (custom SOs without a built-in equivalent) |
 
@@ -241,7 +243,7 @@ Do not keep `GBSStarter` and the legacy `StoryManager` in one scene.
 
 Saving is **not automatic** — only on demand, at checkpoints. The shared `GameSaveController` (one per
 scene) does it: `SaveGame()` goes through every mechanic taking part in saves (`ISaveParticipant`): the GBS
-story, audio tapes, infection zones. A new mechanic joins the pool automatically — its JuicyDI bean just
+story, audio tapes, infection zones, the player checkpoint, the inventory, the state of location objects (doors, picked-up items, switches). A new mechanic joins the pool automatically — its JuicyDI bean just
 implements `ISaveParticipant`.
 
 How to save:

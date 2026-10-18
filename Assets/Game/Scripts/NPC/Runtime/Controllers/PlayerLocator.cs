@@ -1,17 +1,20 @@
 ﻿using Game.Scripts.NPC.Runtime.Interfaces;
 using JuicyDI;
 using JuicyDI.Attributes;
-using JuicyDI.Context;
 using UnityEngine;
 
 namespace Game.Scripts.NPC.Runtime.Controllers
 {
     /// <summary>
-    /// Простой глобальный бин: один раз находит игрока по тегу и раздаёт его
-    /// Transform всем ботам через DI. Повесьте на любой постоянный объект сцены
-    /// (например рядом с InputController) или укажите m_PlayerTransform вручную.
+    /// Простой бин: один раз находит игрока по тегу и раздаёт его Transform всем ботам через DI
+    /// (боты из аддитивно загруженных локаций находят его в сцене ядра). Повесьте на любой постоянный
+    /// объект сцены (например рядом с InputController) или укажите m_PlayerTransform вручную.
+    ///
+    /// Бин сцены, а не глобальный: глобальный бин на корневом объекте JuicyDI уносит в DontDestroyOnLoad,
+    /// а компонент висит на игроке - игрок переживал бы перезагрузку сцены (возврат к сохранению),
+    /// и в игре оказывалось бы два игрока.
     /// </summary>
-    [JDIMonoController(Context = typeof(GlobalBean))]
+    [JDIMonoController]
     [SequenceParticipant(10)]
     public class PlayerLocator : MonoBehaviour, IPlayerLocator, ISequence
     {

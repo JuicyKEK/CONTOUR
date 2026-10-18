@@ -1,4 +1,5 @@
-﻿using Game.Scripts.Inventory.Controllers.Interfaces;
+﻿using System;
+using Game.Scripts.Inventory.Controllers.Interfaces;
 using JuicyDI.Attributes;
 using R3;
 using UnityEngine;
@@ -6,8 +7,9 @@ using UnityEngine;
 namespace Game.Scripts.Inventory.External
 {
     [JDIMonoController]
-    public class InventoryInteraction : MonoBehaviour, IInteraction, IInventoryObject
+    public class InventoryInteraction : MonoBehaviour, IInteraction, IInventoryObject, IPickupObject
     {
+        public event Action PickedUp;
         public Subject<Unit> IsPlaySound => m_IsPlaySound;
         public string ObjectKey => m_ObjectName;
         public Sprite ObjectIcon => m_ObjectIcon;
@@ -28,6 +30,7 @@ namespace Game.Scripts.Inventory.External
         {
             m_IsPlaySound.OnNext(Unit.Default);
             m_Inventory.AddItem(this);
+            PickedUp?.Invoke();
             Destroy(gameObject);
         }
     }

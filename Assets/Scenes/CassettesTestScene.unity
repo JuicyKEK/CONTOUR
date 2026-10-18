@@ -1266,6 +1266,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 437179154}
     - target: {fileID: 6321455367056393362, guid: 4ce7bfec69b9f2c49858805f471ead44, type: 3}
+      propertyPath: m_Pages.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6321455367056393362, guid: 4ce7bfec69b9f2c49858805f471ead44, type: 3}
       propertyPath: m_PanelRectTransform
       value: 
       objectReference: {fileID: 437179153}
@@ -1273,6 +1277,10 @@ PrefabInstance:
       propertyPath: m_CassettePlayerModel
       value: 
       objectReference: {fileID: 697882933}
+    - target: {fileID: 6321455367056393362, guid: 4ce7bfec69b9f2c49858805f471ead44, type: 3}
+      propertyPath: 'm_Pages.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5c5464d7087a09c48bd698be99a7ae89, type: 2}
     - target: {fileID: 7791961489835084671, guid: 4ce7bfec69b9f2c49858805f471ead44, type: 3}
       propertyPath: m_Name
       value: CassettePlayerController

@@ -2,7 +2,7 @@
 
 namespace Game.Scripts.InteractionObjects.Interfaces
 {
-    public interface IInteractionDoor
+    public interface IInteractionDoor : IRestorableDoor
     {
         public void Lock();
         public ReadOnlyReactiveProperty<bool> IsOpen { get; }

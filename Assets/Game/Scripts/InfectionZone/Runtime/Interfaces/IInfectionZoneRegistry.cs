@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Game.Scripts.InfectionZone.Runtime.Interfaces
 {
@@ -28,5 +29,15 @@ namespace Game.Scripts.InfectionZone.Runtime.Interfaces
         /// Убрать зону из реестра (вызывается при уничтожении зоны).
         /// </summary>
         void UnregisterZone(IInfectionZone zone);
+
+        /// <summary>
+        /// Зона появилась в реестре - её сцена загрузилась и зона инициализировалась.
+        /// </summary>
+        event Action<IInfectionZone> ZoneRegistered;
+
+        /// <summary>
+        /// Зона уходит из реестра - её сцена выгружается. Уровень заражения зоны в этот момент ещё можно прочитать.
+        /// </summary>
+        event Action<IInfectionZone> ZoneUnregistering;
     }
 }

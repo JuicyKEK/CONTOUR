@@ -3,6 +3,8 @@ namespace Game.Scripts.InfectionZone.Runtime.Interfaces
     /// <summary>
     /// Сохранение/загрузка уровней заражения зон (JSON-файл: Id зоны -> уровень заражения).
     /// Бин сцены JuicyDI - систему чекпоинтов можно подключить через [Inject].
+    /// Пока игра идёт, уровни зон из выгруженных локаций хранятся в памяти и возвращаются зонам, когда
+    /// их сцена снова загружается; в файл они пишутся только в <see cref="Save"/>.
     /// </summary>
     public interface IInfectionZoneSaveService
     {
