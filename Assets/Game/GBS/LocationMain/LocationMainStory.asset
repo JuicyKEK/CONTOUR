@@ -1,0 +1,640 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11887c1e3c753f140bb3b94f0c944a2e, type: 3}
+  m_Name: LocationMainStory
+  m_EditorClassIdentifier: Assembly-CSharp::GBS.Data.GBSGraphSO
+  m_GraphId: 8f1ebb4e-7de6-43fe-b973-c26fec54dffc
+  m_GraphName: LocationMainStory
+  m_Nodes:
+  - rid: 155225076072710144
+  - rid: 155225076072710145
+  - rid: 155225076072710146
+  - rid: 155225076072710147
+  - rid: 155225076072710148
+  - rid: 155225076072710149
+  - rid: 155225076072710150
+  - rid: 155225076072710151
+  - rid: 155225076072710152
+  - rid: 155225076072710153
+  - rid: 155225076072710154
+  - rid: 155225076072710155
+  - rid: 155225076072710156
+  - rid: 155225076072710157
+  - rid: 155225076072710158
+  - rid: 155225076072710159
+  - rid: 155225076072710160
+  - rid: 155225076072710201
+  m_Edges:
+  - m_FromNodeId: 5fdcfa11-7ddd-4e1c-bb45-9b14d21259bb
+    m_FromPortId: out
+    m_ToNodeId: 9be89c17-60df-4b8d-8cf4-94f73abf961d
+    m_ToPortId: in
+  - m_FromNodeId: 9be89c17-60df-4b8d-8cf4-94f73abf961d
+    m_FromPortId: e7209396-70a9-4ee4-a1e4-9331bab36c4c
+    m_ToNodeId: 00cd0d11-6a99-42d6-a66c-17027c65f927
+    m_ToPortId: in
+  - m_FromNodeId: 9be89c17-60df-4b8d-8cf4-94f73abf961d
+    m_FromPortId: 301a1b19-21ba-42de-b720-2a441189eb44
+    m_ToNodeId: 00cd0d11-6a99-42d6-a66c-17027c65f927
+    m_ToPortId: in
+  - m_FromNodeId: 00cd0d11-6a99-42d6-a66c-17027c65f927
+    m_FromPortId: b764a43e-c04a-47a8-97fb-7db6d0a09d0a
+    m_ToNodeId: d792cd02-e20e-49dd-8ba1-8b27128f49bd
+    m_ToPortId: in
+  - m_FromNodeId: d792cd02-e20e-49dd-8ba1-8b27128f49bd
+    m_FromPortId: adb5cc3d-20d7-4a04-8714-ad3d47af5d7f
+    m_ToNodeId: 30c16178-2832-4406-a97d-240faf87fd8b
+    m_ToPortId: in
+  - m_FromNodeId: 30c16178-2832-4406-a97d-240faf87fd8b
+    m_FromPortId: 8c001999-d5e7-47f0-89a1-433a1706e5ed
+    m_ToNodeId: 3bdfcca9-71f3-4c2a-8bf3-416cef0f6a4e
+    m_ToPortId: in
+  - m_FromNodeId: 3bdfcca9-71f3-4c2a-8bf3-416cef0f6a4e
+    m_FromPortId: 71d819e7-5bb9-46e5-ab46-bfbbe11bc9b3
+    m_ToNodeId: 5a6a0ac7-3f29-4772-a633-b50a56adfbb6
+    m_ToPortId: in
+  - m_FromNodeId: 3bdfcca9-71f3-4c2a-8bf3-416cef0f6a4e
+    m_FromPortId: 445e44ab-8939-4b6b-be02-127da0388936
+    m_ToNodeId: 5f8c3d02-5b32-45c1-aaba-78d1f7cedd2a
+    m_ToPortId: in
+  - m_FromNodeId: 5a6a0ac7-3f29-4772-a633-b50a56adfbb6
+    m_FromPortId: 28c9814d-fa87-454f-bbcb-c63465cd110f
+    m_ToNodeId: 52dea96a-5ac2-49ba-b8f0-3fdeb93c42d5
+    m_ToPortId: in
+  - m_FromNodeId: 5f8c3d02-5b32-45c1-aaba-78d1f7cedd2a
+    m_FromPortId: b83115e4-bf55-4fc4-8b5b-77f3198ebcd1
+    m_ToNodeId: 7c2c9d7b-2518-43c3-bdeb-563266442f53
+    m_ToPortId: in
+  - m_FromNodeId: 52dea96a-5ac2-49ba-b8f0-3fdeb93c42d5
+    m_FromPortId: 74678ada-a764-4ecd-9247-7c7ab5289e46
+    m_ToNodeId: 041e3a52-aca4-499c-8595-1f5aabab63cf
+    m_ToPortId: in
+  - m_FromNodeId: 7c2c9d7b-2518-43c3-bdeb-563266442f53
+    m_FromPortId: b2358b5c-477f-40de-a316-63d3429ed83b
+    m_ToNodeId: 00d1cdca-6c34-4a49-b62b-bf49717fa240
+    m_ToPortId: in
+  - m_FromNodeId: 041e3a52-aca4-499c-8595-1f5aabab63cf
+    m_FromPortId: 9e34dd87-3b6f-420b-be02-7c1e80ad70bf
+    m_ToNodeId: 00cb1086-be1d-4544-8d1b-729780a6f5aa
+    m_ToPortId: in
+  - m_FromNodeId: 00d1cdca-6c34-4a49-b62b-bf49717fa240
+    m_FromPortId: 91c0a228-cdbe-40fd-9e07-e245aaf9c743
+    m_ToNodeId: 5d82aada-afed-40d7-aa77-c6cb8cf99e27
+    m_ToPortId: in
+  - m_FromNodeId: 00cb1086-be1d-4544-8d1b-729780a6f5aa
+    m_FromPortId: 278c4aaa-69ac-47c9-b5a9-17a9d390e6f8
+    m_ToNodeId: bc98409d-68ae-41a8-8ac3-a916e218ad8a
+    m_ToPortId: in
+  - m_FromNodeId: 5d82aada-afed-40d7-aa77-c6cb8cf99e27
+    m_FromPortId: 8e12f2e7-ea96-4ae3-8c25-1b3011147069
+    m_ToNodeId: 3cf291d8-3fe5-4ce3-9625-59fb8d435eea
+    m_ToPortId: in
+  - m_FromNodeId: 3cf291d8-3fe5-4ce3-9625-59fb8d435eea
+    m_FromPortId: cfa75f79-6f70-4314-a6e8-e8c42c3fcb57
+    m_ToNodeId: cefd315f-8649-4d88-b561-5733ff528a9d
+    m_ToPortId: in
+  - m_FromNodeId: cefd315f-8649-4d88-b561-5733ff528a9d
+    m_FromPortId: cd72d3b9-52e8-4230-82aa-812949a3d279
+    m_ToNodeId: 00cb1086-be1d-4544-8d1b-729780a6f5aa
+    m_ToPortId: in
+  - m_FromNodeId: 475a62bc-56dc-4ac5-aea3-9094ad0e9a53
+    m_FromPortId: out
+    m_ToNodeId: 5fdcfa11-7ddd-4e1c-bb45-9b14d21259bb
+    m_ToPortId: gate
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 155225076072710144
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 9be89c17-60df-4b8d-8cf4-94f73abf961d
+        m_NodeName: "1.0 \u0418\u043D\u0442\u0440\u043E: \u0432\u0438\u0434\u0435\u043E"
+        m_Position: {x: 420, y: 0}
+        m_Actions:
+        - rid: 155225076072710202
+        - rid: 155225076072710203
+        - rid: 155225076072710162
+        - rid: 155225076072710163
+        m_Branches:
+        - m_Id: e7209396-70a9-4ee4-a1e4-9331bab36c4c
+          m_BranchName: "\u0427\u0435\u0440\u0435\u0437 49 \u0441"
+          m_InlineCondition:
+            rid: 155225076072710164
+          m_Condition: {fileID: 0}
+        - m_Id: 301a1b19-21ba-42de-b720-2a441189eb44
+          m_BranchName: "\u041A\u043D\u043E\u043F\u043A\u0430 ESC"
+          m_InlineCondition:
+            rid: 155225076072710165
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710145
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 00cd0d11-6a99-42d6-a66c-17027c65f927
+        m_NodeName: "1.1 \u0418\u043D\u0442\u0440\u043E: \u043F\u0440\u043E\u043B\u0451\u0442
+          \u043A\u0430\u043C\u0435\u0440\u044B"
+        m_Position: {x: 840, y: 0}
+        m_Actions:
+        - rid: 155225076072710166
+        - rid: 155225076072710167
+        m_Branches:
+        - m_Id: b764a43e-c04a-47a8-97fb-7db6d0a09d0a
+          m_BranchName: "\u0427\u0435\u0440\u0435\u0437 6 \u0441"
+          m_InlineCondition:
+            rid: 155225076072710168
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710146
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: d792cd02-e20e-49dd-8ba1-8b27128f49bd
+        m_NodeName: "1.2 \u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435
+          \u0438\u0433\u0440\u043E\u043A\u0443"
+        m_Position: {x: 1260, y: 0}
+        m_Actions:
+        - rid: 155225076072710204
+        - rid: 155225076072710205
+        - rid: 155225076072710170
+        - rid: 155225076072710171
+        - rid: 155225076072710172
+        m_Branches:
+        - m_Id: adb5cc3d-20d7-4a04-8714-ad3d47af5d7f
+          m_BranchName: "\u041E\u0442\u043A\u0440\u044B\u0442\u0438\u0435 \u0449\u0438\u0442\u043A\u0430"
+          m_InlineCondition:
+            rid: 155225076072710173
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710147
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 30c16178-2832-4406-a97d-240faf87fd8b
+        m_NodeName: "1.3 \u041F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0430:
+          \u0437\u0430\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0437\u043E\u043D"
+        m_Position: {x: 1680, y: 0}
+        m_Actions:
+        - rid: 155225076072710174
+        m_Branches:
+        - m_Id: 8c001999-d5e7-47f0-89a1-433a1706e5ed
+          m_BranchName: "\u0412\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435 \u0441\u0432\u0435\u0442\u0430"
+          m_InlineCondition:
+            rid: 155225076072710175
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710148
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 3bdfcca9-71f3-4c2a-8bf3-416cef0f6a4e
+        m_NodeName: "1.4 \u0421\u0432\u0435\u0442 \u0432\u043A\u043B\u044E\u0447\u0451\u043D,
+          \u043F\u0440\u0438\u0448\u0451\u043B \u0433\u0430\u0437\u043E\u0432\u0449\u0438\u043A"
+        m_Position: {x: 2100, y: 0}
+        m_Actions:
+        - rid: 155225076072710176
+        - rid: 155225076072710177
+        m_Branches:
+        - m_Id: 71d819e7-5bb9-46e5-ab46-bfbbe11bc9b3
+          m_BranchName: "\u0414\u0432\u0435\u0440\u044C \u043E\u0442\u043A\u0440\u044B\u0442\u0430
+            \u0434\u043E \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u0432"
+          m_InlineCondition:
+            rid: 155225076072710178
+          m_Condition: {fileID: 0}
+        - m_Id: 445e44ab-8939-4b6b-be02-127da0388936
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A \u043F\u0440\u043E\u0432\u0435\u0440\u0438\u043B
+            \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B"
+          m_InlineCondition:
+            rid: 155225076072710179
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710149
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 5a6a0ac7-3f29-4772-a633-b50a56adfbb6
+        m_NodeName: "1.5.1 \u0413\u0430\u0437\u043E\u0432\u0449\u0438\u043A \u043D\u0430\u043F\u0430\u0434\u0430\u0435\u0442"
+        m_Position: {x: 2520, y: 0}
+        m_Actions:
+        - rid: 155225076072710180
+        m_Branches:
+        - m_Id: 28c9814d-fa87-454f-bbcb-c63465cd110f
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A\u0443 \u0432\u0442\u0430\u0449\u0438\u043B\u0438"
+          m_InlineCondition:
+            rid: 155225076072710181
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710150
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 5f8c3d02-5b32-45c1-aaba-78d1f7cedd2a
+        m_NodeName: "1.5.2 \u041F\u0440\u043E\u0432\u0435\u0440\u043A\u0430 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u0432"
+        m_Position: {x: 2520, y: 320}
+        m_Actions:
+        - rid: 155225076072710182
+        - rid: 155225076072710206
+        m_Branches:
+        - m_Id: b83115e4-bf55-4fc4-8b5b-77f3198ebcd1
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A \u043F\u0441\u043E\u043C\u043E\u0442\u0440\u0435\u043B
+            \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B"
+          m_InlineCondition:
+            rid: 155225076072710183
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710151
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 52dea96a-5ac2-49ba-b8f0-3fdeb93c42d5
+        m_NodeName: "1.6.1 \u0423\u0434\u0430\u0440 \u0438 \u043F\u0435\u0440\u0435\u043D\u043E\u0441"
+        m_Position: {x: 2940, y: 0}
+        m_Actions:
+        - rid: 155225076072710184
+        m_Branches:
+        - m_Id: 74678ada-a764-4ecd-9247-7c7ab5289e46
+          m_BranchName: "\u0427\u0435\u0440\u0435\u0437 1 \u0441"
+          m_InlineCondition:
+            rid: 155225076072710185
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710152
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 7c2c9d7b-2518-43c3-bdeb-563266442f53
+        m_NodeName: "1.6.2 \u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B
+          \u043F\u0440\u043E\u0432\u0435\u0440\u0435\u043D\u044B"
+        m_Position: {x: 2940, y: 320}
+        m_Actions:
+        - rid: 155225076072710186
+        - rid: 155225076072710207
+        m_Branches:
+        - m_Id: b2358b5c-477f-40de-a316-63d3429ed83b
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A \u043E\u0442\u043A\u0440\u044B\u043B
+            \u043A\u0430\u043B\u0438\u0442\u043A\u0443"
+          m_InlineCondition:
+            rid: 155225076072710187
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710153
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 041e3a52-aca4-499c-8595-1f5aabab63cf
+        m_NodeName: "1.7.1 \u041F\u043E\u0441\u043B\u0435\u0434\u0441\u0442\u0432\u0438\u044F"
+        m_Position: {x: 3360, y: 0}
+        m_Actions:
+        - rid: 155225076072710188
+        - rid: 155225076072710189
+        m_Branches:
+        - m_Id: 9e34dd87-3b6f-420b-be02-7c1e80ad70bf
+          m_BranchName: "\u0427\u0435\u0440\u0435\u0437 6 \u0441"
+          m_InlineCondition:
+            rid: 155225076072710190
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710154
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 00d1cdca-6c34-4a49-b62b-bf49717fa240
+        m_NodeName: "1.7.2 \u0413\u0430\u0437\u043E\u0432\u0449\u0438\u043A \u0438\u0434\u0451\u0442
+          \u043A \u0431\u0443\u0434\u043A\u0435"
+        m_Position: {x: 3360, y: 320}
+        m_Actions:
+        - rid: 155225076072710191
+        m_Branches:
+        - m_Id: 91c0a228-cdbe-40fd-9e07-e245aaf9c743
+          m_BranchName: "\u041D\u041F\u0421 \u0434\u043E\u0448\u0435\u043B \u0434\u043E
+            \u043A\u043E\u043D\u0446\u0430 \u043F\u0435\u0440\u0432\u043E\u0433\u043E
+            \u043C\u0430\u0440\u0448\u0440\u0443\u0442\u0430"
+          m_InlineCondition:
+            rid: 155225076072710192
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710155
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 00cb1086-be1d-4544-8d1b-729780a6f5aa
+        m_NodeName: "2.1 \u041A\u043E\u043D\u0435\u0446"
+        m_Position: {x: 3780, y: 0}
+        m_Actions:
+        - rid: 155225076072710193
+        - rid: 155225076072710194
+        m_Branches:
+        - m_Id: 278c4aaa-69ac-47c9-b5a9-17a9d390e6f8
+          m_BranchName: End
+          m_InlineCondition:
+            rid: -2
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710156
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 5d82aada-afed-40d7-aa77-c6cb8cf99e27
+        m_NodeName: "1.8.2 \u0413\u0430\u0437\u043E\u0432\u0449\u0438\u043A \u0436\u0434\u0451\u0442
+          \u0443 \u0431\u0443\u0434\u043A\u0438"
+        m_Position: {x: 3780, y: 320}
+        m_Actions:
+        - rid: 155225076072710195
+        m_Branches:
+        - m_Id: 8e12f2e7-ea96-4ae3-8c25-1b3011147069
+          m_BranchName: "\u0418\u0433\u0440\u043E\u043A \u0440\u0430\u0437\u0431\u043B\u043E\u043A\u0438\u0440\u043E\u0432\u0430\u043B
+            \u0431\u0443\u0434\u043A\u0443"
+          m_InlineCondition:
+            rid: 155225076072710196
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710157
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 3cf291d8-3fe5-4ce3-9625-59fb8d435eea
+        m_NodeName: "1.9.2 \u0413\u0430\u0437\u043E\u0432\u0449\u0438\u043A \u0438\u0434\u0451\u0442
+          \u043A \u0432\u044B\u0434\u0430\u0447\u0435"
+        m_Position: {x: 4200, y: 0}
+        m_Actions:
+        - rid: 155225076072710197
+        m_Branches:
+        - m_Id: cfa75f79-6f70-4314-a6e8-e8c42c3fcb57
+          m_BranchName: "\u043D\u043F\u0441 \u0434\u043E\u0448\u0435\u043B \u0434\u043E
+            \u0442\u043E\u0447\u043A\u0438 \u0432\u044B\u0434\u0430\u0447\u0438"
+          m_InlineCondition:
+            rid: 155225076072710198
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710158
+      type: {class: GBSStoryNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: cefd315f-8649-4d88-b561-5733ff528a9d
+        m_NodeName: "1.10.2 \u0412\u044B\u0434\u0430\u0447\u0430"
+        m_Position: {x: 4620, y: 0}
+        m_Actions:
+        - rid: 155225076072710199
+        m_Branches:
+        - m_Id: cd72d3b9-52e8-4230-82aa-812949a3d279
+          m_BranchName: "\u0427\u0435\u0440\u0435\u0437 6 \u0441"
+          m_InlineCondition:
+            rid: 155225076072710200
+          m_Condition: {fileID: 0}
+        m_OnEnterActions: []
+        m_OnEnterEvents: []
+    - rid: 155225076072710159
+      type: {class: GBSStartNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 5fdcfa11-7ddd-4e1c-bb45-9b14d21259bb
+        m_NodeName: Start
+        m_Position: {x: 0, y: 0}
+    - rid: 155225076072710160
+      type: {class: GBSEndNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: bc98409d-68ae-41a8-8ac3-a916e218ad8a
+        m_NodeName: End
+        m_Position: {x: 5460, y: 0}
+        m_OnCompleteActions: []
+        m_OnCompleteEvents: []
+    - rid: 155225076072710162
+      type: {class: RaiseSignal, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEventChannel_1.0
+    - rid: 155225076072710163
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.0
+    - rid: 155225076072710164
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 49
+    - rid: 155225076072710165
+      type: {class: InputPressed, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Button: 6
+    - rid: 155225076072710166
+      type: {class: RaiseSignal, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEventChannel_1.1
+    - rid: 155225076072710167
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.1
+    - rid: 155225076072710168
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 6
+    - rid: 155225076072710170
+      type: {class: RaiseSignal, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEventChannel_1.2
+    - rid: 155225076072710171
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 TAB, \u0447\u0442\u043E\u0431\u044B
+          \u043E\u0442\u043A\u0440\u044B\u0442\u044C \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u044E.
+          \u0412\u043A\u043B\u044E\u0447\u0438\u0432 \u0430\u0443\u0434\u0438\u043E\u0437\u0430\u043F\u0438\u0441\u044C,
+          \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E \u043D\u0430\u0436\u043C\u0438\u0442\u0435
+          \u043D\u0430 TAB, \u0447\u0442\u043E\u0431\u044B \u043F\u0440\u043E\u0441\u043B\u0443\u0448\u0438\u0432\u0430\u0442\u044C
+          \u0435\u0451 \u0432 \u0444\u043E\u043D\u043E\u0432\u043E\u043C \u0440\u0435\u0436\u0438\u043C\u0435."
+        m_UntilNodeExit: 0
+        m_Duration: 8
+        m_WaitUntilHidden: 0
+    - rid: 155225076072710172
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.2
+    - rid: 155225076072710173
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEvent_1.3
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710174
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 TAB, \u0447\u0442\u043E\u0431\u044B
+          \u043F\u0440\u043E\u0441\u043B\u0443\u0448\u0430\u0442\u044C \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u044E
+          \u043E \u0437\u0430\u0440\u0430\u0436\u0435\u043D\u0438\u0438 \u0437\u043E\u043D."
+        m_UntilNodeExit: 0
+        m_Duration: 4
+        m_WaitUntilHidden: 0
+    - rid: 155225076072710175
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEvent_1.4
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710176
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.4
+    - rid: 155225076072710177
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041D\u0435 \u0437\u0430\u0431\u044B\u0432\u0430\u0439\u0442\u0435
+          \u043F\u0440\u043E\u0441\u043B\u0443\u0448\u0438\u0432\u0430\u0442\u044C
+          \u043D\u0430\u0439\u0434\u0435\u043D\u043D\u044B\u0435 \u0438\u0441\u043D\u0442\u0440\u0443\u043A\u0446\u0438\u0438,
+          \u043E\u0441\u043E\u0431\u0435\u043D\u043D\u043E \u0432 \u043D\u0435\u0441\u0442\u0430\u043D\u0434\u0430\u0440\u0442\u043D\u044B\u0445
+          \u0441\u0438\u0442\u0443\u0430\u0446\u0438\u044F\u0445."
+        m_UntilNodeExit: 0
+        m_Duration: 8
+        m_WaitUntilHidden: 0
+    - rid: 155225076072710178
+      type: {class: FlagIs, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/BoolStateChannel_1.5.1
+        m_Expected: 1
+    - rid: 155225076072710179
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEventChannel_1.5.2
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710180
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.5.1
+    - rid: 155225076072710181
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEventChannel_1.5.1
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710182
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.5.2
+    - rid: 155225076072710183
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEventChannel_1.6.2
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710184
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.6.1
+    - rid: 155225076072710185
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 1
+    - rid: 155225076072710186
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.6.2
+    - rid: 155225076072710187
+      type: {class: FlagIs, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/BoolStateChannel_1.5.1
+        m_Expected: 1
+    - rid: 155225076072710188
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.7.1
+    - rid: 155225076072710189
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041D\u0435\u0441\u043E\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u0435
+          \u0438\u043D\u0441\u0442\u0440\u0443\u043A\u0446\u0438\u0439 \u0432\u043B\u0435\u0447\u0435\u0442
+          \u0437\u0430 \u0441\u043E\u0431\u043E\u0439 \u043F\u043E\u0441\u043B\u0435\u0434\u0441\u0442\u0432\u0438\u044F"
+        m_UntilNodeExit: 0
+        m_Duration: 6
+        m_WaitUntilHidden: 0
+    - rid: 155225076072710190
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 6
+    - rid: 155225076072710191
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.7.2
+    - rid: 155225076072710192
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEvent_1.8.2
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710193
+      type: {class: ShowHint, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Text: "\u041D\u0430\u0434\u0430\u043D\u043D\u044B\u0439 \u043C\u043E\u043C\u0435\u043D\u0442
+          \u0432\u0441\u0435, \u0441\u043F\u0430\u0441\u0438\u0431\u043E \u0447\u0442\u043E
+          \u043F\u043E\u0438\u0433\u0440\u0430\u043B\u0438!"
+        m_UntilNodeExit: 0
+        m_Duration: 40
+        m_WaitUntilHidden: 0
+    - rid: 155225076072710194
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_2.1
+    - rid: 155225076072710195
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.8.2
+    - rid: 155225076072710196
+      type: {class: FlagIs, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/BoolStateChannel_1.7.2
+        m_Expected: 1
+    - rid: 155225076072710197
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.9.2
+    - rid: 155225076072710198
+      type: {class: SignalRaised, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/StoryEvent_1.9.2
+        m_OnlyAfterNodeEnter: 1
+    - rid: 155225076072710199
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Legacy/UnityEventAction_1.10.2
+    - rid: 155225076072710200
+      type: {class: AfterDelay, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Seconds: 6
+    - rid: 155225076072710201
+      type: {class: GBSConditionNodeData, ns: GBS.Data, asm: Assembly-CSharp}
+      data:
+        m_Id: 475a62bc-56dc-4ac5-aea3-9094ad0e9a53
+        m_NodeName: "LoacationMain \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u0430"
+        m_Position: {x: -380, y: 160}
+        m_InlineCondition:
+          rid: 155225076072710208
+        m_Condition: {fileID: 0}
+    - rid: 155225076072710202
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Player/Freeze
+    - rid: 155225076072710203
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: LocationMain/CutsceneCamera/On
+    - rid: 155225076072710204
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: LocationMain/CutsceneCamera/Off
+    - rid: 155225076072710205
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Player/Unfreeze
+    - rid: 155225076072710206
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Player/ShowCursor
+    - rid: 155225076072710207
+      type: {class: InvokeSceneReaction, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: Player/HideCursor
+    - rid: 155225076072710208
+      type: {class: FlagIs, ns: GBS.Steps, asm: Assembly-CSharp}
+      data:
+        m_Key: LocationMain/Loaded
+        m_Expected: 1

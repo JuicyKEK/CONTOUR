@@ -1,0 +1,153 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50870e4b4156ca84e99d406e61c3ffcc, type: 3}
+  m_Name: LocationMainStoryKeys
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Story.StoryKeyCatalogSO
+  m_Entries:
+  - Key: Legacy/BoolStateChannel_1.5.1
+    Kind: 2
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryCondition/BoolStateChannel_1.5.1.asset"
+  - Key: Legacy/BoolStateChannel_1.7.2
+    Kind: 2
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryCondition/BoolStateChannel_1.7.2.asset"
+  - Key: Legacy/StoryEventChannel_1.0
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEventChannel_1.0.asset"
+  - Key: Legacy/StoryEventChannel_1.1
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEventChannel_1.1.asset"
+  - Key: Legacy/StoryEventChannel_1.2
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEventChannel_1.2.asset"
+  - Key: Legacy/StoryEventChannel_1.5.1
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEventChannel_1.5.1.asset"
+  - Key: Legacy/StoryEventChannel_1.5.2
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEventChannel_1.5.2.asset"
+  - Key: Legacy/StoryEventChannel_1.6.2
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEventChannel_1.6.2.asset"
+  - Key: Legacy/StoryEvent_1.3
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEvent_1.3.asset"
+  - Key: Legacy/StoryEvent_1.4
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEvent_1.4.asset"
+  - Key: Legacy/StoryEvent_1.8.2
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEvent_1.8.2.asset"
+  - Key: Legacy/StoryEvent_1.9.2
+    Kind: 1
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/Events/StoryEvent_1.9.2.asset"
+  - Key: Legacy/UnityEventAction_1.0
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.0.asset"
+  - Key: Legacy/UnityEventAction_1.1
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.1.asset"
+  - Key: Legacy/UnityEventAction_1.10.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.10.2.asset"
+  - Key: Legacy/UnityEventAction_1.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.2.asset"
+  - Key: Legacy/UnityEventAction_1.4
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.4.asset"
+  - Key: Legacy/UnityEventAction_1.5.1
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.5.1.asset"
+  - Key: Legacy/UnityEventAction_1.5.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.5.2.asset"
+  - Key: Legacy/UnityEventAction_1.6.1
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.6.1.asset"
+  - Key: Legacy/UnityEventAction_1.6.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.6.2.asset"
+  - Key: Legacy/UnityEventAction_1.7.1
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.7.1.asset"
+  - Key: Legacy/UnityEventAction_1.7.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.7.2.asset"
+  - Key: Legacy/UnityEventAction_1.8.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.8.2.asset"
+  - Key: Legacy/UnityEventAction_1.9.2
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_1.9.2.asset"
+  - Key: Legacy/UnityEventAction_2.1
+    Kind: 3
+    Description: "\u041C\u043E\u0441\u0442 \u0441\u043E \u0441\u0442\u0430\u0440\u043E\u0433\u043E
+      SO-\u0430\u0441\u0441\u0435\u0442\u0430: Assets/Game/SO/Story/Alpha/StoryActions/UnityEventAction_2.1.asset"
+  - Key: LocationMain/CutsceneCamera/Off
+    Kind: 3
+    Description: "LoacationMain: \u0432\u044B\u043A\u043B\u044E\u0447\u0438\u0442\u044C
+      \u043A\u0430\u043C\u0435\u0440\u0443 \u043A\u0430\u0442\u0441\u0446\u0435\u043D\u044B."
+  - Key: LocationMain/CutsceneCamera/On
+    Kind: 3
+    Description: "LoacationMain: \u0432\u043A\u043B\u044E\u0447\u0438\u0442\u044C
+      \u043A\u0430\u043C\u0435\u0440\u0443 \u043A\u0430\u0442\u0441\u0446\u0435\u043D\u044B
+      (\u043F\u043E\u0432\u0435\u0440\u0445 \u043A\u0430\u043C\u0435\u0440\u044B
+      \u0438\u0433\u0440\u043E\u043A\u0430)."
+  - Key: LocationMain/Loaded
+    Kind: 2
+    Description: "LoacationMain \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u0430
+      - \u0441 \u044D\u0442\u043E\u0433\u043E \u043C\u043E\u043C\u0435\u043D\u0442\u0430
+      \u0438\u0434\u0451\u0442 \u0435\u0451 \u0441\u044E\u0436\u0435\u0442."
+  - Key: Player/Freeze
+    Kind: 3
+    Description: "GameCore: \u0437\u0430\u0431\u0440\u0430\u0442\u044C \u0443 \u0438\u0433\u0440\u043E\u043A\u0430
+      \u0434\u0432\u0438\u0436\u0435\u043D\u0438\u0435, \u043E\u0431\u0437\u043E\u0440
+      \u0438 \u0432\u0437\u0430\u0438\u043C\u043E\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435
+      (\u0438\u043D\u0442\u0440\u043E)."
+  - Key: Player/HideCursor
+    Kind: 3
+    Description: "GameCore: \u0441\u043F\u0440\u044F\u0442\u0430\u0442\u044C \u043A\u0443\u0440\u0441\u043E\u0440
+      \u0438 \u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0443\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435."
+  - Key: Player/ShowCursor
+    Kind: 3
+    Description: "GameCore: \u043F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u043A\u0443\u0440\u0441\u043E\u0440
+      \u0438 \u043E\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u0438\u0433\u0440\u043E\u043A\u0430
+      (\u043E\u043A\u043D\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u043E\u0432)."
+  - Key: Player/Unfreeze
+    Kind: 3
+    Description: "GameCore: \u0432\u0435\u0440\u043D\u0443\u0442\u044C \u0438\u0433\u0440\u043E\u043A\u0443
+      \u0443\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435."

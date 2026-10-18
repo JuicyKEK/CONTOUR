@@ -13,8 +13,10 @@ using UnityEngine.UI;
 public class StoryEvent_FadeTeleport : MonoBehaviour
 {
     [Header("Игрок")]
-    [Tooltip("Что телепортировать. Если не задано - используется этот же GameObject.")]
+    [Tooltip("Что телепортировать. Если не задано - игрок ищется по тегу в момент события (игрок живёт в GameCore, а сцена-локация грузится отдельно).")]
     [SerializeField] private Transform m_PlayerRoot;
+    [Tooltip("Тег, по которому ищется игрок, если ссылка выше не задана.")]
+    [SerializeField] private string m_PlayerTag = "Player";
 
     [Header("Точка телепортации")]
     [SerializeField] private Transform m_TeleportTarget;
@@ -31,11 +33,6 @@ public class StoryEvent_FadeTeleport : MonoBehaviour
 
     private void Awake()
     {
-        if (m_PlayerRoot == null)
-        {
-            m_PlayerRoot = transform;
-        }
-
         // Создаём (если не назначен в инспекторе) и заранее готовим оверлей
         // затемнения: alpha = 0, сам GameObject выключен.
         EnsureFadeCanvasGroup();
@@ -85,23 +82,46 @@ public class StoryEvent_FadeTeleport : MonoBehaviour
 
     private void TeleportPlayer()
     {
-        if (m_PlayerRoot == null || m_TeleportTarget == null)
+        var playerRoot = ResolvePlayerRoot();
+
+        if (playerRoot == null || m_TeleportTarget == null)
         {
             return;
         }
 
-        var characterController = m_PlayerRoot.GetComponent<CharacterController>();
+        var characterController = playerRoot.GetComponent<CharacterController>();
 
         if (characterController != null)
         {
             characterController.enabled = false;
-            m_PlayerRoot.SetPositionAndRotation(m_TeleportTarget.position, m_TeleportTarget.rotation);
+            playerRoot.SetPositionAndRotation(m_TeleportTarget.position, m_TeleportTarget.rotation);
             characterController.enabled = true;
         }
         else
         {
-            m_PlayerRoot.SetPositionAndRotation(m_TeleportTarget.position, m_TeleportTarget.rotation);
+            playerRoot.SetPositionAndRotation(m_TeleportTarget.position, m_TeleportTarget.rotation);
         }
+    }
+
+    /// <summary>
+    /// Ссылка из инспектора, иначе игрок по тегу: из сцены-локации на игрока в GameCore ссылку не задать.
+    /// </summary>
+    private Transform ResolvePlayerRoot()
+    {
+        if (m_PlayerRoot == null)
+        {
+            var player = GameObject.FindGameObjectWithTag(m_PlayerTag);
+
+            if (player == null)
+            {
+                Debug.LogWarning($"[{nameof(StoryEvent_FadeTeleport)}] {name}: игрок с тегом '{m_PlayerTag}' не найден - телепорт пропущен.", this);
+                return null;
+            }
+
+            m_PlayerRoot = player.transform;
+        }
+
+        return m_PlayerRoot;
     }
 
     private void SetFadeAlpha(float alpha)

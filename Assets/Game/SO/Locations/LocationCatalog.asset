@@ -15,9 +15,10 @@ MonoBehaviour:
   m_GameCoreScene:
     m_SceneAsset: {fileID: 102900000, guid: 072461b2c2c52234798458817cead528, type: 3}
     m_ScenePath: Assets/Game/Scenes/GameCore.unity
-  m_StartLocation: {fileID: 11400000, guid: 82d357fee87d7e54b997c561fb7d78ae, type: 2}
+  m_StartLocation: {fileID: 11400000, guid: f2110b4760178f546a0c66e585addf1d, type: 2}
   m_Locations:
   - {fileID: 11400000, guid: 82d357fee87d7e54b997c561fb7d78ae, type: 2}
   - {fileID: 11400000, guid: cc70626662500bb43a7c674619056b8a, type: 2}
+  - {fileID: 11400000, guid: f2110b4760178f546a0c66e585addf1d, type: 2}
   m_Transitions:
   - {fileID: 11400000, guid: 5ae8833c4e02dd946b3c44ef97f3f879, type: 2}

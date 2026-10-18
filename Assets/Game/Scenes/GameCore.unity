@@ -811,6 +811,223 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
   m_Asset: {fileID: -944628639613478452, guid: 0426fcc89d38c0c49a3b9d509d153979, type: 3}
   m_ActionId: 351f2ccd-1f9f-44bf-9bec-d62ac5c5f408
+--- !u!1 &922746699
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 922746701}
+  - component: {fileID: 922746700}
+  m_Layer: 0
+  m_Name: StoryPlayerReactions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &922746700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922746699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fd9f72fc7fea1b4c80ea2d6b48de5fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Story.StorySceneReactions
+  m_Reactions:
+  - Key: Player/Freeze
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1458957801}
+          m_TargetAssemblyTypeName: AZE.AdvancedFirstPerson.PlayerMovementStateMachine,
+            Assembly-CSharp
+          m_MethodName: SetCanMovement
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1458957800}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.PlayerInteractiveController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1874612995}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.InputController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Key: Player/Unfreeze
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1458957801}
+          m_TargetAssemblyTypeName: AZE.AdvancedFirstPerson.PlayerMovementStateMachine,
+            Assembly-CSharp
+          m_MethodName: SetCanMovement
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 1458957800}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.PlayerInteractiveController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 1874612995}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.InputController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+  - Key: Player/ShowCursor
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1458957801}
+          m_TargetAssemblyTypeName: AZE.AdvancedFirstPerson.PlayerMovementStateMachine,
+            Assembly-CSharp
+          m_MethodName: SetMouseState
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 1458957800}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.PlayerInteractiveController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1874612995}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.InputController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Key: Player/HideCursor
+    Response:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1458957801}
+          m_TargetAssemblyTypeName: AZE.AdvancedFirstPerson.PlayerMovementStateMachine,
+            Assembly-CSharp
+          m_MethodName: SetMouseState
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1458957800}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.PlayerInteractiveController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 1874612995}
+          m_TargetAssemblyTypeName: Game.Scripts.InputController.InputController,
+            Assembly-CSharp
+          m_MethodName: SetControlEnabled
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+--- !u!4 &922746701
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922746699}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1012959357
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -931,12 +1148,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3235658947858098660, guid: 3f51eb24cf4a8314bbf7566edbfdd702, type: 3}
       propertyPath: m_Graphs.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3235658947858098660, guid: 3f51eb24cf4a8314bbf7566edbfdd702, type: 3}
       propertyPath: 'm_Graphs.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 6fab9323017950e4ab218f8456f7ab1c, type: 2}
+      objectReference: {fileID: 11400000, guid: 33462eee1f2f23c428eab3541cdcaf3c, type: 2}
     - target: {fileID: 3235658947858098660, guid: 3f51eb24cf4a8314bbf7566edbfdd702, type: 3}
       propertyPath: 'm_Graphs.Array.data[1]'
       value: 
@@ -1340,6 +1557,28 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5659440458517913730, guid: a5fd43f0dea89fb4ab76506b739b4229, type: 3}
   m_PrefabInstance: {fileID: 1458957798}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1458957800 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9140438488627603957, guid: a5fd43f0dea89fb4ab76506b739b4229, type: 3}
+  m_PrefabInstance: {fileID: 1458957798}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458957799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88b2e9bed0df423184594b5035d75c11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1458957801 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1599558884546896224, guid: a5fd43f0dea89fb4ab76506b739b4229, type: 3}
+  m_PrefabInstance: {fileID: 1458957798}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458957799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 793bbd9aa368e8545a0ac0d29604fc21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementStateMachine
 --- !u!114 &1485878864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1917,3 +2156,4 @@ SceneRoots:
   - {fileID: 1806617011}
   - {fileID: 1416243298}
   - {fileID: 1458957798}
+  - {fileID: 922746701}

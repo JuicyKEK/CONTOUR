@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: LocationCheckpointKeys
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Story.StoryKeyCatalogSO
   m_Entries:
+  - Key: Main/Start
+    Kind: 4
+    Description: "\u0421\u0442\u0430\u0440\u0442 LoacationMain (\u0442\u0430\u043C,
+      \u0433\u0434\u0435 \u0441\u0442\u043E\u044F\u043B \u0438\u0433\u0440\u043E\u043A
+      \u0441\u0446\u0435\u043D\u044B)."
   - Key: TransitionTest1/Start
     Kind: 4
     Description: "\u0422\u0435\u0441\u0442\u043E\u0432\u0430\u044F \u043B\u043E\u043A\u0430\u0446\u0438\u044F
