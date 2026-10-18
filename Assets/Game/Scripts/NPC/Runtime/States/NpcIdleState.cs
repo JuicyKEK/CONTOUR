@@ -1,5 +1,4 @@
 ﻿using Game.Scripts.NPC.Runtime.Core;
-using UnityEngine;
 
 namespace Game.Scripts.NPC.Runtime.States
 {
@@ -8,7 +7,7 @@ namespace Game.Scripts.NPC.Runtime.States
     /// по себе - используется как "пауза" перед сюжетным событием (например
     /// сотрудник газовой службы ждёт, пока игрок проверит документы) или как
     /// состояние по умолчанию до первой команды. Автоматических переходов нет -
-    /// выход только по внешней команде (ForcePatrol/ForceObserve/ForceChase...).
+    /// выход только по внешней команде (ForcePatrol/ForceObserve/ForceChase, шаги графа...).
     /// </summary>
     public class NpcIdleState : NpcState
     {
@@ -16,12 +15,7 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override void Enter(NpcBlackboard blackboard)
         {
-            Debug.Log("Entered Idle State");
-            if (blackboard.Agent.isOnNavMesh)
-            {
-                blackboard.Agent.isStopped = true;
-            }
-
+            NpcNavigation.Halt(blackboard.Agent);
             blackboard.Controller.PlayAnimationSound("Idle");
         }
 
@@ -32,11 +26,7 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override void Exit(NpcBlackboard blackboard)
         {
-            if (blackboard.Agent.isOnNavMesh)
-            {
-                blackboard.Agent.isStopped = false;
-            }
+            NpcNavigation.SetStopped(blackboard.Agent, false);
         }
     }
 }
-

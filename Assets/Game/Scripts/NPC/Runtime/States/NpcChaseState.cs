@@ -4,134 +4,207 @@ using UnityEngine;
 namespace Game.Scripts.NPC.Runtime.States
 {
     /// <summary>
-    /// Преследование: агент через NavMesh ищет путь до игрока и пытается его
-    /// догнать. Останавливается тремя способами (см. NpcTypeDefinitionSO):
-    ///  - сама, потеряв игрока из виду дольше LoseSightGiveUpDelay секунд;
-    ///  - никогда сама не останавливается, если ChaseStopsOnlyByStory = true
-    ///    (тогда выйти можно только принудительно из сюжета - ForcePatrol/ForceIdle);
-    ///  - мгновенно, если у бота отключили агрессию (ManualAggressionSource.SetAggressive(false)).
-    /// Догнав игрока на CatchDistance - сообщает контроллеру о поимке (тот сам
-    /// решает что дальше: анимация "Eat", событие для сюжета и т.д.).
+    /// Погоня: агент через NavMesh бежит к игроку (к месту, где видел его последним).
+    ///  - Игрок в досягаемости - атака (NpcStateId.Attack).
+    ///  - Игрок пропал из виду (забежал за угол) - бот добегает до места, где видел его последним, и если игрока
+    ///    там не видно - начинает поиск (NpcStateId.Search). Не добежал за LoseSightGiveUpDelay - тоже поиск.
+    ///  - Сюжетная погоня (Blackboard.IsHunting: ForceHunt или ChaseStopsOnlyByStory) - бот всегда знает, где
+    ///    игрок, не ищет и сам не останавливается: только по команде сюжета.
+    ///  - Агрессию сняли извне (сюжет) - бросает погоню и возвращается к спокойному поведению.
     ///
-    /// Двери на пути (см. NpcDoorNavigator - живой поиск двери по курсу
-    /// движения, т.к. маршрут погони не расставлен заранее, в отличие от
-    /// Patrol): если CanOpenDoors и дверь не заперта - бот открывает её на
-    /// ходу (TryOpenBy, анимация открытия зависит от ChaseDoorOpenerKind -
-    /// человек или монстр) и продолжает погоню. Если дверь заперта - бот
-    /// останавливается, периодически пытается её открыть (что проигрывает
-    /// анимацию "не поддаётся"), и если за LockedDoorGiveUpDelay секунд дверь
-    /// так и не открыли - сдаётся и уходит блуждать (NpcStateId.Wander).
+    /// Двери на пути (NpcDoorNavigator - поиск двери по курсу движения): незапертую бот, если умеет,
+    /// открывает на ходу (анимация открытия - человек или монстр, по облику). Запертую (или если
+    /// открывать не умеет) - стоит и периодически дёргает ("DoorLockedTry"), а через LockedDoorGiveUpDelay
+    /// переходит к поиску игрока по эту сторону двери. В сюжетной погоне от двери не отходит.
     /// </summary>
     public class NpcChaseState : NpcState
     {
+        private const float RepathInterval = 0.25f;
+        private const float RepathTargetShift = 0.5f;
+        private const float AttackVerticalTolerance = 1.5f;
+
+        private float m_RepathTimer;
+        private Vector3 m_LastDestination;
+
         public override NpcStateId Id => NpcStateId.Chase;
 
         public override void Enter(NpcBlackboard blackboard)
         {
-            blackboard.Agent.speed = blackboard.Definition.ChaseSpeed;
-            blackboard.Agent.isStopped = false;
-            blackboard.Agent.angularSpeed = 180f; 
-            blackboard.TimeSincePlayerLastSeen = 0f;
+            if (blackboard.Definition.ChaseStopsOnlyByStory)
+            {
+                blackboard.IsHunting = true;
+            }
+
+            NpcNavigation.SetSpeed(blackboard.Agent, blackboard.Definition.ChaseSpeed);
+            NpcNavigation.SetStopped(blackboard.Agent, false);
+
+            if (blackboard.Agent != null)
+            {
+                blackboard.Agent.angularSpeed = Mathf.Max(blackboard.Agent.angularSpeed, 360f);
+            }
+
             blackboard.DoorKnockTimer = 0f;
             blackboard.DoorBlockedTimer = 0f;
+            // Отсчёт "потерял из виду" - с начала погони: иначе погоня по команде сюжета у бота, который давно
+            // не видел игрока, сразу сменялась бы поиском.
+            blackboard.TimeSincePlayerLastSeen = 0f;
+            m_RepathTimer = 0f;
+
+            if (blackboard.IsHunting || blackboard.CanSeePlayer || !blackboard.HasLastKnownPlayerPosition)
+            {
+                UpdatePlayerPosition(blackboard);
+            }
+
             blackboard.Controller.PlayAnimationSound("Chase");
             blackboard.Controller.RaiseReachedChaseStart();
         }
 
         public override NpcStateId? Tick(NpcBlackboard blackboard, float deltaTime)
         {
-            // Агрессию выключили извне (сюжет/деактивация мимика и т.п.) - бросаем погоню сразу.
-            if (blackboard.AggressionSource != null && !blackboard.AggressionSource.IsAggressive.CurrentValue)
+            // Агрессию выключили извне (сюжет/граф) - бросаем погоню. Сюжетную погоню снимает только сюжет.
+            if (!blackboard.IsHunting && !blackboard.IsAggressive)
             {
-                return NpcStateId.Patrol;
+                blackboard.Controller.PrepareReturnToCalm();
+                return blackboard.CalmState;
             }
 
-            if (blackboard.CanSeePlayer)
+            if (blackboard.IsHunting)
             {
-                blackboard.TimeSincePlayerLastSeen = 0f;
-                blackboard.LastKnownPlayerPosition = blackboard.PlayerTransform.position;
-            }
-            else
-            {
-                blackboard.TimeSincePlayerLastSeen += deltaTime;
+                UpdatePlayerPosition(blackboard);
             }
 
-            if (blackboard.Definition.CanOpenDoors)
-            {
-                var doorResult = HandleDoorsAhead(blackboard, deltaTime);
+            var doorResult = HandleDoorsAhead(blackboard, deltaTime);
 
-                if (doorResult.HasValue)
+            if (doorResult.HasValue)
+            {
+                return doorResult.Value == NpcStateId.Chase ? null : doorResult;
+            }
+
+            bool knowsWherePlayerIs = blackboard.IsHunting || blackboard.CanSeePlayer;
+
+            if (knowsWherePlayerIs && CanAttack(blackboard))
+            {
+                return NpcStateId.Attack;
+            }
+
+            MoveTowards(blackboard, blackboard.LastKnownPlayerPosition, deltaTime);
+
+            if (!knowsWherePlayerIs)
+            {
+                bool reachedLastSeen = NpcNavigation.HasArrived(blackboard.Agent, 0.6f);
+
+                if (reachedLastSeen || blackboard.TimeSincePlayerLastSeen >= blackboard.Definition.LoseSightGiveUpDelay)
                 {
-                    return doorResult;
+                    blackboard.SearchCenter = blackboard.LastKnownPlayerPosition;
+                    return NpcStateId.Search;
                 }
-            }
-
-            blackboard.Agent.SetDestination(blackboard.LastKnownPlayerPosition);
-
-            if (blackboard.DistanceToPlayer <= blackboard.Definition.CatchDistance)
-            {
-                blackboard.Controller.CatchPlayer();
-            }
-
-            if (!blackboard.Definition.ChaseStopsOnlyByStory
-                && blackboard.TimeSincePlayerLastSeen >= blackboard.Definition.LoseSightGiveUpDelay)
-            {
-                return NpcStateId.Patrol;
             }
 
             return null;
         }
 
+        public override void Exit(NpcBlackboard blackboard)
+        {
+            NpcNavigation.SetStopped(blackboard.Agent, false);
+        }
+
+        private static void UpdatePlayerPosition(NpcBlackboard blackboard)
+        {
+            if (blackboard.PlayerTransform == null)
+            {
+                return;
+            }
+
+            blackboard.LastKnownPlayerPosition = blackboard.PlayerTransform.position;
+            blackboard.HasLastKnownPlayerPosition = true;
+        }
+
+        private static bool CanAttack(NpcBlackboard blackboard)
+        {
+            // Игрока уже схватил другой бот - не нападаем.
+            if (blackboard.AttackCooldownTimer > 0f || blackboard.PlayerTransform == null || blackboard.Controller.IsPlayerCaptured)
+            {
+                return false;
+            }
+
+            if (blackboard.DistanceToPlayer > blackboard.Definition.CatchDistance)
+            {
+                return false;
+            }
+
+            float verticalGap = Mathf.Abs(blackboard.PlayerTransform.position.y - blackboard.Self.position.y);
+            return verticalGap <= AttackVerticalTolerance;
+        }
+
+        private void MoveTowards(NpcBlackboard blackboard, Vector3 target, float deltaTime)
+        {
+            m_RepathTimer -= deltaTime;
+
+            if (m_RepathTimer > 0f && (target - m_LastDestination).sqrMagnitude < RepathTargetShift * RepathTargetShift)
+            {
+                return;
+            }
+
+            m_RepathTimer = RepathInterval;
+            m_LastDestination = target;
+            NpcNavigation.TrySetDestination(blackboard.Agent, target);
+        }
+
         /// <summary>
-        /// Возвращает NpcStateId.Wander, если пора сдаться перед запертой
-        /// дверью; null, если можно продолжать (движение к игроку выполняется
-        /// в Tick() уже после этого вызова).
+        /// null - двери нет или она уже не мешает; Chase - бот стоит перед дверью (остаться в погоне);
+        /// Search - пора бросить дверь и искать игрока.
         /// </summary>
         private NpcStateId? HandleDoorsAhead(NpcBlackboard blackboard, float deltaTime)
         {
             var door = NpcDoorNavigator.DetectDoorAhead(blackboard);
 
-            if (door == null || door.IsOpen.CurrentValue)
+            if (door == null)
             {
                 blackboard.DoorBlockedTimer = 0f;
                 blackboard.DoorKnockTimer = 0f;
-                blackboard.Agent.isStopped = false;
+                NpcNavigation.SetStopped(blackboard.Agent, false);
                 return null;
             }
 
-            if (!door.IsLocked.CurrentValue)
+            if (!door.IsLocked.CurrentValue && blackboard.Definition.CanOpenDoors)
             {
-                door.TryOpenBy(blackboard.Definition.ChaseDoorOpenerKind);
+                door.TryOpenBy(blackboard.Controller.GetDoorOpener(true));
                 blackboard.DoorBlockedTimer = 0f;
                 blackboard.DoorKnockTimer = 0f;
+                NpcNavigation.SetStopped(blackboard.Agent, false);
                 return null;
             }
 
-            // Дверь заперта - стоим, периодически пытаемся, и по истечении
-            // лимита времени сдаёмся и уходим блуждать.
-            blackboard.Agent.isStopped = true;
+            // Дверь не открыть - стоим, периодически дёргаем, а потом ищем игрока по эту сторону двери.
+            NpcNavigation.SetStopped(blackboard.Agent, true);
             blackboard.DoorBlockedTimer += deltaTime;
             blackboard.DoorKnockTimer -= deltaTime;
 
             if (blackboard.DoorKnockTimer <= 0f)
             {
                 blackboard.DoorKnockTimer = blackboard.Definition.KnockInterval;
-                door.TryOpenBy(blackboard.Definition.ChaseDoorOpenerKind);
+
+                if (blackboard.Definition.CanOpenDoors)
+                {
+                    door.TryOpenBy(blackboard.Controller.GetDoorOpener(true));
+                }
+
                 blackboard.Controller.PlayAnimationSound("DoorLockedTry");
             }
-            
-            if (blackboard.DoorBlockedTimer >= blackboard.Definition.LockedDoorGiveUpDelay)
+
+            if (!blackboard.IsHunting && blackboard.DoorBlockedTimer >= blackboard.Definition.LockedDoorGiveUpDelay)
             {
+                // Дальше - поиск по эту сторону: дверь помечается непроходимой, точки поиска за ней не выбираются.
+                Controllers.NpcDoorNavBlocker.Block(door);
                 blackboard.DoorBlockedTimer = 0f;
                 blackboard.DoorKnockTimer = 0f;
-                blackboard.Agent.isStopped = false;
+                NpcNavigation.SetStopped(blackboard.Agent, false);
                 blackboard.ChaseReentrySuppressTimer = blackboard.Definition.WanderChaseSuppressDuration;
-                return NpcStateId.Wander;
+                blackboard.SearchCenter = blackboard.Self.position;
+                return NpcStateId.Search;
             }
 
             return NpcStateId.Chase;
         }
     }
 }
-
-

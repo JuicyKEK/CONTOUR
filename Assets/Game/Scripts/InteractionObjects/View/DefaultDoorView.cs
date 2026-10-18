@@ -26,7 +26,10 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
     [SerializeField] private int _lockedShakeDirection = -1;
     [SerializeField] private UnityEvent _onOpen;
     
+    public bool IsMoving => _swingTween != null && _swingTween.IsActive() && !_swingTween.IsComplete();
+
     private Tween _currentTween;
+    private Tween _swingTween;
     private Quaternion _closedRotation;
     private Quaternion _openRotation;
     private Quaternion _monsterRotation;
@@ -114,6 +117,7 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
                 }
             })
             .SetEase(Ease.OutCubic);
+        _swingTween = _currentTween;
 
         try
         {

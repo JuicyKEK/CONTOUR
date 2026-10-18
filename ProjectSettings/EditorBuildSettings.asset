@@ -41,6 +41,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game/Scenes/GameCore.unity
     guid: 072461b2c2c52234798458817cead528
+  - enabled: 1
+    path: Assets/Scenes/NpcTestScene.unity
+    guid: eb6013df20a28064ea60e9d264c84373
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: baad02ed314ed994698079d6c595bcfc, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

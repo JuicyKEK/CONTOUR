@@ -1,53 +1,83 @@
-﻿using Game.Scripts.NPC.Runtime.Core;
+﻿using Game.Scripts.InteractionObjects.Interfaces;
+using Game.Scripts.NPC.Runtime.Controllers;
+using Game.Scripts.NPC.Runtime.Core;
 using Game.Scripts.Story;
+using UnityEngine;
 
 namespace Game.Scripts.NPC.Runtime.States
 {
     /// <summary>
-    /// Патрулирование: бот ходит по точкам своего текущего NpcPatrolRoute
-    /// (2 и более точек, может зациклиться). Маршрут можно целиком подменить
-    /// через сюжет (NpcController.SetPatrolRoute), не выходя из состояния.
+    /// Патрулирование - спокойное поведение: бот ходит по точкам своего текущего NpcPatrolRoute
+    /// (может зациклиться). Маршрут можно целиком подменить через сюжет
+    /// (NpcController.SetPatrolRoute), не выходя из состояния.
     ///
-    /// Если на пути к точке назначена дверь (NpcPatrolPoint.DoorToPass) и бот
-    /// умеет открывать двери - пытается её открыть; если заперта - "стучит"
-    /// (проигрывает анимацию/звук Knock) и ждёт, периодически повторяя попытку,
-    /// пока дверь не откроют. Мирные боты не реагируют на игрока и продолжают
-    /// патрулировать независимо от того, видят его или нет. Агрессивные боты
-    /// при появлении игрока в поле зрения уходят в Chase.
+    /// На точке с задержкой (NpcPatrolPoint.WaitSeconds) бот стоит и играет действие точки
+    /// (ActionKey) - так мимик изображает свою роль: "чинит механизм", "моет посуду".
+    ///
+    /// Двери: назначенная точке (NpcPatrolPoint.DoorToPass) или закрытая дверь прямо по курсу.
+    /// Незапертую бот, если умеет, открывает на ходу; запертую (или если открывать не умеет) -
+    /// "стучит" (Knock) и ждёт, периодически повторяя, пока дверь не откроют.
+    /// Мирные боты не реагируют на игрока; агрессивные при виде игрока уходят в Chase.
     ///
     /// Если маршрут НЕ зациклен (NpcPatrolRoute.Loop == false) - по достижении
-    /// последней точки бот один раз поднимает StoryEventChannelSO
-    /// (NpcController.RaisePatrolRouteCompleted) и просто останавливается,
-    /// больше не пытаясь двигаться дальше по маршруту.
+    /// последней точки бот один раз сообщает об этом (NpcController.RaisePatrolRouteCompleted)
+    /// и останавливается, больше не пытаясь двигаться дальше по маршруту.
     /// </summary>
     public class NpcPatrolState : NpcState
     {
+        private const float FaceDegreesPerSecond = 240f;
+
         public override NpcStateId Id => NpcStateId.Patrol;
 
+        private const float RerouteDelay = 0.3f;
+        private const float UnreachableRetryDelay = 3f;
+        private const float ReachableEndDistance = 1.5f;
+
+        private readonly NpcLockedDoorAttempts m_DoorAttempts = new();
+
         private bool m_HasRaisedRouteCompleted;
+        private bool m_IsDwelling;
+        private float m_DwellTimer;
+        private float m_RerouteTimer = -1f;
+        private float m_UnreachableRetryTimer = -1f;
+        private bool m_IsCheckingReachability;
+        private int m_SkippedPoints;
 
         public override void Enter(NpcBlackboard blackboard)
         {
-            blackboard.Agent.speed = blackboard.Definition.PatrolSpeed;
-            blackboard.Agent.isStopped = false;
+            NpcNavigation.SetSpeed(blackboard.Agent, blackboard.Definition.PatrolSpeed);
+            NpcNavigation.SetStopped(blackboard.Agent, false);
             blackboard.DoorKnockTimer = 0f;
-            blackboard.CurrentPatrolIndex = 0;
             m_HasRaisedRouteCompleted = false;
+            m_IsDwelling = false;
+            m_RerouteTimer = -1f;
+            m_UnreachableRetryTimer = -1f;
+            m_SkippedPoints = 0;
+            m_DoorAttempts.Reset();
+
+            if (blackboard.PatrolResumeNearest)
+            {
+                blackboard.PatrolResumeNearest = false;
+                blackboard.CurrentPatrolIndex = FindNearestPointIndex(blackboard);
+            }
+            else
+            {
+                blackboard.CurrentPatrolIndex = 0;
+            }
+
             MoveToCurrentPoint(blackboard);
             blackboard.Controller.PlayAnimationSound("Patrol");
         }
 
         public override NpcStateId? Tick(NpcBlackboard blackboard, float deltaTime)
         {
-            if (blackboard.AggressionSource != null
-                && blackboard.AggressionSource.IsAggressive.CurrentValue
-                && blackboard.CanSeePlayer)
+            if (blackboard.IsAggressive && blackboard.CanSeePlayer)
             {
                 return NpcStateId.Chase;
             }
 
             // Незацикленный маршрут уже пройден до конца - просто стоим,
-            // событие о завершении уже поднято один раз в AdvanceToNextPoint.
+            // событие о завершении уже поднято один раз.
             if (m_HasRaisedRouteCompleted)
             {
                 return null;
@@ -62,46 +92,171 @@ namespace Game.Scripts.NPC.Runtime.States
 
             // Защита от рассинхронизации: маршрут/индекс могли быть подменены
             // снаружи (SetPatrolRoute) между тиками - если индекс больше не
-            // валиден для текущего маршрута, просто перескакиваем на первую точку
-            // вместо падения с ArgumentOutOfRangeException.
+            // валиден для текущего маршрута, просто перескакиваем на первую точку.
             if (blackboard.CurrentPatrolIndex >= route.Points.Count)
             {
                 blackboard.CurrentPatrolIndex = 0;
+                m_IsDwelling = false;
                 MoveToCurrentPoint(blackboard);
                 return null;
             }
 
             var currentPoint = route.Points[blackboard.CurrentPatrolIndex];
-            var door = currentPoint.ResolveDoor();
 
-            if (door != null && blackboard.Definition.CanOpenDoors)
+            if (m_IsDwelling)
             {
-                if (door.IsLocked.CurrentValue)
-                {
-                    HandleLockedDoor(blackboard, deltaTime);
-                    return null;
-                }
-
-                // Дверь не заперта, но ещё закрыта - открываем на ходу (не
-                // останавливаясь, коллайдер сам отключается на время анимации
-                // открытия во View), затем продолжаем идти к точке как обычно.
-                if (!door.IsOpen.CurrentValue)
-                {
-                    door.TryOpenBy(blackboard.Definition.PatrolDoorOpenerKind);
-                }
+                TickDwell(blackboard, currentPoint, deltaTime);
+                return null;
             }
 
-            if (!blackboard.Agent.pathPending && blackboard.Agent.remainingDistance <= blackboard.Agent.stoppingDistance)
+            // Бот сдался у запертой двери: ждём, пока NavMesh вырежет проём, и строим путь заново.
+            if (m_RerouteTimer >= 0f)
             {
-                AdvanceToNextPoint(blackboard);
+                m_RerouteTimer -= deltaTime;
+
+                if (m_RerouteTimer < 0f)
+                {
+                    m_SkippedPoints = 0;
+                    MoveToCurrentPoint(blackboard);
+                }
+
+                return null;
+            }
+
+            if (CheckReachability(blackboard, deltaTime))
+            {
+                return null;
+            }
+
+            if (HandleDoor(blackboard, currentPoint, deltaTime))
+            {
+                return null;
+            }
+
+            if (NpcNavigation.HasArrived(blackboard.Agent))
+            {
+                OnArrived(blackboard);
             }
 
             return null;
         }
 
-        private void HandleLockedDoor(NpcBlackboard blackboard, float deltaTime)
+        /// <summary>
+        /// Двери на пути. true - бот стоит перед дверью, которую не может открыть (ждёт).
+        /// </summary>
+        private bool HandleDoor(NpcBlackboard blackboard, NpcPatrolPoint point, float deltaTime)
         {
-            blackboard.Agent.isStopped = true;
+            var assignedDoor = point.ResolveDoor();
+            bool isAssignedDoor = assignedDoor != null && !assignedDoor.IsOpen.CurrentValue;
+            var door = isAssignedDoor ? assignedDoor : NpcDoorNavigator.DetectDoorAhead(blackboard);
+
+            if (door == null || door.IsOpen.CurrentValue)
+            {
+                m_DoorAttempts.Reset();
+                NpcNavigation.SetStopped(blackboard.Agent, false);
+                return false;
+            }
+
+            if (!door.IsLocked.CurrentValue && blackboard.Definition.CanOpenDoors)
+            {
+                // Дверь не заперта, но ещё закрыта - открываем на ходу (коллайдер сам
+                // отключается на время анимации открытия во View) и идём дальше.
+                door.TryOpenBy(blackboard.Controller.GetDoorOpener(false));
+                m_DoorAttempts.Reset();
+                NpcNavigation.SetStopped(blackboard.Agent, false);
+                return false;
+            }
+
+            // Дверь, заданная точке маршрута, - часть сценария: бот стучит и ждёт, пока её откроют.
+            if (isAssignedDoor)
+            {
+                HandleLockedDoor(blackboard, door, deltaTime);
+                return true;
+            }
+
+            // Запертая дверь на пути: несколько попыток, потом - обход.
+            if (m_DoorAttempts.Tick(blackboard, door, deltaTime))
+            {
+                m_RerouteTimer = RerouteDelay;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Точка маршрута стала недостижимой (за дверью, которую пометили запертой) - пропускаем её.
+        /// true - бот занят этим (ждёт или идёт к другой точке).
+        /// </summary>
+        private bool CheckReachability(NpcBlackboard blackboard, float deltaTime)
+        {
+            if (m_UnreachableRetryTimer >= 0f)
+            {
+                m_UnreachableRetryTimer -= deltaTime;
+
+                if (m_UnreachableRetryTimer < 0f)
+                {
+                    m_SkippedPoints = 0;
+                    MoveToCurrentPoint(blackboard);
+                }
+
+                return true;
+            }
+
+            var agent = blackboard.Agent;
+
+            if (!m_IsCheckingReachability || !NpcNavigation.IsReady(agent) || agent.pathPending)
+            {
+                return false;
+            }
+
+            m_IsCheckingReachability = false;
+            var route = blackboard.PatrolRoute;
+            var target = route.Points[blackboard.CurrentPatrolIndex].Point;
+
+            bool isReachable = target == null
+                               || agent.pathStatus == UnityEngine.AI.NavMeshPathStatus.PathComplete
+                               || (agent.hasPath && (agent.pathEndPosition - target.position).sqrMagnitude <= ReachableEndDistance * ReachableEndDistance);
+
+            if (isReachable)
+            {
+                m_SkippedPoints = 0;
+                return false;
+            }
+
+            m_SkippedPoints++;
+
+            if (m_SkippedPoints >= route.Points.Count)
+            {
+                // Ни одна точка не достижима (всё за запертыми дверями) - стоим и пробуем снова.
+                NpcNavigation.Halt(agent);
+                m_UnreachableRetryTimer = UnreachableRetryDelay;
+                blackboard.Controller.LogDebug("ни одна точка маршрута сейчас недостижима - жду");
+                return true;
+            }
+
+            int next = blackboard.CurrentPatrolIndex + 1;
+
+            if (next >= route.Points.Count)
+            {
+                if (!route.Loop)
+                {
+                    m_HasRaisedRouteCompleted = true;
+                    NpcNavigation.Halt(agent);
+                    return true;
+                }
+
+                next = 0;
+            }
+
+            blackboard.Controller.LogDebug($"точка маршрута {blackboard.CurrentPatrolIndex} недостижима - иду к следующей");
+            blackboard.CurrentPatrolIndex = next;
+            MoveToCurrentPoint(blackboard);
+            return true;
+        }
+
+        private void HandleLockedDoor(NpcBlackboard blackboard, IInteractionDoor door, float deltaTime)
+        {
+            NpcNavigation.SetStopped(blackboard.Agent, true);
             blackboard.DoorKnockTimer -= deltaTime;
 
             if (blackboard.DoorKnockTimer <= 0f)
@@ -111,7 +266,29 @@ namespace Game.Scripts.NPC.Runtime.States
             }
         }
 
-        private void AdvanceToNextPoint(NpcBlackboard blackboard)
+        private void TickDwell(NpcBlackboard blackboard, NpcPatrolPoint point, float deltaTime)
+        {
+            if (point.FacePointDirection && point.Point != null)
+            {
+                var target = blackboard.Self.position + point.Point.forward;
+                NpcNavigation.FaceTowards(blackboard.Self, target, FaceDegreesPerSecond, deltaTime);
+            }
+
+            m_DwellTimer -= deltaTime;
+
+            if (m_DwellTimer > 0f)
+            {
+                return;
+            }
+
+            m_IsDwelling = false;
+            MoveToNextPoint(blackboard, true);
+        }
+
+        /// <summary>
+        /// Бот дошёл до текущей точки: сигналы точки, затем задержка с действием или сразу следующая точка.
+        /// </summary>
+        private void OnArrived(NpcBlackboard blackboard)
         {
             var routeBeforeEvent = blackboard.PatrolRoute;
 
@@ -120,23 +297,13 @@ namespace Game.Scripts.NPC.Runtime.States
                 return;
             }
 
-            // Точка, которую бот только что достиг - если у неё задан
-            // ArrivalEventChannel, раздаём его ровно в момент достижения, до того
-            // как перейти к следующей точке (или остановиться, если маршрут не
-            // зациклен и это была последняя точка).
-            //
-            // ВАЖНО: Raise() может СИНХРОННО вызвать NpcController.SetPatrolRoute
-            // (например, через StoryEventChannelListener), который подменит
-            // blackboard.PatrolRoute и сбросит blackboard.CurrentPatrolIndex прямо
-            // во время этого вызова. Поэтому нельзя переиспользовать захваченные до
-            // Raise() значения route/index ниже - нужно перечитать их заново.
+            // ВАЖНО: сигнал/канал точки может СИНХРОННО вызвать NpcController.SetPatrolRoute
+            // (например, через StoryEventChannelListener), который подменит маршрут и сбросит
+            // индекс прямо во время этого вызова. Поэтому после Raise маршрут и индекс перечитываются.
             var reachedPoint = routeBeforeEvent.Points[blackboard.CurrentPatrolIndex];
             StorySignals.Raise(reachedPoint.ArrivalSignal);
             reachedPoint.ArrivalEventChannel?.Raise();
 
-            // Перечитываем маршрут и индекс ПОСЛЕ события - если Raise() подменил
-            // маршрут (например, сюжет сократил список точек), дальше работаем уже
-            // с актуальными данными, а не с теми, что были до вызова.
             var route = blackboard.PatrolRoute;
 
             if (route == null || route.Points.Count == 0)
@@ -144,15 +311,38 @@ namespace Game.Scripts.NPC.Runtime.States
                 return;
             }
 
-            bool routeWasReplacedDuringEvent = !ReferenceEquals(route, routeBeforeEvent);
-
-            // Если маршрут подменили прямо во время Raise() - SetPatrolRoute уже
-            // сбросил CurrentPatrolIndex на 0 сам, поэтому просто идём к первой
-            // точке нового маршрута и не трогаем индекс дальше.
-            if (routeWasReplacedDuringEvent)
+            // Маршрут подменили прямо во время Raise() - SetPatrolRoute уже сбросил индекс на 0,
+            // идём к первой точке нового маршрута.
+            if (!ReferenceEquals(route, routeBeforeEvent))
             {
-                blackboard.Agent.isStopped = false;
+                NpcNavigation.SetStopped(blackboard.Agent, false);
                 MoveToCurrentPoint(blackboard);
+                return;
+            }
+
+            if (reachedPoint.WaitSeconds > 0f)
+            {
+                m_IsDwelling = true;
+                m_DwellTimer = reachedPoint.WaitSeconds;
+                NpcNavigation.Halt(blackboard.Agent);
+
+                if (!string.IsNullOrEmpty(reachedPoint.ActionKey))
+                {
+                    blackboard.Controller.PlayAnimationSound(reachedPoint.ActionKey);
+                }
+
+                return;
+            }
+
+            MoveToNextPoint(blackboard, false);
+        }
+
+        private void MoveToNextPoint(NpcBlackboard blackboard, bool isAfterAction)
+        {
+            var route = blackboard.PatrolRoute;
+
+            if (route == null || route.Points.Count == 0)
+            {
                 return;
             }
 
@@ -167,17 +357,23 @@ namespace Game.Scripts.NPC.Runtime.States
                 else
                 {
                     // Последняя точка незацикленного маршрута достигнута -
-                    // поднимаем событие завершения маршрута один раз и останавливаем бота.
+                    // сообщаем об этом один раз и останавливаем бота.
                     m_HasRaisedRouteCompleted = true;
-                    blackboard.Agent.isStopped = true;
+                    NpcNavigation.Halt(blackboard.Agent);
                     blackboard.Controller.RaisePatrolRouteCompleted();
                     return;
                 }
             }
 
             blackboard.CurrentPatrolIndex = nextIndex;
-            blackboard.Agent.isStopped = false;
+            NpcNavigation.SetStopped(blackboard.Agent, false);
             MoveToCurrentPoint(blackboard);
+
+            // После действия на точке - снова походка (а не застывшая анимация действия).
+            if (isAfterAction)
+            {
+                blackboard.Controller.PlayAnimationSound("Patrol");
+            }
         }
 
         private void MoveToCurrentPoint(NpcBlackboard blackboard)
@@ -186,6 +382,7 @@ namespace Game.Scripts.NPC.Runtime.States
 
             if (route == null || route.Points.Count == 0)
             {
+                NpcNavigation.Halt(blackboard.Agent);
                 return;
             }
 
@@ -198,8 +395,43 @@ namespace Game.Scripts.NPC.Runtime.States
 
             if (point.Point != null)
             {
-                blackboard.Agent.SetDestination(point.Point.position);
+                NpcNavigation.SetStopped(blackboard.Agent, false);
+                m_IsCheckingReachability = NpcNavigation.TrySetDestination(blackboard.Agent, point.Point.position);
             }
+        }
+
+        private static int FindNearestPointIndex(NpcBlackboard blackboard)
+        {
+            var route = blackboard.PatrolRoute;
+
+            if (route == null || route.Points.Count == 0)
+            {
+                return 0;
+            }
+
+            int nearest = 0;
+            float nearestDistance = float.MaxValue;
+            var position = blackboard.Self.position;
+
+            for (int i = 0; i < route.Points.Count; i++)
+            {
+                var point = route.Points[i].Point;
+
+                if (point == null)
+                {
+                    continue;
+                }
+
+                float distance = (point.position - position).sqrMagnitude;
+
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearest = i;
+                }
+            }
+
+            return nearest;
         }
     }
 }

@@ -25,7 +25,13 @@ namespace Game.Scripts.NPC.Runtime.Controllers
 
         public void Interact()
         {
-            if (m_Behaviour.TryGetComponent(out INpcInteractionBehaviour interaction))
+            // Граф бота может ждать "игрок взаимодействовал с ботом" (условие NPC/Player Interacted).
+            if (m_Owner != null)
+            {
+                m_Owner.NotifyPlayerInteracted();
+            }
+
+            if (m_Behaviour != null && m_Behaviour.TryGetComponent(out INpcInteractionBehaviour interaction))
             {
                 interaction.OnPlayerInteracted(m_Owner);
             }

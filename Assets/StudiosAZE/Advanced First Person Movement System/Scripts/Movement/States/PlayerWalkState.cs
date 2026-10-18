@@ -24,9 +24,10 @@ namespace AZE.AdvancedFirstPerson
 
         public override void CheckSwitchStates()
         {
+            // Движение запрещено (игрока схватили, катсцена) - остановка без курсора мыши.
             if (!ctx.IsCanMove)
             {
-                ctx.SwitchState(factory.Mouse);
+                ctx.SwitchState(factory.Stop);
                 return;
             }
             
