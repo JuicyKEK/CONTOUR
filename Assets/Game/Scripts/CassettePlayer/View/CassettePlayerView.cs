@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JuicyDI.Attributes;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,9 +9,13 @@ namespace Game.Scripts.Instructions.View
 {
     /// <summary>
     /// Чисто визуальная панель кассетного плеера: тоглы страниц, сами страницы (ScrollView с разделами
-    /// и кассетами) и кнопка паузы по центру (видна только когда что-то проигрывается). Ничего не решает
-    /// сама - только предоставляет примитивы управления, вызывается из
+    /// и кассетами) и блок проигрывания - название кассеты, полоса прогресса с перемоткой и кнопки
+    /// паузы/Play. Ничего не решает сама - только предоставляет примитивы управления, вызывается из
     /// <see cref="Controllers.CassettePlayerController"/> (получает вид через [Inject]).
+    ///
+    /// Блок проигрывания появляется, когда выбрана первая кассета, и дальше не пропадает - ни после паузы,
+    /// ни когда кассета доиграла, ни после закрытия и открытия панели. Все его поля, кроме кнопки паузы,
+    /// можно не назначать. Если не назначена кнопка Play, кнопка паузы сама переключает паузу и Play.
     /// </summary>
     [JDIMonoController]
     public class CassettePlayerView : MonoBehaviour
@@ -33,14 +38,29 @@ namespace Game.Scripts.Instructions.View
         [SerializeField] private CassetteSectionRowView m_SectionRowPrefab;
         [SerializeField] private CassetteTapeRowView m_TapeRowPrefab;
 
-        [Header("Кнопка паузы (по центру, видна только во время проигрывания)")]
+        [Header("Проигрывание кассеты")]
+        [Tooltip("Общий объект блока проигрывания (название, полоса, кнопки). Скрыт, пока не выбрана ни одна " +
+                 "кассета. Можно не назначать - тогда скрываются только сами элементы.")]
+        [SerializeField] private GameObject m_PlaybackRoot;
+        [Tooltip("Название выбранной кассеты.")]
+        [SerializeField] private TMP_Text m_TapeTitleText;
+        [Tooltip("Полоса прогресса кассеты (Slider): показывает, сколько проиграно; перетаскиванием - перемотка.")]
+        [SerializeField] private Slider m_ProgressSlider;
+        [Tooltip("Кнопка паузы - видна, пока кассета играет.")]
         [SerializeField] private Button m_PauseButton;
+        [Tooltip("Кнопка Play - видна вместо паузы, когда кассета на паузе (продолжает с того же места) или " +
+                 "доиграла (запускает с начала).")]
+        [SerializeField] private Button m_PlayButton;
 
         private readonly List<CassettePageToggleView> m_PageToggles = new();
         private readonly List<CassettePageView> m_Pages = new();
 
         private Action<string> m_OnTapeClicked;
         private Action<int> m_OnPageSelected;
+        private Action m_OnPauseClicked;
+        private Action m_OnPlayClicked;
+        private CassetteSeekSliderView m_SeekSlider;
+        private bool m_IsPlaying;
         private int m_PageCount;
         private int m_SelectedPageIndex = -1;
 
@@ -51,7 +71,12 @@ namespace Game.Scripts.Instructions.View
 
         private void Awake()
         {
-            SetPauseButtonVisible(false);
+            if (m_ProgressSlider != null && !m_ProgressSlider.TryGetComponent(out m_SeekSlider))
+            {
+                m_SeekSlider = m_ProgressSlider.gameObject.AddComponent<CassetteSeekSliderView>();
+            }
+
+            SetPlaybackVisible(false);
         }
 
         public void SetVisible(bool isVisible)
@@ -59,11 +84,6 @@ namespace Game.Scripts.Instructions.View
             if (m_Root != null)
             {
                 m_Root.SetActive(isVisible);
-
-                if (!isVisible)
-                {
-                    SetPauseButtonVisible(false);
-                }
             }
         }
 
@@ -79,26 +99,109 @@ namespace Game.Scripts.Instructions.View
             }
         }
 
-        public void SetPauseButtonVisible(bool isVisible)
+        /// <summary>
+        /// Что делать по кнопкам паузы и Play и по перемотке полосой (доля от длины кассеты, 0..1).
+        /// </summary>
+        public void SetPlaybackActions(Action onPauseClicked, Action onPlayClicked, Action<float> onSeek)
         {
+            m_OnPauseClicked = onPauseClicked;
+            m_OnPlayClicked = onPlayClicked;
+
             if (m_PauseButton != null)
             {
-                m_PauseButton.gameObject.SetActive(isVisible);
+                m_PauseButton.onClick.RemoveAllListeners();
+                m_PauseButton.onClick.AddListener(OnPauseButtonClicked);
+            }
+
+            if (m_PlayButton != null)
+            {
+                m_PlayButton.onClick.RemoveAllListeners();
+                m_PlayButton.onClick.AddListener(() => m_OnPlayClicked?.Invoke());
+            }
+
+            if (m_SeekSlider != null)
+            {
+                m_SeekSlider.Setup(onSeek);
             }
         }
 
-        public void SetPauseButtonAction(Action onPauseClicked)
+        /// <summary>
+        /// Показывает или прячет весь блок проигрывания (название, полосу, кнопки).
+        /// </summary>
+        public void SetPlaybackVisible(bool isVisible)
         {
-            if (m_PauseButton == null)
+            if (m_PlaybackRoot != null)
             {
+                m_PlaybackRoot.SetActive(isVisible);
+            }
+
+            SetActive(m_TapeTitleText, isVisible);
+            SetActive(m_ProgressSlider, isVisible);
+
+            if (isVisible)
+            {
+                SetPlaying(m_IsPlaying);
+            }
+            else
+            {
+                SetActive(m_PauseButton, false);
+                SetActive(m_PlayButton, false);
+            }
+        }
+
+        public void SetTapeTitle(string title)
+        {
+            if (m_TapeTitleText != null)
+            {
+                m_TapeTitleText.text = title;
+            }
+        }
+
+        /// <summary>
+        /// Сколько проиграно (0..1). Пока игрок держит ползунок, полоса не обновляется.
+        /// </summary>
+        public void SetProgress(float progress)
+        {
+            if (m_SeekSlider != null)
+            {
+                m_SeekSlider.SetProgress(progress);
+            }
+        }
+
+        /// <summary>
+        /// Кассета играет - видна кнопка паузы; на паузе или доиграла - кнопка Play.
+        /// </summary>
+        public void SetPlaying(bool isPlaying)
+        {
+            m_IsPlaying = isPlaying;
+
+            if (m_PlayButton == null)
+            {
+                // Кнопки Play нет - кнопка паузы видна всегда и переключает паузу и Play.
+                SetActive(m_PauseButton, true);
                 return;
             }
 
-            m_PauseButton.onClick.RemoveAllListeners();
+            SetActive(m_PauseButton, isPlaying);
+            SetActive(m_PlayButton, !isPlaying);
+        }
 
-            if (onPauseClicked != null)
+        private void OnPauseButtonClicked()
+        {
+            if (m_PlayButton == null && !m_IsPlaying)
             {
-                m_PauseButton.onClick.AddListener(() => onPauseClicked());
+                m_OnPlayClicked?.Invoke();
+                return;
+            }
+
+            m_OnPauseClicked?.Invoke();
+        }
+
+        private static void SetActive(Component component, bool isActive)
+        {
+            if (component != null && component.gameObject.activeSelf != isActive)
+            {
+                component.gameObject.SetActive(isActive);
             }
         }
 
