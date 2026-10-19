@@ -5,8 +5,9 @@ namespace Game.Scripts.Scares
 {
     /// <summary>
     /// Шевелит цепочки костей - руки из перепонки, пальцы вместо перил, щупальца: каждая цепочка изгибается
-    /// бегущей от основания к кончику волной, иногда подёргивается и поджимается. У каждой цепочки своя скорость
-    /// и фаза, поэтому они не двигаются в такт.
+    /// бегущей от основания к кончику волной, иногда вздрагивает и поджимается. У каждой цепочки своя скорость
+    /// и фаза, поэтому они не двигаются в такт. Движение непрерывное, без начала и конца - повторов и скачков нет;
+    /// вздрагивание тоже плавное (быстро набирается и медленно отпускает).
     /// Цепочка - кость из списка оснований и её дочерние кости до кончика (дочерние объекты с мешем пропускаются).
     /// Повороты считаются от положения костей при запуске.
     /// </summary>
@@ -24,11 +25,14 @@ namespace Game.Scripts.Scares
         [Tooltip("Сдвиг волны между соседними суставами, доли колебания - волна бежит к кончику.")]
         [SerializeField] private float m_Wave = 0.18f;
 
-        [Tooltip("Сколько раз в секунду (в среднем) цепочка дёргается.")]
+        [Tooltip("Сколько раз в секунду (в среднем) цепочка вздрагивает.")]
         [SerializeField] private float m_TwitchRate = 0.35f;
 
-        [Tooltip("Сила рывка, градусы.")]
+        [Tooltip("Сила вздрагивания, градусы (0 - без вздрагиваний).")]
         [SerializeField] private float m_TwitchStrength = 12f;
+
+        [Tooltip("За сколько секунд вздрагивание набирается и за сколько отпускает.")]
+        [SerializeField] private Vector2 m_TwitchSmooth = new(0.12f, 0.35f);
 
         [Tooltip("Медленное поджимание в одну сторону (как сжимаются пальцы), градусы.")]
         [SerializeField] private float m_Curl = 10f;
@@ -38,7 +42,7 @@ namespace Game.Scripts.Scares
             public Transform[] Bones;
             public Quaternion[] Rest;
             public Vector3[] AxisA, AxisB;
-            public float Speed, Phase, NextTwitch, Twitch;
+            public float Speed, Phase, NextTwitch, Twitch, TwitchTarget, TwitchHold, TwitchVelocity;
         }
 
         private readonly List<Chain> m_Chains = new();
@@ -105,11 +109,16 @@ namespace Game.Scripts.Scares
                 chain.NextTwitch -= dt;
                 if (chain.NextTwitch <= 0f)
                 {
-                    chain.Twitch = Random.Range(-1f, 1f) * m_TwitchStrength;
+                    chain.TwitchTarget = Random.Range(-1f, 1f) * m_TwitchStrength;
+                    chain.TwitchHold = Random.Range(0.15f, 0.4f);
                     chain.NextTwitch = Random.Range(0.3f, 2f) / Mathf.Max(0.05f, m_TwitchRate);
                 }
 
-                chain.Twitch = Mathf.MoveTowards(chain.Twitch, 0f, m_TwitchStrength * 2.5f * dt);
+                // Вздрагивание плавно набирается, держится и плавно отпускает - без скачка за один кадр.
+                if (chain.TwitchHold > 0f) chain.TwitchHold -= dt;
+                else chain.TwitchTarget = 0f;
+                float smooth = Mathf.Max(0.01f, chain.TwitchTarget != 0f ? m_TwitchSmooth.x : m_TwitchSmooth.y);
+                if (dt > 0f) chain.Twitch = Mathf.SmoothDamp(chain.Twitch, chain.TwitchTarget, ref chain.TwitchVelocity, smooth, Mathf.Infinity, dt);
                 int n = chain.Bones.Length;
                 float cycle = time * chain.Speed + chain.Phase;
                 float curl = m_Curl * (0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * (cycle * 0.37f + 0.3f)));

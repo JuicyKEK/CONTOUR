@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: M_Hands
-    second: {fileID: 2100000, guid: dd11bbfc83c4a8540ab12908511e5b80, type: 2}
+    second: {fileID: 2100000, guid: 9b6825df888bdd845993d6f3ea7c0990, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

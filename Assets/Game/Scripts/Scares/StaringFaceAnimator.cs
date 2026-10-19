@@ -8,7 +8,8 @@ namespace Game.Scripts.Scares
     /// следующую. Челюсть медленно приоткрывается и так же медленно закрывается - зубы смыкаются со стуком.
     ///
     /// По сюжету (StorySceneReactions или UnityEvent) лицо переводится в режимы:
-    /// StartChatter - громко стучит зубами, уставившись на игрока; StartScream - кричит, широко раскрыв рот;
+    /// StartChatter - стучит зубами, уставившись на игрока (раз в 1-1.5 с широко раскрывает рот и захлопывает его);
+    /// StartScream - кричит, широко раскрыв рот;
     /// Calm - возвращается к обычному поведению. Звуки - в AudioSource режимов (клипы задаются в инспекторе).
     ///
     /// Углы задаются в осях этого объекта: +Z - куда смотрит лицо, +Y - к макушке, +X - вправо от лица.
@@ -90,21 +91,27 @@ namespace Game.Scripts.Scares
         [SerializeField] private Transform m_ShakeTarget;
 
         [Header("Стук зубами (по сюжету)")]
-        [Tooltip("Сколько ударов зубов в секунду.")]
-        [SerializeField] private float m_ChatterRate = 13f;
+        [Tooltip("Через сколько секунд повторяется удар зубов: от и до (у каждого удара своё).")]
+        [SerializeField] private Vector2 m_ChatterInterval = new(1f, 1.5f);
 
-        [Tooltip("Насколько рот открывается при каждом ударе, градусы: от и до.")]
-        [SerializeField] private Vector2 m_ChatterOpen = new(1.5f, 4.5f);
+        [Tooltip("Насколько широко рот раскрывается перед ударом, градусы: от и до.")]
+        [SerializeField] private Vector2 m_ChatterOpen = new(15f, 22f);
 
-        [Tooltip("Тряска головы при стуке, метры.")]
-        [SerializeField] private float m_ChatterShake = 0.03f;
+        [Tooltip("За какую долю промежутка рот раскрывается; затем держится и захлопывается.")]
+        [SerializeField] [Range(0.1f, 0.8f)] private float m_ChatterOpenShare = 0.45f;
 
-        [Tooltip("Звук стука (зацикленный клип). Включается и выключается вместе с режимом.")]
+        [Tooltip("За сколько секунд рот захлопывается (удар).")]
+        [SerializeField] private float m_ChatterSnapTime = 0.08f;
+
+        [Tooltip("Вздрагивание головы при ударе зубов, метры (быстро затухает).")]
+        [SerializeField] private float m_ChatterShake = 0.06f;
+
+        [Tooltip("Звук удара зубов: клип проигрывается при каждом ударе.")]
         [SerializeField] private AudioSource m_ChatterAudio;
 
         [Header("Крик (по сюжету)")]
-        [Tooltip("Насколько широко раскрывается рот при крике, градусы.")]
-        [SerializeField] private float m_ScreamOpen = 30f;
+        [Tooltip("Насколько широко раскрывается рот при крике, градусы (в 1.5 раза шире самого широкого раскрытия при стуке).")]
+        [SerializeField] private float m_ScreamOpen = 33f;
 
         [Tooltip("За сколько секунд рот раскрывается для крика.")]
         [SerializeField] private float m_ScreamOpenTime = 0.35f;
@@ -152,7 +159,9 @@ namespace Game.Scripts.Scares
         private bool m_SmallTap;
 
         private FaceMode m_Mode = FaceMode.Idle;
-        private float m_ModeTime, m_TapPhase, m_TapAmplitude, m_ScreamStartAngle;
+        private float m_ModeTime, m_TapAmplitude, m_ScreamStartAngle;
+        private float m_ChatterTime, m_ChatterPeriod, m_Jolt;
+        private bool m_Clacked;
 
         /// <summary>Текущий угол челюсти, градусы (для отладки).</summary>
         public float JawAngle => m_JawAngle;
@@ -204,7 +213,9 @@ namespace Game.Scripts.Scares
         {
             m_Mode = mode;
             m_ModeTime = 0f;
-            m_TapPhase = 1f;
+            m_ChatterTime = 0f;
+            m_ChatterPeriod = 0f;
+            m_Jolt = 0f;
             m_ScreamStartAngle = m_JawAngle;
             if (mode == FaceMode.Idle)
             {
@@ -214,15 +225,9 @@ namespace Game.Scripts.Scares
 
             if (m_ChatterAudio != null)
             {
-                if (mode == FaceMode.Chatter && m_ChatterAudio.clip != null)
-                {
-                    m_ChatterAudio.loop = true;
-                    m_ChatterAudio.Play();
-                }
-                else
-                {
-                    m_ChatterAudio.Stop();
-                }
+                // Звук стука играет на каждом ударе (UpdateChatter); при смене режима - тишина.
+                m_ChatterAudio.loop = false;
+                m_ChatterAudio.Stop();
             }
 
             if (m_ScreamAudio != null)
@@ -251,7 +256,7 @@ namespace Game.Scripts.Scares
                 UpdatePlayerGaze(dt);
                 if (m_Mode == FaceMode.Chatter) UpdateChatter(dt);
                 else UpdateScream();
-                Shake(m_Mode == FaceMode.Chatter ? m_ChatterShake : m_ScreamShake);
+                Shake(m_Mode == FaceMode.Chatter ? m_ChatterShake * m_Jolt : m_ScreamShake);
                 if (m_Mode == FaceMode.Scream && m_ScreamDuration > 0f && m_ModeTime >= m_ScreamDuration)
                 {
                     Calm();
@@ -342,17 +347,52 @@ namespace Game.Scripts.Scares
             m_JitterRight = Vector2.MoveTowards(m_JitterRight, m_JitterRightGoal, micro);
         }
 
-        /// <summary>Частые удары зубов: каждый - быстрое приоткрывание и смыкание, сила каждый раз своя.</summary>
+        /// <summary>
+        /// Стук зубами: раз в 1-1.5 с рот широко раскрывается, чуть держится и захлопывается со стуком (челюсть
+        /// отскакивает, голова вздрагивает). Раскрытие и промежуток каждый раз свои.
+        /// </summary>
         private void UpdateChatter(float dt)
         {
-            m_TapPhase += dt * Mathf.Max(0.1f, m_ChatterRate);
-            if (m_TapPhase >= 1f)
+            m_Jolt = Mathf.MoveTowards(m_Jolt, 0f, dt * 4f);
+            m_ChatterTime += dt;
+            if (m_ChatterTime >= m_ChatterPeriod)
             {
-                m_TapPhase -= Mathf.Floor(m_TapPhase);
-                m_TapAmplitude = Random.value < 0.12f ? 0f : Random.Range(m_ChatterOpen.x, m_ChatterOpen.y);
+                m_ChatterTime = m_ChatterPeriod > 0f ? m_ChatterTime - m_ChatterPeriod : 0f;
+                m_ChatterPeriod = Random.Range(m_ChatterInterval.x, Mathf.Max(m_ChatterInterval.x, m_ChatterInterval.y));
+                m_TapAmplitude = Random.Range(m_ChatterOpen.x, m_ChatterOpen.y);
+                m_Clacked = false;
             }
 
-            m_JawAngle = m_TapAmplitude * Mathf.Sin(Mathf.PI * m_TapPhase);
+            float open = m_ChatterPeriod * m_ChatterOpenShare;
+            float snapStart = Mathf.Max(open, m_ChatterPeriod * 0.62f);
+            float snap = Mathf.Max(0.01f, m_ChatterSnapTime);
+            float t = m_ChatterTime;
+            if (t < open)
+            {
+                float u = 1f - t / open;
+                m_JawAngle = m_TapAmplitude * (1f - u * u * u);                 // раскрывается, к концу медленнее
+            }
+            else if (t < snapStart)
+            {
+                m_JawAngle = m_TapAmplitude;                                      // держит
+            }
+            else if (t < snapStart + snap)
+            {
+                float u = (t - snapStart) / snap;
+                m_JawAngle = m_TapAmplitude * (1f - u * u);                       // захлопывает с ускорением
+            }
+            else
+            {
+                if (!m_Clacked)
+                {
+                    m_Clacked = true;
+                    m_Jolt = 1f;
+                    if (m_ChatterAudio != null && m_ChatterAudio.clip != null) m_ChatterAudio.PlayOneShot(m_ChatterAudio.clip);
+                }
+
+                float b = (t - snapStart - snap) / 0.12f;
+                m_JawAngle = b < 1f ? m_TapAmplitude * 0.08f * Mathf.Sin(Mathf.PI * b) : 0f;   // отскок и тишина
+            }
         }
 
         /// <summary>Крик: рот быстро раскрывается во всю ширину и дрожит.</summary>

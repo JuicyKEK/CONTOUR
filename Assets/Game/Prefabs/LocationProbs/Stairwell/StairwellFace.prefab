@@ -211,7 +211,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_LocalScale: {x: 1.5600001, y: 1.5600001, z: 1.5600001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3866747209187072789}
@@ -297,7 +297,7 @@ Transform:
   m_GameObject: {fileID: 3973859226170751229}
   serializedVersion: 2
   m_LocalRotation: {x: -0.00500986, y: -0.000000018626451, z: -0.000000020489097, w: 0.9999875}
-  m_LocalPosition: {x: -0.029296424, y: 0.034374848, z: 0.083517306}
+  m_LocalPosition: {x: -0.029243728, y: 0.03298456, z: 0.08035901}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -329,7 +329,7 @@ Transform:
   m_GameObject: {fileID: 4541408840621130671}
   serializedVersion: 2
   m_LocalRotation: {x: -0.00500986, y: -0.000000018626451, z: -0.000000020489097, w: 0.9999875}
-  m_LocalPosition: {x: 0.029296368, y: 0.03937403, z: 0.08346724}
+  m_LocalPosition: {x: 0.029359799, y: 0.037700392, z: 0.079665475}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -493,7 +493,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.88, y: 0.88, z: 0.88}
+  m_LocalScale: {x: 1.2960001, y: 1.2960001, z: 1.2960001}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1839289134951880601}
@@ -617,20 +617,22 @@ MonoBehaviour:
   m_Disagreement: 2.5
   m_Jaw: {fileID: 9170106435654052376}
   m_JawAxis: {x: 1, y: 0, z: 0}
-  m_JawOpen: {x: 2.5, y: 5}
+  m_JawOpen: {x: 0, y: 0}
   m_JawTime: {x: 0.9, y: 1.6}
   m_JawHold: {x: 0.1, y: 0.3}
   m_JawPause: {x: 0.2, y: 0.9}
-  m_TapBounce: 0.8
-  m_ExtraTaps: {x: 0, y: 1}
+  m_TapBounce: 0
+  m_ExtraTaps: {x: 0, y: 0}
   m_PlayerTarget: {fileID: 0}
   m_PlayerLookLimit: 45
   m_ShakeTarget: {fileID: 8943581605476208018}
-  m_ChatterRate: 13
-  m_ChatterOpen: {x: 1.5, y: 4.5}
-  m_ChatterShake: 0.03
+  m_ChatterInterval: {x: 1, y: 1.5}
+  m_ChatterOpen: {x: 15, y: 22}
+  m_ChatterOpenShare: 0.45
+  m_ChatterSnapTime: 0.08
+  m_ChatterShake: 0.06
   m_ChatterAudio: {fileID: 1815944977963917691}
-  m_ScreamOpen: 30
+  m_ScreamOpen: 33
   m_ScreamOpenTime: 0.35
   m_ScreamDuration: 3.5
   m_ScreamTremble: 1.5
