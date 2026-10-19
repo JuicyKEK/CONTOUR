@@ -457,7 +457,9 @@ MonoBehaviour:
   - {fileID: 516815937373140581}
   - {fileID: 2376167355690944258}
   m_Bend: 18
-  m_Speed: {x: 0.3, y: 0.8}
+  m_Speed: {x: 0.15, y: 1.4}
+  m_SpeedWander: 0.6
+  m_BendSpread: 0.5
   m_Wave: 0.18
   m_TwitchRate: 0.35
   m_TwitchStrength: 12
@@ -967,7 +969,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.60484976
+      value: 0.9072746
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -1522,7 +1524,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.54604304
+      value: 0.81906456
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -2856,6 +2858,8 @@ MonoBehaviour:
   - {fileID: 9126672835799857953}
   m_Bend: 16
   m_Speed: {x: 0.2, y: 0.5}
+  m_SpeedWander: 0
+  m_BendSpread: 0
   m_Wave: 0.18
   m_TwitchRate: 0.35
   m_TwitchStrength: 12
@@ -2903,7 +2907,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.8851533
+      value: 1.32773
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -3033,7 +3037,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.9962119
+      value: 1.4943178
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -4131,7 +4135,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.510061
+      value: 0.76509154
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -4254,7 +4258,9 @@ MonoBehaviour:
   - {fileID: 2018632877323097203}
   - {fileID: 8823811673578717748}
   m_Bend: 18
-  m_Speed: {x: 0.3, y: 0.8}
+  m_Speed: {x: 0.15, y: 1.4}
+  m_SpeedWander: 0.6
+  m_BendSpread: 0.5
   m_Wave: 0.18
   m_TwitchRate: 0.35
   m_TwitchStrength: 12
@@ -4406,7 +4412,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.9114186
+      value: 1.3671279
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -4536,7 +4542,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.45421353
+      value: 0.6813203
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -4823,7 +4829,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.6414488
+      value: 0.9621732
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -4944,7 +4950,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.7691872
+      value: 1.1537808
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -5441,7 +5447,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.81929404
+      value: 1.2289411
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -5596,7 +5602,9 @@ MonoBehaviour:
   - {fileID: 1551788318035120686}
   - {fileID: 2554623742930976577}
   m_Bend: 18
-  m_Speed: {x: 0.3, y: 0.8}
+  m_Speed: {x: 0.15, y: 1.4}
+  m_SpeedWander: 0.6
+  m_BendSpread: 0.5
   m_Wave: 0.18
   m_TwitchRate: 0.35
   m_TwitchStrength: 12
@@ -6550,7 +6558,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.62388015
+      value: 0.9358202
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -6616,7 +6624,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.3901625
+      value: 0.58524376
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -7388,7 +7396,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.50072443
+      value: 0.75108665
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -8565,7 +8573,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.32693192
+      value: 0.49039787
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -9372,7 +9380,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.70372194
+      value: 1.0555829
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -10335,7 +10343,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.5175196
+      value: 0.7762794
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -10433,7 +10441,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.4885963
+      value: 0.7328944
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -10663,7 +10671,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.9486695
+      value: 1.4230043
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name
@@ -11347,7 +11355,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1244861853727146938, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 0.6375521
+      value: 0.95632815
       objectReference: {fileID: 0}
     - target: {fileID: 1992496833362989851, guid: e1ef9189492c2ef4a84eaa1738a6f30c, type: 3}
       propertyPath: m_Name

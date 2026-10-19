@@ -22,6 +22,13 @@ namespace Game.Scripts.Scares
         [Tooltip("Скорость шевеления, колебаний в секунду: от и до (у каждой цепочки своя).")]
         [SerializeField] private Vector2 m_Speed = new(0.25f, 0.6f);
 
+        [Tooltip("Насколько скорость каждой цепочки сама плавно меняется со временем: 0 - постоянная, " +
+                 "0.5 - от половины до полуторной, 1 - от почти остановки до двойной.")]
+        [SerializeField] [Range(0f, 1f)] private float m_SpeedWander;
+
+        [Tooltip("Разброс размаха между цепочками: 0 - у всех одинаковый, 1 - от трети до 1.7 размаха.")]
+        [SerializeField] [Range(0f, 1f)] private float m_BendSpread;
+
         [Tooltip("Сдвиг волны между соседними суставами, доли колебания - волна бежит к кончику.")]
         [SerializeField] private float m_Wave = 0.18f;
 
@@ -42,7 +49,7 @@ namespace Game.Scripts.Scares
             public Transform[] Bones;
             public Quaternion[] Rest;
             public Vector3[] AxisA, AxisB;
-            public float Speed, Phase, NextTwitch, Twitch, TwitchTarget, TwitchHold, TwitchVelocity;
+            public float Speed, Phase, NextTwitch, Twitch, TwitchTarget, TwitchHold, TwitchVelocity, Cycle, Seed, BendScale;
         }
 
         private readonly List<Chain> m_Chains = new();
@@ -82,8 +89,11 @@ namespace Game.Scripts.Scares
                     AxisB = new Vector3[bones.Count],
                     Speed = Random.Range(m_Speed.x, m_Speed.y),
                     Phase = Random.value,
+                    Seed = Random.Range(0f, 100f),
+                    BendScale = 1f + Random.Range(-1f, 1f) * m_BendSpread * 0.7f,
                     NextTwitch = Random.Range(0.5f, 3f),
                 };
+                chain.Cycle = chain.Phase;
                 for (int i = 0; i < bones.Count; i++)
                 {
                     var bone = bones[i];
@@ -120,14 +130,19 @@ namespace Game.Scripts.Scares
                 float smooth = Mathf.Max(0.01f, chain.TwitchTarget != 0f ? m_TwitchSmooth.x : m_TwitchSmooth.y);
                 if (dt > 0f) chain.Twitch = Mathf.SmoothDamp(chain.Twitch, chain.TwitchTarget, ref chain.TwitchVelocity, smooth, Mathf.Infinity, dt);
                 int n = chain.Bones.Length;
-                float cycle = time * chain.Speed + chain.Phase;
+                // Фаза копится по шагам: скорость может плавно меняться - без скачков.
+                float speed = chain.Speed;
+                if (m_SpeedWander > 0f) speed *= 1f + m_SpeedWander * (Mathf.PerlinNoise(time * 0.15f, chain.Seed) - 0.5f) * 2f;
+                chain.Cycle += dt * Mathf.Max(0f, speed);
+                float cycle = chain.Cycle;
+                float bend = m_Bend * chain.BendScale;
                 float curl = m_Curl * (0.5f + 0.5f * Mathf.Sin(2f * Mathf.PI * (cycle * 0.37f + 0.3f)));
                 for (int i = 0; i < n; i++)
                 {
                     float weight = (i + 1f) / n;
                     float wave = 2f * Mathf.PI * (cycle - i * m_Wave);
-                    float bendA = m_Bend * weight * Mathf.Sin(wave) + curl * weight + chain.Twitch * weight;
-                    float bendB = m_Bend * 0.6f * weight * Mathf.Sin(wave * 0.73f + 1.1f);
+                    float bendA = bend * weight * Mathf.Sin(wave) + curl * weight + chain.Twitch * weight;
+                    float bendB = bend * 0.6f * weight * Mathf.Sin(wave * 0.73f + 1.1f);
                     chain.Bones[i].localRotation = chain.Rest[i] * Quaternion.AngleAxis(bendA, chain.AxisA[i]) * Quaternion.AngleAxis(bendB, chain.AxisB[i]);
                 }
             }
