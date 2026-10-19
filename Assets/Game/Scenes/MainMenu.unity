@@ -29606,14 +29606,34 @@ MonoBehaviour:
   m_Agent: {fileID: 1285469983}
   m_Animator: {fileID: 1285469980}
   m_AudioSource: {fileID: 1285469979}
+  m_FootstepSource: {fileID: 0}
+  m_VoiceSource: {fileID: 0}
+  m_Appearance: {fileID: 0}
   m_PatrolRoute: {fileID: 0}
   m_InitialState: 0
+  m_CalmState: 2
+  m_SearchArea: {fileID: 0}
   m_PlayerCaughtSignal: 
+  m_PlayerHitSignal: 
+  m_PlayerKilledSignal: 
   m_ChaseStartedSignal: 
+  m_OnPlayerHit:
+    m_PersistentCalls:
+      m_Calls: []
+  m_OnPlayerKilled:
+    m_PersistentCalls:
+      m_Calls: []
+  m_CapturePlayerOnKill: 1
+  m_ReturnToLastSaveOnKill: 1
+  m_ReturnToLastSaveDelay: 3
+  m_KillFadeDuration: 1.2
+  m_ReloadSceneWithoutSave: 1
+  m_CalmDownAfterKillDelay: 0
   m_OnPlayerCaughtChannel: {fileID: 11400000, guid: 09dd5fad27dee6d4180db891cc1f335e, type: 2}
   m_OnChaseStartedChannel: {fileID: 0}
   m_OnPatrolRouteCompletedChannel: {fileID: 0}
   m_InfectionZoneSource: {fileID: 0}
+  m_DebugLog: 0
 --- !u!114 &1285469982
 MonoBehaviour:
   m_ObjectHideFlags: 0
