@@ -1,0 +1,37 @@
+# Blender MTL File: 'SOFA RETOPOLOGY OK.blend'
+# Material Count: 3
+
+newmtl Fabric
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 1.500000 D:\\R.U.C Studio Waves\\Blender Waves\\SculptJanuary 2017\\Modeling Playstation\\3D -20190915T045010Z-001\\Model test\\fabric 97-(tile) - normal.jpg
+map_Kd D:\\R.U.C Studio Waves\\Blender Waves\\SculptJanuary 2017\\Modeling Playstation\\3D -20190915T045010Z-001\\Model test\\fabric 97-(tile) - Base.jpg
+map_Ns D:\\R.U.C Studio Waves\\Blender Waves\\SculptJanuary 2017\\Modeling Playstation\\3D -20190915T045010Z-001\\Model test\\fabric 97-(tile) - rough.jpg
+
+newmtl Metal
+Ns 276.768603
+Ka 1.000000 1.000000 1.000000
+Kd 0.101514 0.057440 0.013108
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 3
+
+newmtl wood
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.0 0.0 0.0
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump D:\\R.U.C Studio Waves\\Blender Waves\\SculptJanuary 2017\\Modeling Playstation\\3D -20190915T045010Z-001\\Model test\\Wood25_nrm.jpg
+map_Kd D:\\R.U.C Studio Waves\\Blender Waves\\SculptJanuary 2017\\Modeling Playstation\\3D -20190915T045010Z-001\\Model test\\Wood25_col.jpg

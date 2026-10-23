@@ -6,13 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Game/Scenes/MainMenu.unity
+    path: Assets/Game/Scenes/0_MainMenu.unity
     guid: d7df330f17415b34c8af8e54cae3cafe
   - enabled: 1
-    path: Assets/Game/Scenes/LoacationMain.unity
+    path: Assets/Game/Scenes/1_LoacationMain.unity
     guid: e2abf0100c2a5ea4ca99ae5ad407590e
   - enabled: 1
-    path: Assets/Game/Scenes/TransitionStairwell.unity
+    path: Assets/Game/Scenes/Transition_1_2_Stairwell.unity
     guid: cab4ce1d32b67854b9e5fce08d1c628b
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
@@ -47,6 +47,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/NpcTestScene.unity
     guid: eb6013df20a28064ea60e9d264c84373
+  - enabled: 1
+    path: Assets/Scenes/ProbsScene.unity
+    guid: 4cdf3d4ab5a04864ca28625fc3f9b8d5
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: baad02ed314ed994698079d6c595bcfc, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
