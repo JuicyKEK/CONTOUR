@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationScene.Runtime.Data.LocationTransitionDefinitionSO
   m_Scene:
     m_SceneAsset: {fileID: 102900000, guid: cab4ce1d32b67854b9e5fce08d1c628b, type: 3}
-    m_ScenePath: Assets/Game/Scenes/TransitionStairwell.unity
+    m_ScenePath: Assets/Game/Scenes/Transition_1_2_Stairwell.unity
   m_LocationA: {fileID: 11400000, guid: f2110b4760178f546a0c66e585addf1d, type: 2}
-  m_LocationB: {fileID: 0}
+  m_LocationB: {fileID: 11400000, guid: 40900ed2dec6f064e9ce8629322502fe, type: 2}
