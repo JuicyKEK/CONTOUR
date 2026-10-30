@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: BlackFungus_Tentacle
+  m_Shader: {fileID: 4800000, guid: e4401831a5598fd42be60ab5ca5801c5, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _TENTACLE_SWAY
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 42762a0684422984885cbef04960aa1b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MoldMap:
+        m_Texture: {fileID: 2800000, guid: b85a1aaa176bce2468526208f7333dc4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 00fd1a2d8dd3bb6469f29813c265527d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SkinMap:
+        m_Texture: {fileID: 2800000, guid: b6b2019214c2ade419a9e5ed9a228d68, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SkinNormal:
+        m_Texture: {fileID: 2800000, guid: 095ab9e33c4941548b46f5a222af8ae7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DetailBump: 0.6
+    - _FlowFrequency: 3
+    - _FlowHeight: 0.009
+    - _FlowSpeed: 0.6
+    - _FlowWiden: 0.8
+    - _InfectionAmount: 1
+    - _MoldRepeat: 0.7
+    - _MoldSpread: 0.7
+    - _NormalStrength: 1
+    - _PulseSpeed: 1.3
+    - _PulseStrength: 0.25
+    - _ReachAmount: 0.6
+    - _SkinAmount: 0.35
+    - _SkinRepeat: 0.8
+    - _SkinScale: 2.5
+    - _SkinSmoothness: 0.6
+    - _Smoothness: 0.3
+    - _SwayAmount: 0.07
+    - _SwayCurl: 4.5
+    - _SwaySpeed: 0.8
+    - _TentacleSway: 1
+    - _TileMeters: 1.2
+    - _TriplanarSharpness: 6
+    - _VeinBranches: 0.8
+    - _VeinHeight: 0.005
+    - _VeinScale: 6
+    - _VeinSeed: 0
+    - _VeinSmoothness: 0.55
+    - _VeinWarp: 1.1
+    - _VeinWidth: 0.08
+    m_Colors:
+    - _BaseColor: {r: 0.13, g: 0.115, b: 0.11, a: 1}
+    - _FlowColor: {r: 0.2, g: 0.012, b: 0.018, a: 1}
+    - _MoldColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ReachTarget: {r: 0, g: 0, b: 0, a: 0}
+    - _SkinTint: {r: 0.5, g: 0.22, b: 0.22, a: 1}
+    - _VeinColor: {r: 0.006, g: 0.005, b: 0.005, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

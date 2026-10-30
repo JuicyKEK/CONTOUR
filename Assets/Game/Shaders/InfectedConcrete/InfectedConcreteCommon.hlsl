@@ -49,7 +49,9 @@ void IC_Displace(float3 positionOS, float3 normalOS, out float3 displacedOS, out
 // Цвет вершины: R - насколько точка свободна (0 - лежит на поверхности или у корня, 1 - кончик), G - фаза щупальца.
 // Сдвиг растёт к кончику, фаза бежит вдоль щупальца - оно изгибается волной, а не качается палкой.
 // Узор вен считается по точке до сдвига, поэтому вены едут вместе со щупальцем.
-float3 IC_Sway(float4 color)
+// Reach: свободные концы тянутся к _ReachTarget.xyz (мир) с силой _ReachTarget.w - не дальше _ReachAmount и не дальше
+// половины расстояния до цели.
+float3 IC_Sway(float3 positionOS, float4 color)
 {
 #if defined(_TENTACLE_SWAY)
     float w = saturate(color.r);
@@ -59,7 +61,11 @@ float3 IC_Sway(float4 color)
     float3 o = float3(sin(t + ph + k),
                       0.6 * sin(t * 1.37 + ph * 1.7 + k * 1.3),
                       cos(t * 0.83 + ph * 2.3 + k * 0.8));
-    return o * (_SwayAmount * w * w);
+    float3 targetOS = mul(GetWorldToObjectMatrix(), float4(_ReachTarget.xyz, 1.0)).xyz;
+    float3 toTarget = targetOS - positionOS;
+    float dist = length(toTarget);
+    float3 reach = toTarget / max(dist, 1e-3) * min(dist * 0.5, _ReachAmount) * saturate(_ReachTarget.w) * w * w;
+    return o * (_SwayAmount * w * w) + reach;
 #else
     return 0;
 #endif
@@ -68,7 +74,7 @@ float3 IC_Sway(float4 color)
 void IC_DisplaceAll(float3 positionOS, float3 normalOS, float4 color, out float3 displacedOS, out float3 displacedNormalOS)
 {
     IC_Displace(positionOS, normalOS, displacedOS, displacedNormalOS);
-    displacedOS += IC_Sway(color);
+    displacedOS += IC_Sway(positionOS, color);
 }
 
 // Рельеф по высоте в пикселе (поверхностный градиент, Mikkelsen 2010) - чёткие края вен на редкой сетке.

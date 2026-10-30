@@ -7,7 +7,8 @@ Shader "Custom/InfectedConcrete"
     // _InfectionAmount (0..1) - сила заражения: вены тоньше и пропадают, плесень сходит. Его может вести
     // MoldInfectionVisual от зоны заражения (то же имя свойства).
     // Sway - для щупалец: свободные концы извиваются (цвет вершины R - насколько точка свободна, G - фаза щупальца);
-    // у стен выключено.
+    // у стен выключено. Reach - свободные концы тянутся к точке _ReachTarget (её задаёт компонент InfectionTentacleReach,
+    // по умолчанию сила 0 - не тянутся).
     Properties
     {
         [Header(Concrete)]
@@ -60,6 +61,8 @@ Shader "Custom/InfectedConcrete"
         _SwayAmount ("Sway, m", Range(0, 0.3)) = 0.08
         _SwaySpeed ("Sway Speed", Range(0, 4)) = 0.9
         _SwayCurl ("Curl along the Tentacle", Range(0, 12)) = 4
+        _ReachAmount ("Reach toward the Player, m", Range(0, 1)) = 0.6
+        [HideInInspector] _ReachTarget ("Reach Target (xyz world, w strength; set by InfectionTentacleReach)", Vector) = (0, 0, 0, 0)
     }
 
     SubShader
@@ -104,6 +107,8 @@ Shader "Custom/InfectedConcrete"
             float _SwayAmount;
             float _SwaySpeed;
             float _SwayCurl;
+            float _ReachAmount;
+            float4 _ReachTarget;
         CBUFFER_END
 
         #include "Assets/Game/Shaders/InfectedConcrete/InfectedConcreteCommon.hlsl"
