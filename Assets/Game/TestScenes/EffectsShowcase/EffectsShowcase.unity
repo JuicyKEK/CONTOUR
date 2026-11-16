@@ -3646,6 +3646,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1167479801}
     m_Modifications:
+    - target: {fileID: 2928793252676639433, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2928793252676639433, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2928793252676639433, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
+      propertyPath: InitialModule.startRotationX.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2928793252676639433, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
+      propertyPath: InitialModule.startRotationY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6403511681748753538, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.9
@@ -3693,6 +3709,14 @@ PrefabInstance:
     - target: {fileID: 6403511681748753538, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8126740929899252120, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8126740929899252120, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8337420577231814164, guid: 4035e4977fb72114bb45e0c2a2692397, type: 3}
       propertyPath: m_Name
@@ -8237,6 +8261,14 @@ PrefabInstance:
     - target: {fileID: 3755501632161640654, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
       propertyPath: m_Name
       value: Dust_Falling
+      objectReference: {fileID: 0}
+    - target: {fileID: 4927976767205221632, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4927976767205221632, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
