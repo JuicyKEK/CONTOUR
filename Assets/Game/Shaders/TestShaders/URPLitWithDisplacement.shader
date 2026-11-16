@@ -607,6 +607,10 @@ Shader "Custom/URPLitWithDisplacement"
                 return deformedPos;
             }
 
+            // Position of the spot/point light casting the shadow; URP sets it (ShadowUtils)
+            // and declares it in its own ShadowCasterPass.hlsl, which this pass does not include.
+            float3 _LightPosition;
+
             float4 GetShadowPositionHClip(Attributes input)
             {
                 // === APPLY SAME DEFORMATIONS ===
