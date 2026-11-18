@@ -8258,6 +8258,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1400880738033586526, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
+      propertyPath: InitialModule.startSizeY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1400880738033586526, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
+      propertyPath: InitialModule.startSizeZ.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1400880738033586526, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
+      propertyPath: InitialModule.startRotationX.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1400880738033586526, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
+      propertyPath: InitialModule.startRotationY.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3755501632161640654, guid: aea3aaecc78787d4dbf0af68e7f36d1d, type: 3}
       propertyPath: m_Name
       value: Dust_Falling
