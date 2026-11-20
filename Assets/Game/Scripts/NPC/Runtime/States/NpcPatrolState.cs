@@ -32,6 +32,7 @@ namespace Game.Scripts.NPC.Runtime.States
         private const float RerouteDelay = 0.3f;
         private const float UnreachableRetryDelay = 3f;
         private const float ReachableEndDistance = 1.5f;
+        private const float MinDwellSeconds = 0.5f;
 
         private readonly NpcLockedDoorAttempts m_DoorAttempts = new();
 
@@ -71,6 +72,11 @@ namespace Game.Scripts.NPC.Runtime.States
 
         public override NpcStateId? Tick(NpcBlackboard blackboard, float deltaTime)
         {
+            if (blackboard.IsThreatening)
+            {
+                return NpcStateId.Threaten;
+            }
+
             if (blackboard.IsAggressive && blackboard.CanSeePlayer)
             {
                 return NpcStateId.Chase;
@@ -268,7 +274,7 @@ namespace Game.Scripts.NPC.Runtime.States
 
         private void TickDwell(NpcBlackboard blackboard, NpcPatrolPoint point, float deltaTime)
         {
-            if (point.FacePointDirection && point.Point != null)
+            if (point.FacePointDirection && point.Point != null && !blackboard.Controller.IsPosed)
             {
                 var target = blackboard.Self.position + point.Point.forward;
                 NpcNavigation.FaceTowards(blackboard.Self, target, FaceDegreesPerSecond, deltaTime);
@@ -320,15 +326,30 @@ namespace Game.Scripts.NPC.Runtime.States
                 return;
             }
 
-            if (reachedPoint.WaitSeconds > 0f)
+            if (reachedPoint.WaitSeconds > 0f || reachedPoint.HasRandomActions)
             {
+                string actionKey = reachedPoint.ActionKey;
+                float seconds = reachedPoint.WaitSeconds;
+
+                if (reachedPoint.HasRandomActions)
+                {
+                    var action = PickRandomAction(blackboard, reachedPoint.RandomActions);
+                    actionKey = action.Key;
+                    seconds = action.Seconds > 0f ? action.Seconds : reachedPoint.WaitSeconds;
+                }
+
                 m_IsDwelling = true;
-                m_DwellTimer = reachedPoint.WaitSeconds;
+                m_DwellTimer = Mathf.Max(seconds, MinDwellSeconds);
                 NpcNavigation.Halt(blackboard.Agent);
 
-                if (!string.IsNullOrEmpty(reachedPoint.ActionKey))
+                if (reachedPoint.SnapToPoint && reachedPoint.Point != null)
                 {
-                    blackboard.Controller.PlayAnimationSound(reachedPoint.ActionKey);
+                    blackboard.Controller.SetPose(reachedPoint.Point);
+                }
+
+                if (!string.IsNullOrEmpty(actionKey))
+                {
+                    blackboard.Controller.PlayAnimationSound(actionKey);
                 }
 
                 return;
@@ -365,6 +386,12 @@ namespace Game.Scripts.NPC.Runtime.States
                 }
             }
 
+            // Следующая точка - другое место: если бот стоял в позе (в ванне, на стуле), сначала вернуть его на NavMesh.
+            if (route.Points[nextIndex].Point != route.Points[blackboard.CurrentPatrolIndex].Point)
+            {
+                blackboard.Controller.ClearPose();
+            }
+
             blackboard.CurrentPatrolIndex = nextIndex;
             NpcNavigation.SetStopped(blackboard.Agent, false);
             MoveToCurrentPoint(blackboard);
@@ -398,6 +425,22 @@ namespace Game.Scripts.NPC.Runtime.States
                 NpcNavigation.SetStopped(blackboard.Agent, false);
                 m_IsCheckingReachability = NpcNavigation.TrySetDestination(blackboard.Agent, point.Point.position);
             }
+        }
+
+        /// <summary>
+        /// Случайное действие точки, по возможности не то же, что в прошлый раз.
+        /// </summary>
+        private static NpcPointAction PickRandomAction(NpcBlackboard blackboard, NpcPointAction[] actions)
+        {
+            int index = Random.Range(0, actions.Length);
+
+            if (actions.Length > 1 && index == blackboard.LastRoutineActionIndex)
+            {
+                index = (index + Random.Range(1, actions.Length)) % actions.Length;
+            }
+
+            blackboard.LastRoutineActionIndex = index;
+            return actions[index];
         }
 
         private static int FindNearestPointIndex(NpcBlackboard blackboard)

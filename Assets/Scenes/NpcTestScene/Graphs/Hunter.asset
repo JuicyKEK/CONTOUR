@@ -45,6 +45,10 @@ MonoBehaviour:
     m_FromPortId: e1d7ac7d-61f6-4ee7-aa82-a528f6ac162d
     m_ToNodeId: f475fb2e-3722-445d-957e-5897defd9e01
     m_ToPortId: in
+  - m_FromNodeId: f475fb2e-3722-445d-957e-5897defd9e01
+    m_FromPortId: 76ff1f88-57e4-49c1-aa99-e1b399a5a5d1
+    m_ToNodeId: 539dcdab-b28a-4061-bd3e-ed3b3644d29c
+    m_ToPortId: in
   references:
     version: 2
     RefIds:
@@ -68,6 +72,11 @@ MonoBehaviour:
             \u0432 \u043A\u043E\u0440\u0438\u0434\u043E\u0440"
           m_InlineCondition:
             rid: 155225068860080201
+          m_Condition: {fileID: 0}
+        - m_Id: 76ff1f88-57e4-49c1-aa99-e1b399a5a5d1
+          m_BranchName: "\u0412\u0438\u0434\u0438\u0442 \u0438\u0433\u0440\u043E\u043A\u0430"
+          m_InlineCondition:
+            rid: 155225068860080290
           m_Condition: {fileID: 0}
         m_OnEnterActions: []
         m_OnEnterEvents: []
@@ -193,3 +202,7 @@ MonoBehaviour:
       type: {class: NpcArrived, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
       data:
         m_PointKey: Home
+    - rid: 155225068860080290
+      type: {class: NpcSeesPlayer, ns: Game.Scripts.NPC.Story, asm: Assembly-CSharp}
+      data:
+        m_ForSeconds: 0

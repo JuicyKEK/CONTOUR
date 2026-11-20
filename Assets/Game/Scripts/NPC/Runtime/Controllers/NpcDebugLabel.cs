@@ -107,6 +107,8 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 case NpcStateId.Attack: return "атакует";
                 case NpcStateId.Perform: return "действие";
                 case NpcStateId.MoveTo: return "идёт к точке";
+                case NpcStateId.Threaten: return "<color=#ffa040>шипит</color>";
+                case NpcStateId.Roar: return "<color=#ff5050>рычит</color>";
                 default: return state.ToString();
             }
         }

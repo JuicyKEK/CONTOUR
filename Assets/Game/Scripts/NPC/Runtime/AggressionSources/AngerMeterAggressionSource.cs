@@ -15,14 +15,20 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
     ///    "неправильное" - поднимает.
     ///  - Чем выше заражение зоны, тем быстрее растёт злость (AngerInfectionMultiplier при 100%).
     ///  - С уровня заражения InstantAggressionInfectionLevel мимик при виде игрока сразу агрессивен.
-    /// Когда мимик, не найдя игрока, возвращается к своей роли - шкала сбрасывается (<see cref="CalmDown"/>).
+    ///  - Если у типа задано шипение (ThreatDuration больше нуля), заполненная шкала сначала включает шипение
+    ///    (<see cref="IsThreatening"/>): злость ещё можно опустить, и ниже ThreatCalmThreshold шипение снимается.
+    ///    Начался рык (<see cref="BeginRoar"/>) - шкала больше не меняется, после рыка - <see cref="Enrage"/>.
+    /// Когда мимик, не найдя игрока, возвращается к своей роли - шкала сбрасывается (<see cref="CalmDown"/>),
+    /// если у типа не включено "Не сбрасывать злость после погони".
     /// </summary>
     public sealed class AngerMeterAggressionSource : INpcAggressionSource, IDisposable
     {
         private readonly NpcTypeDefinitionSO m_Definition;
         private readonly ReactiveProperty<bool> m_IsAggressive = new(false);
         private readonly ReactiveProperty<float> m_Anger = new(0f);
+        private readonly ReactiveProperty<bool> m_IsThreatening = new(false);
         private IStoryState m_StoryState;
+        private bool m_IsRoaring;
 
         private bool m_CanSeePlayer;
         private float m_InfectionLevel;
@@ -31,6 +37,12 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
 
         /// <summary>Шкала злости от 0 до 1.</summary>
         public ReadOnlyReactiveProperty<float> Anger => m_Anger;
+
+        /// <summary>
+        /// Шкала заполнилась, но бот ещё только шипит (NpcTypeDefinitionSO.ThreatDuration больше нуля): ещё не агрессивен,
+        /// злость можно опустить.
+        /// </summary>
+        public ReadOnlyReactiveProperty<bool> IsThreatening => m_IsThreatening;
 
         public AngerMeterAggressionSource(NpcTypeDefinitionSO definition, IStoryState storyState)
         {
@@ -70,7 +82,7 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
             m_CanSeePlayer = canSeePlayer;
             m_InfectionLevel = infectionLevel;
 
-            if (m_IsAggressive.Value)
+            if (m_IsAggressive.Value || m_IsRoaring)
             {
                 return;
             }
@@ -78,7 +90,7 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
             if (canSeePlayer && infectionLevel >= m_Definition.InstantAggressionInfectionLevel)
             {
                 m_Anger.Value = 1f;
-                m_IsAggressive.Value = true;
+                OnFull();
                 return;
             }
 
@@ -97,7 +109,7 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
         /// </summary>
         public void AddAnger(float delta)
         {
-            if (m_IsAggressive.Value)
+            if (m_IsAggressive.Value || m_IsRoaring)
             {
                 return;
             }
@@ -106,20 +118,37 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
         }
 
         /// <summary>
-        /// Мимик вернулся к своей роли: агрессия снята, шкала - на значении AngerAfterCalm.
+        /// Мимик вернулся к своей роли: агрессия и шипение сняты, шкала - на значении AngerAfterCalm
+        /// (keepAnger - шкала остаётся какой была).
         /// </summary>
-        public void CalmDown()
+        public void CalmDown(bool keepAnger = false)
         {
             m_IsAggressive.Value = false;
-            m_Anger.Value = Mathf.Clamp01(m_Definition.AngerAfterCalm);
+            m_IsThreatening.Value = false;
+            m_IsRoaring = false;
+
+            if (!keepAnger)
+            {
+                m_Anger.Value = Mathf.Clamp01(m_Definition.AngerAfterCalm);
+            }
         }
 
         /// <summary>
-        /// Сразу разозлить (сюжет/граф).
+        /// Начался рык перед погоней: шкала больше не меняется, отменить погоню уже нельзя.
+        /// </summary>
+        public void BeginRoar()
+        {
+            m_IsRoaring = true;
+        }
+
+        /// <summary>
+        /// Сразу разозлить (сюжет/граф, конец рыка).
         /// </summary>
         public void Enrage()
         {
             m_Anger.Value = 1f;
+            m_IsThreatening.Value = false;
+            m_IsRoaring = false;
             m_IsAggressive.Value = true;
         }
 
@@ -128,6 +157,7 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
             SetStoryState(null);
             m_IsAggressive.Dispose();
             m_Anger.Dispose();
+            m_IsThreatening.Dispose();
         }
 
         private void OnStoryChanged(string key)
@@ -160,6 +190,25 @@ namespace Game.Scripts.NPC.Runtime.AggressionSources
             m_Anger.Value = Mathf.Clamp01(m_Anger.Value + delta);
 
             if (m_Anger.Value >= 1f)
+            {
+                OnFull();
+            }
+            else if (m_IsThreatening.Value && m_Anger.Value < m_Definition.ThreatCalmThreshold)
+            {
+                m_IsThreatening.Value = false;
+            }
+        }
+
+        /// <summary>
+        /// Шкала заполнилась: шипение перед погоней (если у типа оно задано) или сразу агрессия.
+        /// </summary>
+        private void OnFull()
+        {
+            if (m_Definition.ThreatDuration > 0f)
+            {
+                m_IsThreatening.Value = true;
+            }
+            else
             {
                 m_IsAggressive.Value = true;
             }

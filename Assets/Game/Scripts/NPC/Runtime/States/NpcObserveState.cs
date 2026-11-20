@@ -28,6 +28,11 @@ namespace Game.Scripts.NPC.Runtime.States
                 NpcNavigation.FaceTowards(blackboard.Self, blackboard.PlayerTransform.position, RotationSpeedDegPerSec, deltaTime);
             }
 
+            if (blackboard.IsThreatening)
+            {
+                return NpcStateId.Threaten;
+            }
+
             if (blackboard.IsAggressive && blackboard.CanSeePlayer)
             {
                 return NpcStateId.Chase;

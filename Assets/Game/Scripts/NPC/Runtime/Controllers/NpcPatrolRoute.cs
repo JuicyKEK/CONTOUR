@@ -28,7 +28,32 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [Tooltip("Пока стоит на точке, повернуться так же, как повёрнут объект точки (лицом к механизму, к раковине).")]
         public bool FacePointDirection;
 
+        [Tooltip("Необязательно: несколько действий на этой точке - каждый раз бот берёт случайное (не повторяя предыдущее) " +
+                 "и делает его указанное время. Задано - вместо ActionKey/WaitSeconds. Маршрут из одной такой точки - " +
+                 "бот так и занимается своими делами на месте, чередуя действия.")]
+        public NpcPointAction[] RandomActions;
+
+        [Tooltip("Встать точно в точку и повернуться как она, даже если точка вне NavMesh (сидит в ванне, на стуле, " +
+                 "вплотную к раковине): агент доходит до ближайшего места, а модель плавно встаёт в позу. Уходя с точки, " +
+                 "бот плавно возвращается на NavMesh.")]
+        public bool SnapToPoint;
+
+        public bool HasRandomActions => RandomActions != null && RandomActions.Length > 0;
+
         public IInteractionDoor ResolveDoor() => DoorToPass as IInteractionDoor;
+    }
+
+    /// <summary>
+    /// Одно из случайных действий на точке маршрута: ключ анимации/звука и сколько секунд его делать.
+    /// </summary>
+    [System.Serializable]
+    public struct NpcPointAction
+    {
+        [Tooltip("Ключ анимации/звука (запись профиля, триггер или имя состояния аниматора), например 'Wash_Dishes'.")]
+        public string Key;
+
+        [Tooltip("Сколько секунд делать это действие. 0 - столько, сколько WaitSeconds точки.")]
+        [Min(0f)] public float Seconds;
     }
 
     /// <summary>

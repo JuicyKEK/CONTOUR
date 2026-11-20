@@ -1,4 +1,5 @@
 ﻿using Game.Scripts.InfectionZone.Runtime.Interfaces;
+using Game.Scripts.NPC.Runtime.AggressionSources;
 using Game.Scripts.NPC.Runtime.Controllers;
 using Game.Scripts.NPC.Runtime.Data;
 using Game.Scripts.NPC.Runtime.Interfaces;
@@ -55,6 +56,15 @@ namespace Game.Scripts.NPC.Runtime.Core
         public float ZoneInfectionLevel => Zone != null ? Zone.InfectionLevel.CurrentValue : 0f;
 
         public bool IsAggressive => AggressionSource != null && AggressionSource.IsAggressive.CurrentValue;
+
+        /// <summary>Шкала злости бота (только в режиме "Шкала злости"), иначе null.</summary>
+        public AngerMeterAggressionSource AngerMeter { get; set; }
+
+        /// <summary>Шкала злости заполнилась, бот шипит перед погоней (см. <see cref="NpcStateId.Threaten"/>).</summary>
+        public bool IsThreatening => AngerMeter != null && AngerMeter.IsThreatening.CurrentValue;
+
+        /// <summary>Индекс последнего случайного действия на точке маршрута (чтобы не повторять одно и то же подряд).</summary>
+        public int LastRoutineActionIndex { get; set; } = -1;
 
         // --- Восприятие, пересчитывается каждый кадр в NpcController ---
         public bool CanSeePlayer { get; set; }

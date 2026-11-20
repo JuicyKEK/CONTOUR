@@ -1,5 +1,6 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
+using Game.Scripts.Enemies;
 using Game.Scripts.InfectionZone.Runtime.Interfaces;
 using Game.Scripts.InteractionObjects.Interfaces;
 using Game.Scripts.LocationScene.Runtime.Interfaces;
@@ -123,6 +124,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [Inject] private IPlayerLocator m_PlayerLocator;
 
         private readonly NpcAnimatorDriver m_AnimatorDriver = new();
+        private readonly NpcDoorwayTraversal m_Doorway = new();
 
         private NpcBlackboard m_Blackboard;
         private NpcStateMachine m_StateMachine;
@@ -132,6 +134,17 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         private ManualAggressionSource m_ManualAggressionSource; // валиден только при AggressionMode = Manual
         private AngerMeterAggressionSource m_AngerMeter;          // валиден только при AggressionMode = AngerMeter
         private float m_CurrentSpeed;
+        private MonsterHeadLook m_HeadLook;                       // поворот головы к игроку (если есть на модели)
+
+        // Поза на точке (SnapToPoint): модель стоит точно в точке вне NavMesh, агент - на ближайшем месте NavMesh.
+        private const float PoseBlendSeconds = 0.35f;
+        private bool m_IsPosed;
+        private bool m_IsPoseReturning;
+        private float m_PoseBlend = 1f;
+        private Vector3 m_PoseFromPosition;
+        private Quaternion m_PoseFromRotation;
+        private Vector3 m_PoseToPosition;
+        private Quaternion m_PoseToRotation;
 
         /// <summary>Смена состояния (from, to).</summary>
         public event Action<NpcStateId, NpcStateId> StateChanged;
@@ -160,6 +173,15 @@ namespace Game.Scripts.NPC.Runtime.Controllers
 
         /// <summary>Шкала злости 0..1 (только для режима "Шкала злости", иначе 0).</summary>
         public float Anger => m_AngerMeter?.Anger.CurrentValue ?? 0f;
+
+        /// <summary>Шкала злости заполнилась и бот шипит перед погоней.</summary>
+        public bool IsThreatening => m_AngerMeter != null && m_AngerMeter.IsThreatening.CurrentValue;
+
+        /// <summary>Бот стоит в позе на точке (SnapToPoint) или плавно в неё входит/из неё выходит.</summary>
+        public bool IsPosed => m_IsPosed;
+
+        /// <summary>Бот проходит дверной проём своей анимацией (NpcDoorway).</summary>
+        public bool IsInDoorway => m_Doorway.IsActive;
 
         // Счётчики событий - по ним условия графа бота ждут "ударил", "дошёл" и т.п. после входа в ноду.
         public int HitCount { get; private set; }
@@ -205,6 +227,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
 
             m_Blackboard.Zone = ResolveZone();
             m_Blackboard.AggressionSource = CreateAggressionSource();
+            m_Blackboard.AngerMeter = m_AngerMeter;
             m_Perception = new NpcPerception(transform, m_Definition);
             m_Audio = new NpcAudioPlayer(m_AudioSource, EnsureSource(ref m_FootstepSource, "Footsteps"), EnsureSource(ref m_VoiceSource, "Voice"));
 
@@ -231,6 +254,8 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             m_StateMachine.Register(new NpcAttackState());
             m_StateMachine.Register(new NpcPerformState());
             m_StateMachine.Register(new NpcMoveToState());
+            m_StateMachine.Register(new NpcThreatenState());
+            m_StateMachine.Register(new NpcRoarState());
             m_StateMachine.StateChanged += OnStateChanged;
             m_StateMachine.Start(m_InitialState);
         }
@@ -353,11 +378,21 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             }
 
             m_AngerMeter?.Tick(m_Blackboard.CanSeePlayer, m_Blackboard.ZoneInfectionLevel, deltaTime);
-            m_StateMachine.Tick(deltaTime);
+
+            // В проёме бота ведёт анимация прохода, состояние поведения ждёт.
+            if (m_Doorway.IsActive || m_Doorway.TryStart(m_Blackboard, CurrentProfile, m_AnimatorDriver))
+            {
+                m_Doorway.Tick(m_Blackboard, deltaTime);
+            }
+            else
+            {
+                m_StateMachine.Tick(deltaTime);
+            }
 
             m_CurrentSpeed = 0f;
 
-            if (NpcNavigation.IsReady(m_Agent))
+            // In a doorway the bot is moved by the doorway clip, not by the agent: no speed for the animator and steps.
+            if (NpcNavigation.IsReady(m_Agent) && !m_Doorway.IsActive)
             {
                 var velocity = m_Agent.velocity;
                 velocity.y = 0f;
@@ -366,6 +401,122 @@ namespace Game.Scripts.NPC.Runtime.Controllers
 
             m_AnimatorDriver.Update(m_CurrentSpeed, m_StateMachine.CurrentStateId, m_Blackboard.IsAggressive, Anger);
             m_Audio.Tick(transform.position, m_CurrentSpeed, deltaTime);
+            UpdatePose(deltaTime);
+            UpdateHeadLook();
+        }
+
+        /// <summary>
+        /// Встать точно в точку (поза вне NavMesh: в ванне, на стуле, вплотную к раковине) - плавно, за PoseBlendSeconds.
+        /// Агент остаётся на ближайшем месте NavMesh и модель не двигает, пока поза не снята (<see cref="ClearPose"/>).
+        /// </summary>
+        public void SetPose(Transform point)
+        {
+            if (point == null)
+            {
+                return;
+            }
+
+            if (m_Agent != null)
+            {
+                m_Agent.updatePosition = false;
+                m_Agent.updateRotation = false;
+            }
+
+            m_IsPosed = true;
+            m_IsPoseReturning = false;
+            m_PoseFromPosition = transform.position;
+            m_PoseFromRotation = transform.rotation;
+            m_PoseToPosition = point.position;
+            m_PoseToRotation = Quaternion.Euler(0f, point.eulerAngles.y, 0f);
+            m_PoseBlend = 0f;
+        }
+
+        /// <summary>
+        /// Снять позу: модель плавно возвращается на ближайшее место NavMesh, потом агент снова её водит.
+        /// </summary>
+        public void ClearPose()
+        {
+            if (!m_IsPosed || m_IsPoseReturning)
+            {
+                return;
+            }
+
+            // Агент всё это время стоял на ближайшем к точке месте NavMesh (а не за стеной) - туда и возвращаемся.
+            var target = transform.position;
+
+            if (m_Agent != null && NpcNavigation.IsReady(m_Agent))
+            {
+                target = m_Agent.nextPosition;
+            }
+            else if (NavMesh.SamplePosition(transform.position, out var hit, 2f, NavMesh.AllAreas))
+            {
+                target = hit.position;
+            }
+
+            m_IsPoseReturning = true;
+            m_PoseFromPosition = transform.position;
+            m_PoseFromRotation = transform.rotation;
+            m_PoseToPosition = target;
+            m_PoseToRotation = transform.rotation;
+            m_PoseBlend = 0f;
+        }
+
+        private void UpdatePose(float deltaTime)
+        {
+            if (!m_IsPosed || m_PoseBlend >= 1f && !m_IsPoseReturning)
+            {
+                return;
+            }
+
+            m_PoseBlend = Mathf.Min(1f, m_PoseBlend + deltaTime / PoseBlendSeconds);
+            float t = Mathf.SmoothStep(0f, 1f, m_PoseBlend);
+            transform.SetPositionAndRotation(Vector3.Lerp(m_PoseFromPosition, m_PoseToPosition, t),
+                Quaternion.Slerp(m_PoseFromRotation, m_PoseToRotation, t));
+
+            if (!m_IsPoseReturning || m_PoseBlend < 1f)
+            {
+                return;
+            }
+
+            m_IsPosed = false;
+            m_IsPoseReturning = false;
+
+            if (m_Agent != null)
+            {
+                // Warp drops the agent's path: the bot may already have a new goal (MoveTo, search point) - keep it.
+                bool hadPath = m_Agent.isOnNavMesh && (m_Agent.hasPath || m_Agent.pathPending);
+                var destination = m_Agent.destination;
+
+                if (m_Agent.isOnNavMesh || NavMesh.SamplePosition(m_PoseToPosition, out _, 0.5f, m_Agent.areaMask))
+                {
+                    m_Agent.Warp(m_PoseToPosition);
+                }
+
+                m_Agent.updatePosition = true;
+                m_Agent.updateRotation = true;
+
+                if (hadPath && m_Agent.isOnNavMesh)
+                {
+                    m_Agent.SetDestination(destination);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Голова к игроку (MonsterHeadLook на модели), когда бот видит игрока и злость не ниже порога типа, а также
+        /// при шипении и рыке. Только для режима "Шкала злости" - у остальных ботов голову не трогаем.
+        /// </summary>
+        private void UpdateHeadLook()
+        {
+            if (m_HeadLook == null || m_AngerMeter == null)
+            {
+                return;
+            }
+
+            var state = m_StateMachine.CurrentStateId;
+            bool look = m_Blackboard.CanSeePlayer && Anger >= m_Definition.HeadLookAngerThreshold ||
+                        state == NpcStateId.Threaten || state == NpcStateId.Roar;
+            m_HeadLook.Weight = look ? 1f : 0f;
         }
 
         private void UpdatePerception(float deltaTime)
@@ -412,6 +563,18 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 LogDebug($"{from} -> {to}");
             }
 
+            // Поза на точке остаётся только пока бот занят своими делами, шипит или рычит.
+            if (to != NpcStateId.Patrol && to != NpcStateId.Threaten && to != NpcStateId.Roar)
+            {
+                ClearPose();
+            }
+
+            // Команда пришла, пока бот проходил проём: проход заканчивается сразу, там, где он стоит.
+            if (from != to)
+            {
+                m_Doorway.Finish(m_Blackboard);
+            }
+
             m_Audio?.OnStateChanged(to);
             StateChanged?.Invoke(from, to);
         }
@@ -425,7 +588,9 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         private void BindForm()
         {
             var formAnimator = m_Appearance != null ? m_Appearance.Current?.Animator : null;
-            m_AnimatorDriver.Bind(formAnimator != null ? formAnimator : m_Animator);
+            var animator = formAnimator != null ? formAnimator : m_Animator;
+            m_AnimatorDriver.Bind(animator);
+            m_HeadLook = animator != null ? animator.GetComponentInChildren<MonsterHeadLook>(true) : null;
             m_Audio?.SetProfile(CurrentProfile);
 
             if (m_StateMachine != null)
@@ -523,7 +688,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 }
                 else
                 {
-                    m_AngerMeter.CalmDown();
+                    m_AngerMeter.CalmDown(false);
                 }
 
                 return;
@@ -669,8 +834,8 @@ namespace Game.Scripts.NPC.Runtime.Controllers
 
             m_Blackboard.IsHunting = false;
             m_Blackboard.PatrolResumeNearest = true;
-            m_AngerMeter?.CalmDown();
-            LogDebug("возвращается к спокойному поведению");
+            m_AngerMeter?.CalmDown(m_Definition.KeepAngerAfterChase);
+            LogDebug("возвращается к спокойному поведению" + (m_AngerMeter != null ? $" (злость {Anger:P0})" : string.Empty));
         }
 
         /// <summary>Как этот бот сейчас открывает двери (по облику, иначе по настройкам типа).</summary>

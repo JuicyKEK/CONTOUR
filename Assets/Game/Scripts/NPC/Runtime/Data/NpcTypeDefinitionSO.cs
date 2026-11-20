@@ -117,6 +117,26 @@ namespace Game.Scripts.NPC.Runtime.Data
         [SerializeField] private NpcAngerAction[] m_AngerActions = Array.Empty<NpcAngerAction>();
         [Tooltip("Значение шкалы, когда мимик, не найдя игрока, возвращается к своей роли.")]
         [SerializeField, Range(0f, 1f)] private float m_AngerAfterCalm;
+        [Tooltip("Включено - после погони (не нашёл игрока и вернулся к своим делам) шкала злости остаётся какой была, " +
+                 "а не становится 'Значением после возврата к роли': при следующей встрече бот сразу начинает шипеть.")]
+        [SerializeField] private bool m_KeepAngerAfterChase;
+        [Tooltip("С какого значения шкалы (0..1) бот поворачивает голову к игроку, продолжая свои дела " +
+                 "(нужен компонент MonsterHeadLook на модели).")]
+        [SerializeField, Range(0f, 1f)] private float m_HeadLookAngerThreshold = 0.7f;
+
+        [Header("Шипение и рык перед погоней (шкала злости)")]
+        [Tooltip("Шкала заполнилась - бот бросает свои дела, стоит и шипит столько секунд, потом рычит и начинает погоню. " +
+                 "0 - без шипения и рыка: сразу погоня.")]
+        [SerializeField, Min(0f)] private float m_ThreatDuration;
+        [Tooltip("Если во время шипения игрок опустил шкалу ниже этого значения (0..1) - бот успокаивается и возвращается " +
+                 "к своим делам. Рык уже начался - не успокоить.")]
+        [SerializeField, Range(0f, 1f)] private float m_ThreatCalmThreshold = 0.7f;
+        [Tooltip("Необязательно: действие перед рыком (ключ анимации/звука), например 'встать из ванны'. Пусто - сразу рык.")]
+        [SerializeField] private string m_RoarPreludeKey;
+        [Tooltip("Сколько секунд длится действие перед рыком.")]
+        [SerializeField, Min(0f)] private float m_RoarPreludeDuration;
+        [Tooltip("Сколько секунд длится рык (ключ анимации/звука 'Roar'), после него - погоня.")]
+        [SerializeField, Min(0f)] private float m_RoarDuration = 2f;
 
         [Header("Скорости (NavMeshAgent.speed)")]
         [Tooltip("Спокойное поведение: обход маршрута, роль мимика, походка по команде графа.")]
@@ -215,6 +235,14 @@ namespace Game.Scripts.NPC.Runtime.Data
         public float InstantAggressionInfectionLevel => m_InstantAggressionInfectionLevel;
         public NpcAngerAction[] AngerActions => m_AngerActions ?? Array.Empty<NpcAngerAction>();
         public float AngerAfterCalm => m_AngerAfterCalm;
+        public bool KeepAngerAfterChase => m_KeepAngerAfterChase;
+        public float HeadLookAngerThreshold => m_HeadLookAngerThreshold;
+
+        public float ThreatDuration => m_ThreatDuration;
+        public float ThreatCalmThreshold => m_ThreatCalmThreshold;
+        public string RoarPreludeKey => m_RoarPreludeKey;
+        public float RoarPreludeDuration => m_RoarPreludeDuration;
+        public float RoarDuration => m_RoarDuration;
 
         public float PatrolSpeed => m_PatrolSpeed;
         public float SearchSpeed => m_SearchSpeed;

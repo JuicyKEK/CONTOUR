@@ -68,7 +68,23 @@ namespace Game.Scripts.NPC.Editor
                     Field("m_InstantAggressionInfectionLevel", "Сразу агрессивен при виде игрока с заражения");
                     Field("m_AngerActions", "Действия игрока (сигналы сюжета)");
                     Field("m_AngerAfterCalm", "Злость после возврата к роли");
+                    Field("m_KeepAngerAfterChase", "Не сбрасывать злость после погони");
+                    Field("m_HeadLookAngerThreshold", "Поворачивает голову к игроку со злости");
                     Hint("Злость можно менять и из UnityEvent: NpcController.AddAnger(число).");
+                    var threat = Field("m_ThreatDuration", "Шипит перед погоней, с");
+
+                    if (threat.floatValue > 0f)
+                    {
+                        Field("m_ThreatCalmThreshold", "Во время шипения успокаивается ниже злости");
+                        Field("m_RoarPreludeKey", "Действие перед рыком (ключ)");
+                        Field("m_RoarPreludeDuration", "Действие перед рыком, с");
+                        Field("m_RoarDuration", "Рык, с");
+                        Hint("Шипение - голос состояния Threaten в профиле анимаций и звуков; рык - ключ 'Roar' (анимация и звук).");
+                    }
+                    else
+                    {
+                        Hint("0 - без шипения и рыка: шкала заполнилась - сразу погоня.");
+                    }
                 }
             }
 

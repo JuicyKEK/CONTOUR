@@ -8,6 +8,11 @@ namespace Game.Scripts.NPC.Runtime.Core
     /// а действия (удар, превращение...) - триггерами. Параметр выставляется, только если он есть
     /// в контроллере аниматора, поэтому бот работает и с пустым/старым контроллером, и вовсе без Animator
     /// (примитивы). Имена параметров - константы ниже; их же ждёт шаблонный контроллер NpcTemplate.
+    ///
+    /// Если триггера с именем действия в контроллере нет, но есть состояние с таким именем (бытовые анимации монстров:
+    /// мытьё посуды, еда - к ним в контроллере нет переходов), аниматор плавно переходит в это состояние. Как только
+    /// бот пойдёт (Speed больше 0.1), аниматор плавно возвращается в состояние, из которого действие началось
+    /// (обычно Idle с переходами по Speed).
     /// </summary>
     public class NpcAnimatorDriver
     {
@@ -21,9 +26,13 @@ namespace Game.Scripts.NPC.Runtime.Core
         private static readonly int s_AggressiveHash = Animator.StringToHash(AggressiveParameter);
         private static readonly int s_AngerHash = Animator.StringToHash(AngerParameter);
 
+        private const float StateFadeSeconds = 0.25f;
+        private const float MovingSpeed = 0.1f;
+
         private readonly Dictionary<int, AnimatorControllerParameterType> m_Parameters = new();
         private Animator m_Animator;
         private RuntimeAnimatorController m_BoundController;
+        private int m_ReturnStateHash; // куда вернуться, когда бот пойдёт после действия-состояния (0 - некуда)
 
         public Animator Animator => m_Animator;
 
@@ -32,6 +41,7 @@ namespace Game.Scripts.NPC.Runtime.Core
             m_Animator = animator;
             m_BoundController = null;
             m_Parameters.Clear();
+            m_ReturnStateHash = 0;
         }
 
         public void Update(float speed, NpcStateId state, bool isAggressive, float anger)
@@ -39,6 +49,12 @@ namespace Game.Scripts.NPC.Runtime.Core
             if (!EnsureParameters())
             {
                 return;
+            }
+
+            if (m_ReturnStateHash != 0 && speed > MovingSpeed)
+            {
+                m_Animator.CrossFadeInFixedTime(m_ReturnStateHash, StateFadeSeconds, 0);
+                m_ReturnStateHash = 0;
             }
 
             SetFloat(s_SpeedHash, speed);
@@ -61,10 +77,35 @@ namespace Game.Scripts.NPC.Runtime.Core
 
             if (!m_Parameters.TryGetValue(hash, out var type) || type != AnimatorControllerParameterType.Trigger)
             {
+                return TryPlayState(hash);
+            }
+
+            m_ReturnStateHash = 0;
+            m_Animator.SetTrigger(hash);
+            return true;
+        }
+
+        /// <summary>
+        /// Плавно перейти в состояние аниматора (слой 0) с этим именем, если оно есть. Возвращает false, если такого нет.
+        /// </summary>
+        private bool TryPlayState(int stateHash)
+        {
+            if (!m_Animator.HasState(0, stateHash))
+            {
                 return false;
             }
 
-            m_Animator.SetTrigger(hash);
+            if (m_ReturnStateHash == 0)
+            {
+                int current = m_Animator.GetCurrentAnimatorStateInfo(0).shortNameHash;
+                m_ReturnStateHash = current != stateHash ? current : 0;
+            }
+            else if (m_ReturnStateHash == stateHash)
+            {
+                m_ReturnStateHash = 0;
+            }
+
+            m_Animator.CrossFadeInFixedTime(stateHash, StateFadeSeconds, 0);
             return true;
         }
 

@@ -80,7 +80,7 @@ ParticleSystem:
   lengthInSec: 2
   simulationSpeed: 1
   stopAction: 0
-  cullingMode: 0
+  cullingMode: 2
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
@@ -4815,7 +4815,7 @@ ParticleSystemRenderer:
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 0
+  m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
@@ -5070,7 +5070,7 @@ ParticleSystem:
   lengthInSec: 2
   simulationSpeed: 1
   stopAction: 0
-  cullingMode: 0
+  cullingMode: 2
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
@@ -9805,7 +9805,7 @@ ParticleSystemRenderer:
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
   m_MotionVectors: 1
-  m_LightProbeUsage: 0
+  m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
@@ -10022,6 +10022,18 @@ PrefabInstance:
     - target: {fileID: 1721113725610599498, guid: 5e3fdcf1d7e17b546a4bc422553572f8, type: 3}
       propertyPath: m_Name
       value: BlackWater_Pour
+      objectReference: {fileID: 0}
+    - target: {fileID: 2675228953729489935, guid: 5e3fdcf1d7e17b546a4bc422553572f8, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3213508350607064828, guid: 5e3fdcf1d7e17b546a4bc422553572f8, type: 3}
+      propertyPath: cullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5052368293401564005, guid: 5e3fdcf1d7e17b546a4bc422553572f8, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8006366449155685102, guid: 5e3fdcf1d7e17b546a4bc422553572f8, type: 3}
       propertyPath: m_LocalPosition.x

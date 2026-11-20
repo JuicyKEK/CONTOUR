@@ -48,6 +48,34 @@ namespace Game.Scripts.NPC.Runtime.Data
     }
 
     /// <summary>
+    /// Анимация прохода в дверной проём (NpcDoorway): бота ведут через проём по кривой Progress, аниматор играет
+    /// состояние AnimatorState. Клип сделан под эту кривую: StartDistance - где перед проёмом клип начинается,
+    /// Travel - сколько метров бот проходит за клип.
+    /// </summary>
+    [Serializable]
+    public struct NpcDoorwayClip
+    {
+        [Tooltip("Состояние аниматора с анимацией прохода (например 'Door_Pass', 'Door_Squeeze').")]
+        public string AnimatorState;
+
+        [Tooltip("Включено - этой анимацией бот пробегает проём (когда бежит), выключено - проходит шагом.")]
+        public bool Run;
+
+        [Tooltip("За сколько метров до проёма начинается анимация.")]
+        [Min(0f)] public float StartDistance;
+
+        [Tooltip("Сколько метров бот проходит за всю анимацию.")]
+        [Min(0f)] public float Travel;
+
+        [Tooltip("Длительность анимации (с).")]
+        [Min(0f)] public float Duration;
+
+        [Tooltip("Доля пройденного пути (0..1) от доли времени (0..1): по этой кривой бота ведут через проём, " +
+                 "под неё в клипе поставлены шаги (где он замедляется, протискиваясь).")]
+        public AnimationCurve Progress;
+    }
+
+    /// <summary>
     /// Анимации и звуки одного типа бота (или одного его облика - см. NpcAppearance):
     ///  - действия по логическому ключу ("Chase", "Attack", "Transform"...) - триггер аниматора и звук;
     ///  - шаги: свои для спокойного шага и для бега;
@@ -79,6 +107,10 @@ namespace Game.Scripts.NPC.Runtime.Data
         [Header("Голос по состояниям")]
         [SerializeField] private NpcVoiceEntry[] m_Voices = Array.Empty<NpcVoiceEntry>();
 
+        [Header("Проход в дверной проём (NpcDoorway)")]
+        [Tooltip("Анимации прохода в проём: шагом и бегом. Пусто - бот идёт через проём обычной походкой.")]
+        [SerializeField] private NpcDoorwayClip[] m_DoorwayClips = Array.Empty<NpcDoorwayClip>();
+
         [Header("Звук в пространстве")]
         [Tooltip("Для источников шагов и голоса, которые бот создаёт сам: ближе этого расстояния звук на полной громкости...")]
         [SerializeField, Min(0.1f)] private float m_MinDistance = 1f;
@@ -96,6 +128,33 @@ namespace Game.Scripts.NPC.Runtime.Data
         public float StepVolume => m_StepVolume;
         public float MinDistance => m_MinDistance;
         public float MaxDistance => Mathf.Max(m_MaxDistance, m_MinDistance + 0.1f);
+
+        public bool HasDoorwayClips => m_DoorwayClips != null && m_DoorwayClips.Length > 0;
+
+        /// <summary>
+        /// Анимация прохода в проём для бега (run) или шага; нет такой - любая из заданных.
+        /// </summary>
+        public bool TryGetDoorwayClip(bool run, out NpcDoorwayClip clip)
+        {
+            clip = default;
+
+            if (!HasDoorwayClips)
+            {
+                return false;
+            }
+
+            foreach (var c in m_DoorwayClips)
+            {
+                if (c.Run == run && !string.IsNullOrEmpty(c.AnimatorState))
+                {
+                    clip = c;
+                    return true;
+                }
+            }
+
+            clip = m_DoorwayClips[0];
+            return !string.IsNullOrEmpty(clip.AnimatorState);
+        }
 
         private void OnEnable()
         {

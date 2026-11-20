@@ -47,7 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Game/Scenes/GameCore.unity
     guid: 072461b2c2c52234798458817cead528
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/NpcTestScene.unity
     guid: eb6013df20a28064ea60e9d264c84373
   - enabled: 1

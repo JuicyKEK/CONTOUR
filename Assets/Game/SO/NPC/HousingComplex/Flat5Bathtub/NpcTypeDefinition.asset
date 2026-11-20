@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 784cd218efad5574e8729bcc6cd1376e, type: 3}
+  m_Name: NpcTypeDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Data.NpcTypeDefinitionSO
+  m_TypeName: "\u0421\u0438\u0434\u044F\u0449\u0438\u0439 \u0432 \u0432\u0430\u043D\u043D\u0435
+    (E4, 7 \u044D\u0442\u0430\u0436)"
+  m_AnimationSoundProfile: {fileID: 11400000, guid: 13efd97fbb0c0bc49b2fe44b59bc9159, type: 2}
+  m_ViewDistance: 10
+  m_ViewHalfAngle: 75
+  m_RequireLineOfSight: 1
+  m_LineOfSightObstacles:
+    serializedVersion: 2
+    m_Bits: 0
+  m_EyeHeight: 1.2
+  m_AggressionMode: 3
+  m_StartsAggressive: 0
+  m_InfectionAggressionThreshold: 60
+  m_AngerRisePerSecond: 0.04
+  m_AngerDecayPerSecond: 0
+  m_AngerInfectionMultiplier: 3
+  m_InstantAggressionInfectionLevel: 101
+  m_AngerActions: []
+  m_AngerAfterCalm: 0
+  m_KeepAngerAfterChase: 1
+  m_HeadLookAngerThreshold: 0.7
+  m_ThreatDuration: 5
+  m_ThreatCalmThreshold: 0.6
+  m_RoarPreludeKey: Rise_From_Bath
+  m_RoarPreludeDuration: 10
+  m_RoarDuration: 5.6
+  m_PatrolSpeed: 0.22479999
+  m_SearchSpeed: 2.2734
+  m_ChaseSpeed: 3.0312002
+  m_PanicSpeed: 3.0312002
+  m_CatchDistance: 1.4
+  m_AttackKind: 1
+  m_AttackHitDelay: 0.4
+  m_AttackDuration: 1.5
+  m_AttackCooldown: 1.5
+  m_AfterHit: 0
+  m_LoseSightGiveUpDelay: 5
+  m_ChaseStopsOnlyByStory: 0
+  m_SearchRadius: 5
+  m_LocalSearchDuration: 12
+  m_SearchLookAroundMin: 1
+  m_SearchLookAroundMax: 3
+  m_ZoneSearchInfectionLevel: 101
+  m_ZoneSearchDuration: 60
+  m_ZoneSearchFallbackRadius: 25
+  m_CanOpenDoors: 1
+  m_KnockInterval: 2
+  m_DoorDetectionMask:
+    serializedVersion: 2
+    m_Bits: 0
+  m_DoorDetectionDistance: 1.5
+  m_DoorDetectionRadius: 0.4
+  m_LockedDoorGiveUpDelay: 5
+  m_LockedDoorTriesWhenCalm: 2
+  m_PatrolDoorOpenerKind: 1
+  m_ChaseDoorOpenerKind: 1
+  m_WanderRadius: 6
+  m_WanderMinInterval: 3
+  m_WanderMaxInterval: 7
+  m_WanderChaseSuppressDuration: 6

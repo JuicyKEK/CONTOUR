@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78c35314d066d4a84fcb1e8943ebc8, type: 3}
+  m_Name: NpcAnimationSoundProfile
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Data.NpcAnimationSoundProfileSO
+  m_Entries:
+  - Key: Threaten
+    AnimatorTrigger: Idle
+    Sound: {fileID: 0}
+    LoopSound: 0
+  - Key: Roar
+    AnimatorTrigger: Scream
+    Sound: {fileID: 8300000, guid: fa2cae75473421f48a3a2082fdf18e66, type: 3}
+    LoopSound: 0
+  - Key: Kill
+    AnimatorTrigger: 
+    Sound: {fileID: 8300000, guid: e145182201cacd0499113c0d2e40b10d, type: 3}
+    LoopSound: 0
+  - Key: Knock
+    AnimatorTrigger: Door_Bash
+    Sound: {fileID: 8300000, guid: 4f514ebe122995247bc95a514148ad49, type: 3}
+    LoopSound: 0
+  - Key: DoorLockedTry
+    AnimatorTrigger: Door_Bash
+    Sound: {fileID: 8300000, guid: 4f514ebe122995247bc95a514148ad49, type: 3}
+    LoopSound: 0
+  m_FootstepsFromAnimation: 0
+  m_WalkSteps:
+  - {fileID: 8300000, guid: 4918a3ca0c06fd344b8f8f572b5a8234, type: 3}
+  - {fileID: 8300000, guid: 3ac1654a3b4505f4a97dcb435fc9d631, type: 3}
+  - {fileID: 8300000, guid: 6deb5ec04c996304389b5ef801f4c234, type: 3}
+  m_RunSteps: []
+  m_RunSpeedThreshold: 2.5
+  m_WalkStepDistance: 0.7
+  m_RunStepDistance: 1.3
+  m_StepVolume: 0.6
+  m_Voices:
+  - State: 10
+    Clips:
+    - {fileID: 8300000, guid: 1b54e1c5292631c489dbefd1f9836a2a, type: 3}
+    - {fileID: 8300000, guid: 76470cd61197b3340b7e17dee5cd1440, type: 3}
+    Loop: 0
+    MinInterval: 0.1
+    MaxInterval: 0.5
+    Volume: 1
+  - State: 3
+    Clips:
+    - {fileID: 8300000, guid: 2b354964255f33b41b4a0284774485b9, type: 3}
+    - {fileID: 8300000, guid: 125502154984e75459bfd05c9b540086, type: 3}
+    - {fileID: 8300000, guid: 196631b5d117eb74a8e7ac2a2eab1327, type: 3}
+    Loop: 0
+    MinInterval: 2.5
+    MaxInterval: 4.5
+    Volume: 0.8
+  m_DoorwayClips:
+  - AnimatorState: Door_Squeeze
+    Run: 0
+    StartDistance: 1.12
+    Travel: 2.32
+    Duration: 5.6
+    Progress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0.90114945
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.26785713
+        value: 0.2413793
+        inSlope: 0.90114945
+        outSlope: 0.6034482
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.6964286
+        value: 0.5
+        inSlope: 0.6034482
+        outSlope: 1.647059
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1.647059
+        outSlope: 0
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  - AnimatorState: Door_Squeeze_Run
+    Run: 1
+    StartDistance: 1.6
+    Travel: 2.8
+    Duration: 1.7333
+    Progress:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1.7608465
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.2596154
+        value: 0.45714286
+        inSlope: 1.7608465
+        outSlope: 0.17687073
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.66346157
+        value: 0.5285714
+        inSlope: 0.17687073
+        outSlope: 1.3619047
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1.0096154
+        value: 1
+        inSlope: 1.3619047
+        outSlope: 0
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  m_MinDistance: 1
+  m_MaxDistance: 18

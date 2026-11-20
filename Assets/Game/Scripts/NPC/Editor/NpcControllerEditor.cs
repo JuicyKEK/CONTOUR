@@ -133,7 +133,14 @@ namespace Game.Scripts.NPC.Editor
                 if (npc.Definition != null && npc.Definition.AggressionMode == NpcAggressionMode.AngerMeter)
                 {
                     var rect = EditorGUILayout.GetControlRect(false, 18f);
-                    EditorGUI.ProgressBar(rect, npc.Anger, $"Злость {npc.Anger:P0}");
+                    EditorGUI.ProgressBar(rect, npc.Anger, $"Злость {npc.Anger:P0}" + (npc.IsThreatening ? " - шипит" : string.Empty));
+
+                    using (new EditorGUILayout.HorizontalScope())
+                    {
+                        if (GUILayout.Button("Злость -10%")) npc.AddAnger(-0.1f);
+                        if (GUILayout.Button("Злость +10%")) npc.AddAnger(0.1f);
+                        if (GUILayout.Button("Злость 100%")) npc.AddAnger(1f);
+                    }
                 }
 
                 if (npc.Zone != null)
