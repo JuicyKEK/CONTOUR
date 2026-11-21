@@ -4580,6 +4580,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1 &257673833
 GameObject:
   m_ObjectHideFlags: 0
@@ -8903,6 +8904,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1001 &534491927
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10502,6 +10504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1001 &608724359
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -17229,6 +17232,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1 &902330812
 GameObject:
   m_ObjectHideFlags: 0
@@ -21048,6 +21052,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1 &1016374321
 GameObject:
   m_ObjectHideFlags: 0
@@ -22112,6 +22117,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1 &1047599924
 GameObject:
   m_ObjectHideFlags: 0
@@ -22478,6 +22484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1 &1074303512
 GameObject:
   m_ObjectHideFlags: 0
@@ -35656,6 +35663,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!1001 &1682106865
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40868,6 +40876,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_DisplayName: 
 --- !u!108 &1984828875 stripped
 Light:
   m_CorrespondingSourceObject: {fileID: 4877242289650980245, guid: 93813cbeb01676941bd52fb5a0983792, type: 3}

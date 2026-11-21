@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Unity.Cinemachine;
 
 namespace AZE.AdvancedFirstPerson
@@ -27,8 +28,21 @@ namespace AZE.AdvancedFirstPerson
         [Range(0f, 20f)] [SerializeField] private float fovBoostAmount = 10f;
         [Range(0.1f, 20f)] [SerializeField] private float fovSmoothing = 4f;
 
+        [Header("Приближение по ПКМ")]
+        [Tooltip("Пока зажата правая кнопка мыши, камера слегка приближается (сужается угол обзора), " +
+                 "отпустили - возвращается. Не работает, пока виден курсор (открыта панель, осмотр предмета) " +
+                 "или движение игрока запрещено.")]
+        [SerializeField] private bool useRightMouseZoom = true;
+        [Tooltip("Во сколько раз сужается угол обзора при приближении: 0.8 - на 20 % (60° -> 48°).")]
+        [Range(0.3f, 1f)] [SerializeField] private float zoomFovMultiplier = 0.8f;
+        [Tooltip("Скорость приближения и возврата камеры.")]
+        [Range(0.1f, 30f)] [SerializeField] private float zoomSmoothing = 10f;
+
         private CinemachineBasicMultiChannelPerlin _cameraNoise;
         private float _baseFOV;
+        // Текущий множитель приближения (1 - без приближения) и текущая прибавка угла обзора от бега.
+        private float _zoomFactor = 1f;
+        private float _fovKick;
 
         private void Awake()
         {
@@ -95,16 +109,31 @@ namespace AZE.AdvancedFirstPerson
 
         private void HandleFOV(float speedPercent)
         {
-            if (!useFovKick) return;
+            if (!useFovKick && !useRightMouseZoom) return;
             if (cinemachineCamera == null) return;
 
-            float targetFOV = _baseFOV + (fovBoostAmount * speedPercent);
+            // Прибавка от бега и приближение сглаживаются каждое своей скоростью: приближение по ПКМ
+            // должно срабатывать быстрее, чем плавное расширение обзора на бегу.
+            float targetKick = useFovKick ? fovBoostAmount * speedPercent : 0f;
+            _fovKick = Mathf.Lerp(_fovKick, targetKick, fovSmoothing * Time.deltaTime);
+
+            float targetZoom = IsZoomHeld() ? zoomFovMultiplier : 1f;
+            _zoomFactor = Mathf.Lerp(_zoomFactor, targetZoom, zoomSmoothing * Time.deltaTime);
 
             var lens = cinemachineCamera.Lens;
 
-            lens.FieldOfView = Mathf.Lerp(lens.FieldOfView, targetFOV, fovSmoothing * Time.deltaTime);
+            lens.FieldOfView = _baseFOV * _zoomFactor + _fovKick;
 
             cinemachineCamera.Lens = lens;
+        }
+
+        private bool IsZoomHeld()
+        {
+            if (!useRightMouseZoom) return false;
+            if (playerMovement.IsUseMouse || !playerMovement.IsCanMove) return false;
+
+            var mouse = Mouse.current;
+            return mouse != null && mouse.rightButton.isPressed;
         }
     }
 }
