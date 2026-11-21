@@ -1554,6 +1554,7 @@ GameObject:
   - component: {fileID: 3727907854570265209}
   - component: {fileID: 4161319651184818089}
   - component: {fileID: 6946068589895065150}
+  - component: {fileID: 520208409891556831}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1764,6 +1765,28 @@ MonoBehaviour:
   m_CameraController: {fileID: 0}
   m_LookAtHeight: 1.6
   m_TurnDuration: 0.35
+--- !u!114 &520208409891556831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5659440458517913730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05a82e8f8cbe2448897942e4a4afd3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InteractionObjects.Controllers.PlayerDoorRush
+  m_Movement: {fileID: 1599558884546896224}
+  m_IsEnabled: 1
+  m_MinSpeed: 3
+  m_OpenDistance: 0.55
+  m_MaxAngle: 60
+  m_MinDoorHeight: 1.5
+  m_ShakeLockedDoor: 1
+  m_DoorMask:
+    serializedVersion: 2
+    m_Bits: 4294967291
 --- !u!1 &5813335771040159623
 GameObject:
   m_ObjectHideFlags: 0
