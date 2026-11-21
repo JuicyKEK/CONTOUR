@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using AZE.AdvancedFirstPerson;
+using DG.Tweening;
 using Game.Scripts.InputController;
-using Game.Scripts.Inventory.External.View;
+using Game.Scripts.ItemInspection.View;
 using Game.Scripts.Story;
 using JuicyDI;
 using JuicyDI.Attributes;
@@ -11,34 +12,33 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-namespace Game.Scripts.Inventory.External.Controllers
+namespace Game.Scripts.ItemInspection.Controllers
 {
     /// <summary>
-    /// Осмотр предмета при первом подборе (по примеру Resident Evil). Лежит в префабе игрока (объект ItemInspection).
+    /// Осмотр предмета (по примеру Resident Evil) - отдельный модуль, <see cref="IItemInspection"/>. Лежит в префабе
+    /// игрока (объект ItemInspection). Что за предмет и что с ним будет потом, модуль не знает: при подборе его зовёт
+    /// InspectOnFirstPickup (только первый предмет каждого типа), но можно звать и откуда угодно ещё.
     ///
     /// Как работает:
-    /// 1. Предмет (InventoryInteraction) при подборе вызывает <see cref="TryInspect"/>. Если предмет с этим ключом
-    ///    уже осматривали - осмотра нет, предмет сразу попадает в инвентарь.
-    /// 2. С предмета снимается копия (только меши и материалы, без коллайдеров, света и скриптов) на отдельном слое
-    ///    (InspectItem), сам предмет на сцене прячется. Копия летит от места, где лежал предмет, к камере.
+    /// 1. Кто-то вызывает <see cref="TryInspect"/> с объектом на сцене.
+    /// 2. С объекта снимается копия (только меши и материалы, без коллайдеров, света и скриптов) на отдельном слое
+    ///    (InspectItem), сам объект прячется (рендереры и коллайдеры выключаются). Копия летит к камере.
     /// 3. Копию рисует отдельная камера (Overlay), которую на время осмотра ставят в стек основной камеры, - поэтому
     ///    предмет не размыт и не проваливается в стены. Основная камера перестаёт видеть слой предмета, а её
     ///    картинку размывает Volume с глубиной резкости (вес плавно растёт до 1).
     /// 4. Снизу - название предмета, подсказка и кнопка "Принять". Зажав ЛКМ и двигая мышь, предмет крутят.
-    /// 5. По Esc или кнопке "Принять" предмет уменьшается и летит к ячейке инвентаря; когда долетел -
-    ///    вызывается onFinished (предмет кладут в инвентарь), всё возвращается как было.
+    /// 5. По Esc или кнопке "Принять" предмет уменьшается и улетает (к панели инвентаря, см. Fly Target); когда
+    ///    долетел - объект на сцене снова виден, вызывается onFinished, всё возвращается как было.
     ///
     /// На время осмотра: курсор виден, движение и поворот камеры выключены, клавиши E/F/R/TAB/цифры не действуют,
     /// игра по желанию на паузе (Time.timeScale = 0, сам осмотр анимируется по реальному времени).
-    ///
-    /// Осмотренные ключи хранит этот же компонент (<see cref="IItemInspectionRegistry"/>), сохраняет их
-    /// InventorySaveController вместе с инвентарём.
     /// </summary>
     [JDIMonoController]
     [SequenceParticipant(115)]
-    public class ItemInspectionController : MonoBehaviour, ISequence, IUpdateSequence, IItemInspection, IItemInspectionRegistry
+    public class ItemInspectionController : MonoBehaviour, ISequence, IUpdateSequence, IItemInspection
     {
         private enum Phase
         {
@@ -63,15 +63,15 @@ namespace Game.Scripts.Inventory.External.Controllers
         }
 
         [Header("Ссылки")]
-        [Tooltip("Интерфейс осмотра: название предмета, подсказка, кнопка \"Принять\".")]
-        [SerializeField] private ItemInspectionView m_View;
         [Tooltip("Камера, которая рисует осматриваемый предмет поверх размытой картинки (Render Type: Overlay). " +
                  "Объект камеры выключен, пока осмотра нет; на время осмотра камера встаёт в стек основной камеры.")]
         [SerializeField] private Camera m_InspectionCamera;
         [Tooltip("Размытие всего, что за предметом: Volume с глубиной резкости. Вес плавно меняется 0 -> 1 -> 0.")]
         [SerializeField] private Volume m_BlurVolume;
-        [Tooltip("Панель инвентаря на экране - к её ячейке улетает предмет после осмотра.")]
-        [SerializeField] private RectTransform m_InventoryPanel;
+        [Tooltip("Куда на экране улетает предмет после осмотра. Сейчас - панель инвентаря: предмет летит на место " +
+                 "после её последнего видимого элемента (туда, где появится новая ячейка). Пусто - вниз экрана.")]
+        [FormerlySerializedAs("m_InventoryPanel")]
+        [SerializeField] private RectTransform m_FlyTarget;
         [Tooltip("Элементы интерфейса, которые прячутся на время осмотра (прицел посреди экрана - поверх предмета).")]
         [SerializeField] private GameObject[] m_HideWhileInspecting;
 
@@ -101,38 +101,40 @@ namespace Game.Scripts.Inventory.External.Controllers
                  "таймеры замирают. Звук не останавливается.")]
         [SerializeField] private bool m_PauseGame = true;
 
+        [Inject] private ItemInspectionView m_View;
         [Inject] private IInputActions m_InputActions;
         [Inject] private IPlayerMoveController m_PlayerMoveController;
         [Inject] private global::Game.Scripts.InputController.InputController m_InputController;
         [Inject] private List<IPlayerControlHandle> m_ControlHandles;
 
-        private readonly HashSet<string> m_InspectedKeys = new();
         private readonly List<Mesh> m_BakedMeshes = new();
+        // Что выключено у самого объекта на время осмотра - только это и включается обратно.
+        private readonly List<Renderer> m_HiddenSourceRenderers = new();
+        private readonly List<Collider> m_DisabledSourceColliders = new();
         private readonly List<BatchedPart> m_BatchedParts = new();
         private readonly List<RectTransform> m_SlotsBuffer = new();
         // Какие из m_HideWhileInspecting были включены до осмотра - только их и включаем обратно.
         private readonly List<GameObject> m_HiddenObjects = new();
 
         private Phase m_Phase = Phase.None;
-        private float m_PhaseTime;
+        private Sequence m_Sequence;
         private Transform m_Item;
         private int m_ItemLayer;
         private float m_ItemRadius;
         private Action m_OnFinished;
+        // Куда улетает этот предмет (null - m_FlyTarget).
+        private Transform m_ItemFlyTarget;
 
         private Camera m_BaseCamera;
         private int m_BaseCullingMask;
         private bool m_IsPaused;
         private float m_TimeScaleBefore = 1f;
 
-        private Vector3 m_FromPosition;
+        // Поза предмета перед камерой (куда он летит при осмотре).
         private Vector3 m_ToPosition;
-        private Quaternion m_FromRotation;
         private Quaternion m_ToRotation;
-        private float m_FromScale;
         private float m_ToScale;
-        private float m_BlurAtFlyOut;
-        private float m_AlphaAtFlyOut;
+        private float m_BlurWeight;
 
         private bool m_IsDragging;
 
@@ -158,42 +160,9 @@ namespace Game.Scripts.Inventory.External.Controllers
             }
         }
 
-        #region IItemInspectionRegistry
-
-        public bool WasInspected(string itemKey)
+        public bool TryInspect(GameObject source, string displayName, Transform flyTarget, Action onFinished)
         {
-            return !string.IsNullOrEmpty(itemKey) && m_InspectedKeys.Contains(itemKey);
-        }
-
-        public void MarkInspected(string itemKey)
-        {
-            if (!string.IsNullOrEmpty(itemKey))
-            {
-                m_InspectedKeys.Add(itemKey);
-            }
-        }
-
-        public void GetInspectedKeys(List<string> result)
-        {
-            result.Clear();
-            result.AddRange(m_InspectedKeys);
-        }
-
-        public void ClearInspected()
-        {
-            m_InspectedKeys.Clear();
-        }
-
-        #endregion
-
-        public bool TryInspect(IInventoryObject item, string displayName, GameObject source, Action onFinished)
-        {
-            if (m_Phase != Phase.None || item == null || source == null)
-            {
-                return false;
-            }
-
-            if (WasInspected(item.ObjectKey))
+            if (m_Phase != Phase.None || source == null)
             {
                 return false;
             }
@@ -209,7 +178,7 @@ namespace Game.Scripts.Inventory.External.Controllers
             if (layer < 0)
             {
                 Debug.LogError($"[ItemInspection] Нет слоя '{m_InspectionLayerName}' (Project Settings -> Tags and Layers) - " +
-                               "предмет кладётся в инвентарь без осмотра.", this);
+                               "осмотра не будет.", this);
                 return false;
             }
 
@@ -218,7 +187,7 @@ namespace Game.Scripts.Inventory.External.Controllers
             if (baseCamera == null || m_InspectionCamera == null || m_View == null)
             {
                 Debug.LogWarning("[ItemInspection] Нет основной камеры (тег MainCamera), камеры осмотра или интерфейса " +
-                                 "осмотра - предмет кладётся в инвентарь без осмотра.", this);
+                                 "осмотра - осмотра не будет.", this);
                 return false;
             }
 
@@ -229,21 +198,20 @@ namespace Game.Scripts.Inventory.External.Controllers
                 return false;
             }
 
-            MarkInspected(item.ObjectKey);
-
             m_Item = copy;
             m_ItemLayer = layer;
             m_ItemRadius = radius;
             m_OnFinished = onFinished;
+            m_ItemFlyTarget = flyTarget;
 
+            HideSource(source);
             SetupCameras(baseCamera, layer);
             SetupPoses(radius);
             LockControls();
 
-            m_View.Show(string.IsNullOrEmpty(displayName) ? item.ObjectKey : displayName);
+            m_View.Show(string.IsNullOrEmpty(displayName) ? source.name : displayName);
             m_IsDragging = false;
-            m_Phase = Phase.FlyIn;
-            m_PhaseTime = 0f;
+            PlayFlyIn();
             return true;
         }
 
@@ -261,24 +229,14 @@ namespace Game.Scripts.Inventory.External.Controllers
                 return;
             }
 
-            m_PhaseTime += Time.unscaledDeltaTime;
-
-            switch (m_Phase)
+            if (m_Phase == Phase.Inspect)
             {
-                case Phase.FlyIn:
-                    UpdateFlyIn();
-                    break;
-                case Phase.Inspect:
-                    UpdateRotation();
-                    break;
-                case Phase.FlyOut:
-                    UpdateFlyOut();
-                    break;
+                UpdateRotation();
             }
         }
 
         /// <summary>
-        /// Esc или кнопка "Принять": предмет улетает в инвентарь.
+        /// Esc или кнопка "Принять": предмет улетает (к Fly Target).
         /// </summary>
         private void Accept()
         {
@@ -289,36 +247,40 @@ namespace Game.Scripts.Inventory.External.Controllers
 
             m_IsDragging = false;
             m_View.SetInteractable(false);
-
-            m_FromPosition = m_Item.position;
-            m_FromRotation = m_Item.rotation;
-            m_FromScale = m_Item.localScale.x;
-            m_ToPosition = GetInventoryWorldPoint();
-            m_ToScale = m_FromScale * m_EndScale;
-            m_BlurAtFlyOut = m_BlurVolume != null ? m_BlurVolume.weight : 0f;
-            m_AlphaAtFlyOut = m_View.Alpha;
-
-            m_Phase = Phase.FlyOut;
-            m_PhaseTime = 0f;
+            PlayFlyOut();
         }
 
-        private void UpdateFlyIn()
+        /// <summary>
+        /// Предмет летит к камере, фон размывается, подпись появляется. Анимации - по реальному времени: игра на паузе.
+        /// </summary>
+        private void PlayFlyIn()
         {
-            float t = Mathf.Clamp01(m_PhaseTime / m_FlyInDuration);
-            float e = Mathf.SmoothStep(0f, 1f, t);
+            m_Phase = Phase.FlyIn;
+            m_Sequence?.Kill();
+            m_Sequence = DOTween.Sequence()
+                .Join(m_Item.DOMove(m_ToPosition, m_FlyInDuration).SetEase(Ease.InOutSine))
+                .Join(m_Item.DORotateQuaternion(m_ToRotation, m_FlyInDuration).SetEase(Ease.InOutSine))
+                .Join(m_Item.DOScale(m_ToScale, m_FlyInDuration).SetEase(Ease.InOutSine))
+                .Join(DOTween.To(() => m_BlurWeight, SetBlur, 1f, m_FlyInDuration).SetEase(Ease.InOutSine))
+                .Insert(m_FlyInDuration * 0.3f, m_View.Fade(1f, m_FlyInDuration * 0.7f))
+                .SetUpdate(true)
+                .OnComplete(() => m_Phase = Phase.Inspect);
+        }
 
-            m_Item.position = Vector3.LerpUnclamped(m_FromPosition, m_ToPosition, e);
-            m_Item.rotation = Quaternion.Slerp(m_FromRotation, m_ToRotation, e);
-            m_Item.localScale = Vector3.one * Mathf.Lerp(m_FromScale, m_ToScale, e);
-
-            SetBlur(e);
-            m_View.SetAlpha(Mathf.Clamp01((t - 0.3f) / 0.7f));
-
-            if (t >= 1f)
-            {
-                m_Phase = Phase.Inspect;
-                m_PhaseTime = 0f;
-            }
+        /// <summary>
+        /// Предмет с разгоном уменьшается и улетает к Fly Target, размытие и подпись гаснут.
+        /// </summary>
+        private void PlayFlyOut()
+        {
+            m_Phase = Phase.FlyOut;
+            m_Sequence?.Kill();
+            m_Sequence = DOTween.Sequence()
+                .Join(m_Item.DOMove(GetFlyTargetWorldPoint(), m_FlyOutDuration).SetEase(Ease.InQuad))
+                .Join(m_Item.DOScale(m_Item.localScale.x * m_EndScale, m_FlyOutDuration).SetEase(Ease.InQuad))
+                .Join(DOTween.To(() => m_BlurWeight, SetBlur, 0f, m_FlyOutDuration).SetEase(Ease.Linear))
+                .Join(m_View.Fade(0f, m_FlyOutDuration * 0.3f))
+                .SetUpdate(true)
+                .OnComplete(Finish);
         }
 
         private void UpdateRotation()
@@ -355,24 +317,6 @@ namespace Game.Scripts.Inventory.External.Controllers
             m_Item.Rotate(cameraTransform.right, delta.y * speed, Space.World);
         }
 
-        private void UpdateFlyOut()
-        {
-            float t = Mathf.Clamp01(m_PhaseTime / m_FlyOutDuration);
-            // Разгон к инвентарю.
-            float e = t * t;
-
-            m_Item.position = Vector3.LerpUnclamped(m_FromPosition, m_ToPosition, e);
-            m_Item.localScale = Vector3.one * Mathf.Lerp(m_FromScale, m_ToScale, e);
-
-            SetBlur(m_BlurAtFlyOut * (1f - t));
-            m_View.SetAlpha(m_AlphaAtFlyOut * (1f - Mathf.Clamp01(t / 0.3f)));
-
-            if (t >= 1f)
-            {
-                Finish();
-            }
-        }
-
         private void Finish()
         {
             var onFinished = m_OnFinished;
@@ -391,18 +335,24 @@ namespace Game.Scripts.Inventory.External.Controllers
         }
 
         /// <summary>
-        /// Убирает копию, камеру осмотра, размытие и интерфейс, снимает паузу; с restoreControls - возвращает
-        /// игроку управление (при уничтожении самого игрока контроллеры движения и ввода уже могут быть удалены).
+        /// Убирает копию, камеру осмотра, размытие и интерфейс, снова показывает сам объект, снимает паузу;
+        /// с restoreControls - возвращает игроку управление (при уничтожении самого игрока контроллеры движения
+        /// и ввода уже могут быть удалены).
         /// </summary>
         private void Cleanup(bool restoreControls)
         {
             m_Phase = Phase.None;
             m_IsDragging = false;
+            m_ItemFlyTarget = null;
+            m_Sequence?.Kill();
+            m_Sequence = null;
 
             if (m_Item != null)
             {
                 Destroy(m_Item.gameObject);
             }
+
+            ShowSource();
 
             m_Item = null;
 
@@ -515,6 +465,8 @@ namespace Game.Scripts.Inventory.External.Controllers
 
         private void SetBlur(float weight)
         {
+            m_BlurWeight = weight;
+
             if (m_BlurVolume == null)
             {
                 return;
@@ -522,6 +474,63 @@ namespace Game.Scripts.Inventory.External.Controllers
 
             m_BlurVolume.weight = weight;
             m_BlurVolume.enabled = weight > 0f;
+        }
+
+        #endregion
+
+        #region Сам объект на сцене
+
+        /// <summary>
+        /// На время осмотра объект на сцене не виден (его заменяет копия перед камерой) и с ним нельзя
+        /// взаимодействовать: выключаются его включённые рендереры и коллайдеры.
+        /// </summary>
+        private void HideSource(GameObject source)
+        {
+            m_HiddenSourceRenderers.Clear();
+            m_DisabledSourceColliders.Clear();
+
+            foreach (var sourceRenderer in source.GetComponentsInChildren<Renderer>(false))
+            {
+                if (sourceRenderer.enabled)
+                {
+                    sourceRenderer.enabled = false;
+                    m_HiddenSourceRenderers.Add(sourceRenderer);
+                }
+            }
+
+            foreach (var sourceCollider in source.GetComponentsInChildren<Collider>(false))
+            {
+                if (sourceCollider.enabled)
+                {
+                    sourceCollider.enabled = false;
+                    m_DisabledSourceColliders.Add(sourceCollider);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Включает обратно ровно то, что выключил <see cref="HideSource"/>.
+        /// </summary>
+        private void ShowSource()
+        {
+            foreach (var sourceRenderer in m_HiddenSourceRenderers)
+            {
+                if (sourceRenderer != null)
+                {
+                    sourceRenderer.enabled = true;
+                }
+            }
+
+            foreach (var sourceCollider in m_DisabledSourceColliders)
+            {
+                if (sourceCollider != null)
+                {
+                    sourceCollider.enabled = true;
+                }
+            }
+
+            m_HiddenSourceRenderers.Clear();
+            m_DisabledSourceColliders.Clear();
         }
 
         #endregion
@@ -694,9 +703,7 @@ namespace Game.Scripts.Inventory.External.Controllers
             var cameraTransform = m_InspectionCamera.transform;
             float halfHeight = m_Distance * Mathf.Tan(m_InspectionCamera.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
-            m_FromPosition = m_Item.position;
-            m_FromRotation = m_Item.rotation;
-            m_FromScale = 1f;
+            Quaternion fromRotation = m_Item.rotation;
 
             m_ToPosition = cameraTransform.position + cameraTransform.forward * m_Distance +
                            cameraTransform.up * (2f * halfHeight * m_ScreenOffsetY);
@@ -712,32 +719,39 @@ namespace Game.Scripts.Inventory.External.Controllers
             }
 
             var yaw = Quaternion.LookRotation(flatForward.normalized, Vector3.up);
-            m_ToRotation = cameraTransform.rotation * (Quaternion.Inverse(yaw) * m_FromRotation);
+            m_ToRotation = cameraTransform.rotation * (Quaternion.Inverse(yaw) * fromRotation);
         }
 
         /// <summary>
-        /// Точка, куда летит предмет: ячейка инвентаря, в которой он появится. Ряд ячеек выровнен по центру,
-        /// новая ячейка встаёт справа, а весь ряд сдвигается на половину шага влево.
+        /// Точка, куда летит предмет. Свой объект на сцене у предмета (например, кассетный плеер) - его позиция.
+        /// Элемент интерфейса (по умолчанию - панель инвентаря) - место после его последнего элемента: ряд ячеек
+        /// выровнен по центру, новая ячейка встаёт справа, а весь ряд сдвигается на половину шага влево.
         /// </summary>
-        private Vector3 GetInventoryWorldPoint()
+        private Vector3 GetFlyTargetWorldPoint()
         {
-            Vector2 screenPoint = GetInventoryScreenPoint();
+            if (m_ItemFlyTarget != null && m_ItemFlyTarget is not RectTransform)
+            {
+                return m_ItemFlyTarget.position;
+            }
+
+            var uiTarget = m_ItemFlyTarget as RectTransform;
+            Vector2 screenPoint = GetFlyTargetScreenPoint(uiTarget != null ? uiTarget : m_FlyTarget);
             var cameraTransform = m_InspectionCamera.transform;
             float depth = Vector3.Dot(m_Item.position - cameraTransform.position, cameraTransform.forward);
 
             return m_InspectionCamera.ScreenToWorldPoint(new Vector3(screenPoint.x, screenPoint.y, Mathf.Max(depth, 0.1f)));
         }
 
-        private Vector2 GetInventoryScreenPoint()
+        private Vector2 GetFlyTargetScreenPoint(RectTransform target)
         {
-            if (m_InventoryPanel == null)
+            if (target == null)
             {
                 return new Vector2(Screen.width * 0.5f, Screen.height * 0.1f);
             }
 
             m_SlotsBuffer.Clear();
 
-            foreach (Transform child in m_InventoryPanel)
+            foreach (Transform child in target)
             {
                 if (child.gameObject.activeSelf && child is RectTransform slot)
                 {
@@ -745,18 +759,18 @@ namespace Game.Scripts.Inventory.External.Controllers
                 }
             }
 
-            var canvas = m_InventoryPanel.GetComponentInParent<Canvas>();
+            var canvas = target.GetComponentInParent<Canvas>();
             float scale = canvas != null ? canvas.scaleFactor : 1f;
 
             if (m_SlotsBuffer.Count == 0)
             {
-                // Инвентарь пуст: ячейка встанет посередине у верхнего края панели.
+                // Панель пуста: новый элемент встанет посередине у её верхнего края.
                 var corners = new Vector3[4];
-                m_InventoryPanel.GetWorldCorners(corners);
+                target.GetWorldCorners(corners);
                 return new Vector2((corners[1].x + corners[2].x) * 0.5f, corners[1].y - 40f * scale);
             }
 
-            var layout = m_InventoryPanel.GetComponent<HorizontalLayoutGroup>();
+            var layout = target.GetComponent<HorizontalLayoutGroup>();
             float step = m_SlotsBuffer.Count >= 2
                 ? m_SlotsBuffer[1].position.x - m_SlotsBuffer[0].position.x
                 : (m_SlotsBuffer[0].rect.width + (layout != null ? layout.spacing : 0f)) * scale;

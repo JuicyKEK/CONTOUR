@@ -18,12 +18,6 @@ namespace Game.Scripts.Inventory.External.Data
         public int Version = CurrentVersion;
 
         public List<InventorySaveEntry> Items = new();
-
-        /// <summary>
-        /// Ключи предметов, которые игрок уже осматривал при первом подборе (ItemInspectionController).
-        /// В старых сохранениях этого поля нет - тогда осмотренными считаются предметы, лежащие в инвентаре.
-        /// </summary>
-        public List<string> InspectedItems = new();
     }
 
     [Serializable]

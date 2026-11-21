@@ -33,8 +33,6 @@ namespace Game.Scripts.Inventory.External.Controllers
 
         [Inject] private IInventoryContent m_Content;
         [Inject] private IInventoryAdd m_Inventory;
-        // Какие предметы игрок уже осматривал при первом подборе - сохраняются в том же файле.
-        [Inject] private IItemInspectionRegistry m_InspectionRegistry;
 
         private readonly List<KeyValuePair<string, int>> m_ItemsBuffer = new();
 
@@ -81,7 +79,6 @@ namespace Game.Scripts.Inventory.External.Controllers
             }
 
             m_ItemsBuffer.Clear();
-            m_InspectionRegistry?.GetInspectedKeys(data.InspectedItems);
             JsonSaveFile.TryWrite(m_FileName, data, this);
         }
 
@@ -99,7 +96,6 @@ namespace Game.Scripts.Inventory.External.Controllers
             }
 
             m_Content.ClearItems();
-            LoadInspectedItems(data);
 
             if (data.Items == null)
             {
@@ -128,39 +124,6 @@ namespace Game.Scripts.Inventory.External.Controllers
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Осмотренные предметы из сохранения. Предметы, лежащие в инвентаре, тоже считаются осмотренными:
-        /// в старых сохранениях списка осмотренных нет, а подобранный раньше предмет второй раз не осматривают.
-        /// </summary>
-        private void LoadInspectedItems(InventorySaveData data)
-        {
-            if (m_InspectionRegistry == null)
-            {
-                return;
-            }
-
-            m_InspectionRegistry.ClearInspected();
-
-            if (data.InspectedItems != null)
-            {
-                foreach (string itemKey in data.InspectedItems)
-                {
-                    m_InspectionRegistry.MarkInspected(itemKey);
-                }
-            }
-
-            if (data.Items != null)
-            {
-                foreach (var entry in data.Items)
-                {
-                    if (entry != null)
-                    {
-                        m_InspectionRegistry.MarkInspected(entry.ItemKey);
-                    }
-                }
-            }
         }
 
         [ContextMenu("Delete Save")]

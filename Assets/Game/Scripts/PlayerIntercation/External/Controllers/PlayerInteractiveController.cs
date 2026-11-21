@@ -91,6 +91,26 @@ namespace Game.Scripts.InputController
 
             var interactable = m_CurrentInteractable;
 
+            // Объект может сначала показать что-то сам (осмотр предмета при первом подборе - InspectOnFirstPickup),
+            // тогда взаимодействие выполнится, когда он закончит.
+            if (interactable is Component component && component != null
+                && component.TryGetComponent(out IInteractionInterceptor interceptor)
+                && interceptor.TryIntercept(() => Interact(interactable)))
+            {
+                return;
+            }
+
+            Interact(interactable);
+        }
+
+        private static void Interact(IInteraction interactable)
+        {
+            // Пока шёл перехват, объект могли удалить (выгрузка сцены).
+            if (interactable == null || (interactable is Component component && component == null))
+            {
+                return;
+            }
+
             interactable.Interact();
             NotifyListeners(interactable);
         }

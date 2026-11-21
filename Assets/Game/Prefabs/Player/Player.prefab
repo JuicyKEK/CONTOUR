@@ -398,6 +398,8 @@ GameObject:
   - component: {fileID: 8286414253707689584}
   - component: {fileID: 4196113320146935114}
   - component: {fileID: 2656499958534286134}
+  - component: {fileID: 4770487467772329236}
+  - component: {fileID: 5957220177462171295}
   m_Layer: 0
   m_Name: ItemInspectionView
   m_TagString: Untagged
@@ -454,6 +456,46 @@ MonoBehaviour:
   m_CanvasGroup: {fileID: 4196113320146935114}
   m_NameText: {fileID: 8165520714852443312}
   m_AcceptButton: {fileID: 5607930479481980359}
+--- !u!223 &4770487467772329236
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075172361751461325}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &5957220177462171295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2075172361751461325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &2310876496448200536
 GameObject:
   m_ObjectHideFlags: 0
@@ -1555,6 +1597,7 @@ GameObject:
   - component: {fileID: 4161319651184818089}
   - component: {fileID: 6946068589895065150}
   - component: {fileID: 520208409891556831}
+  - component: {fileID: 4414667701230502925}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1777,7 +1820,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f05a82e8f8cbe2448897942e4a4afd3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InteractionObjects.Controllers.PlayerDoorRush
-  m_Movement: {fileID: 1599558884546896224}
   m_IsEnabled: 1
   m_MinSpeed: 3
   m_OpenDistance: 0.55
@@ -1787,6 +1829,18 @@ MonoBehaviour:
   m_DoorMask:
     serializedVersion: 2
     m_Bits: 4294967291
+--- !u!114 &4414667701230502925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5659440458517913730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23ee2f4727e31f34eb8d5e7ac0d3c34f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Rendering.PickupHighlightController
 --- !u!1 &5813335771040159623
 GameObject:
   m_ObjectHideFlags: 0
@@ -2377,6 +2431,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1583392260150474735}
   - component: {fileID: 1231719595688041068}
+  - component: {fileID: 1188375087125978201}
+  - component: {fileID: 286205921404825974}
   m_Layer: 0
   m_Name: ItemInspection
   m_TagString: Untagged
@@ -2413,10 +2469,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d416e559f3e8d0041b65629f0f609f4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.Controllers.ItemInspectionController
-  m_View: {fileID: 2656499958534286134}
   m_InspectionCamera: {fileID: 390213869670620199}
   m_BlurVolume: {fileID: 2416676609338600806}
-  m_InventoryPanel: {fileID: 8147269653182971531}
+  m_FlyTarget: {fileID: 8147269653182971531}
   m_HideWhileInspecting:
   - {fileID: 2029213278272601468}
   m_InspectionLayerName: InspectItem
@@ -2428,6 +2483,32 @@ MonoBehaviour:
   m_FlyOutDuration: 0.45
   m_EndScale: 0.12
   m_PauseGame: 1
+--- !u!114 &1188375087125978201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7497922037623062620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: beb61d8b4f8ea804bbec7c2eed2806cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.ItemInspection.Controllers.ItemInspectionRegistry
+--- !u!114 &286205921404825974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7497922037623062620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5bc1449896194441ad22de71f080a4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.ItemInspection.Controllers.ItemInspectionSaveController
+  m_FileName: item_inspection.json
+  m_LoadOnStart: 1
 --- !u!1 &7549628100463558571
 GameObject:
   m_ObjectHideFlags: 0
@@ -3066,11 +3147,11 @@ RectTransform:
   - {fileID: 108614296153980906}
   m_Father: {fileID: 8286414253707689584}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.245}
-  m_AnchorMax: {x: 1, y: 0.245}
-  m_AnchoredPosition: {x: -30, y: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -40, y: -40}
   m_SizeDelta: {x: 190, y: 40}
-  m_Pivot: {x: 1, y: 0.5}
+  m_Pivot: {x: 1, y: 1}
 --- !u!222 &217985614711460777
 CanvasRenderer:
   m_ObjectHideFlags: 0

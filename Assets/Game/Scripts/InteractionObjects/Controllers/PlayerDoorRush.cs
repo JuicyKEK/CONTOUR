@@ -1,5 +1,7 @@
 using AZE.AdvancedFirstPerson;
 using Game.Scripts.InteractionObjects.Interfaces;
+using JuicyDI;
+using JuicyDI.Attributes;
 using UnityEngine;
 
 namespace Game.Scripts.InteractionObjects.Controllers
@@ -10,10 +12,11 @@ namespace Game.Scripts.InteractionObjects.Controllers
     /// Створка уходит от игрока (настройки "С разбега" у вида двери). Запертая дверь дёргается - один раз, пока игрок
     /// бежит в неё. Шагом дверь, как и раньше, открывается только нажатием.
     /// </summary>
-    [RequireComponent(typeof(CharacterController))]
-    public class PlayerDoorRush : MonoBehaviour
+    [JDIMonoController]
+    public class PlayerDoorRush : MonoBehaviour, IUpdateSequence
     {
-        [SerializeField] private PlayerMovementStateMachine m_Movement;
+        [Inject] private PlayerMovementStateMachine m_Movement;
+
         [Tooltip("Выключено - двери на бегу сами не открываются.")]
         [SerializeField] private bool m_IsEnabled = true;
         [Tooltip("Дверь распахивается, только пока игрок бежит (спринт) и не медленнее этого, м/с.")]
@@ -38,7 +41,6 @@ namespace Game.Scripts.InteractionObjects.Controllers
         private const float MinCastDistance = 0.05f;
 
         private readonly RaycastHit[] m_Hits = new RaycastHit[16];
-        private CharacterController m_Controller;
         private IInteractionDoor m_ShakenDoor;
 
         // Для гизмо в окне Scene: последний поиск двери.
@@ -47,17 +49,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
         private float m_LastCastDistance;
         private bool m_LastCastFoundDoor;
 
-        private void Awake()
-        {
-            m_Controller = GetComponent<CharacterController>();
-
-            if (m_Movement == null)
-            {
-                m_Movement = GetComponent<PlayerMovementStateMachine>();
-            }
-        }
-
-        private void Update()
+        public void CustomUpdate()
         {
             IInteractionDoor door = m_IsEnabled ? FindDoorAhead() : null;
             m_LastCastFoundDoor = door != null;
@@ -72,7 +64,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
             {
                 if (m_ShakeLockedDoor && door != m_ShakenDoor)
                 {
-                    door.TryRushOpen(DoorOpenerKind.Human, transform.position);
+                    door.TryRushOpen(DoorOpenerKind.Human, m_Movement.transform.position);
                     m_ShakenDoor = door;
                 }
 
@@ -80,7 +72,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
             }
 
             m_ShakenDoor = null;
-            door.TryRushOpen(DoorOpenerKind.Human, transform.position);
+            door.TryRushOpen(DoorOpenerKind.Human, m_Movement.transform.position);
         }
 
         /// <summary>
@@ -106,9 +98,11 @@ namespace Game.Scripts.InteractionObjects.Controllers
             }
 
             Vector3 direction = velocity / speed;
-            float radius = m_Controller.radius;
-            Vector3 center = transform.TransformPoint(m_Controller.center);
-            float halfLine = Mathf.Max(0f, m_Controller.height * 0.5f - radius);
+            CharacterController controller = m_Movement.Controller;
+            Transform player = m_Movement.transform;
+            float radius = controller.radius;
+            Vector3 center = player.TransformPoint(controller.center);
+            float halfLine = Mathf.Max(0f, controller.height * 0.5f - radius);
             Vector3 top = center + Vector3.up * halfLine;
             Vector3 bottom = center - Vector3.up * halfLine;
             // Капсула ищет дверь на столько, сколько остаётся от её передней стенки до точки "камера в m_OpenDistance от двери".
@@ -137,7 +131,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
             {
                 RaycastHit hit = m_Hits[i];
 
-                if (hit.collider == null || hit.collider.transform.IsChildOf(transform) || hit.distance >= nearestDistance)
+                if (hit.collider == null || hit.collider.transform.IsChildOf(player) || hit.distance >= nearestDistance)
                 {
                     continue;
                 }
@@ -151,7 +145,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
 
                 Bounds leaf = hit.collider.bounds;
 
-                if (leaf.size.y < m_MinDoorHeight || leaf.min.y > transform.position.y + MaxDoorBottomAboveFeet)
+                if (leaf.size.y < m_MinDoorHeight || leaf.min.y > player.position.y + MaxDoorBottomAboveFeet)
                 {
                     // Дверца шкафа или щитка, а не проход.
                     continue;
@@ -197,7 +191,7 @@ namespace Game.Scripts.InteractionObjects.Controllers
             Gizmos.color = m_LastCastFoundDoor ? Color.green : Color.yellow;
             Vector3 end = m_LastCastStart + m_LastCastDirection * m_LastCastDistance;
             Gizmos.DrawLine(m_LastCastStart, end);
-            Gizmos.DrawWireSphere(end, m_Controller != null ? m_Controller.radius : 0.3f);
+            Gizmos.DrawWireSphere(end, m_Movement != null && m_Movement.Controller != null ? m_Movement.Controller.radius : 0.3f);
         }
     }
 }

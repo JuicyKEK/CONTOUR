@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 4307823119788068083}
   - component: {fileID: 394909230382017253}
   - component: {fileID: 5676965161520244625}
+  - component: {fileID: 1547141443780944705}
+  - component: {fileID: 5700714302096539379}
   m_Layer: 0
   m_Name: SprayUninfection
   m_TagString: Untagged
@@ -75,7 +77,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
   m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
-  m_DisplayName: "\u0421\u043F\u0440\u0435\u0439 \u0441 \u0443\u043A\u0441\u0443\u0441\u043E\u043C"
 --- !u!114 &394909230382017253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +113,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
   m_StateId: 
+--- !u!114 &1547141443780944705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470312605753923111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9df04d5714ccfb45975014f89e7197c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Rendering.PickupHighlight
+  m_Color: {r: 0.08, g: 0.3, b: 1, a: 1}
+  m_Intensity: 1
+  m_OutlineColor: {r: 0.08, g: 0.3, b: 1, a: 1}
+  m_OutlineIntensity: 1
+--- !u!114 &5700714302096539379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470312605753923111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2433a26fa19b0d14ea68c0e3b87a923b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.ItemInspection.Controllers.InspectOnFirstPickup
+  m_TypeKey: Spray with vinegar
+  m_DisplayName: "\u0421\u043F\u0440\u0435\u0439 \u0441 \u0443\u043A\u0441\u0443\u0441\u043E\u043C"
+  m_OnlyFirstOfType: 1
 --- !u!1 &1996637210768687187
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,7 +517,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3485580979166323182
 Transform:
   m_ObjectHideFlags: 0

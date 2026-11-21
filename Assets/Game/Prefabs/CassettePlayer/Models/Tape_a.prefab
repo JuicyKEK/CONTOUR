@@ -103,6 +103,10 @@ GameObject:
   - component: {fileID: 4322732339513256714}
   - component: {fileID: 5349140916373857743}
   - component: {fileID: 7147799739527306491}
+  - component: {fileID: 6867668274129998258}
+  - component: {fileID: 3729029885370864976}
+  - component: {fileID: 7434865616179157281}
+  - component: {fileID: 5615300532246566834}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -230,6 +234,73 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
   m_StateId: 
+--- !u!114 &6867668274129998258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6446676570933489764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9df04d5714ccfb45975014f89e7197c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Rendering.PickupHighlight
+  m_Color: {r: 1, g: 0.82, b: 0.35, a: 1}
+  m_Intensity: 0.6
+  m_OutlineColor: {r: 1, g: 0.82, b: 0.35, a: 1}
+  m_OutlineIntensity: 0.6
+--- !u!114 &3729029885370864976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6446676570933489764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c66beff9f79fd3646b50d8ae96e8f058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.View.AudioTapeHighlightColor
+  m_NormalColor: {r: 1, g: 0.82, b: 0.35, a: 1}
+  m_NormalIntensity: 0.6
+  m_NormalOutlineColor: {r: 1, g: 0.82, b: 0.35, a: 1}
+  m_NormalOutlineIntensity: 0.6
+  m_EvilColor: {r: 1, g: 0.08, b: 0.05, a: 1}
+  m_EvilIntensity: 1
+  m_EvilOutlineColor: {r: 1, g: 0.08, b: 0.05, a: 1}
+  m_EvilOutlineIntensity: 1
+--- !u!114 &7434865616179157281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6446676570933489764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2433a26fa19b0d14ea68c0e3b87a923b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.ItemInspection.Controllers.InspectOnFirstPickup
+  m_TypeKey: 
+  m_DisplayName: 
+  m_OnlyFirstOfType: 1
+--- !u!114 &5615300532246566834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6446676570933489764}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a921fccc9732bab4ea75168ce78665a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.View.AudioTapeInspectionInfo
+  m_NormalTypeKey: AudioTape
+  m_NormalDisplayName: "\u041A\u0430\u0441\u0441\u0435\u0442\u0430"
+  m_EvilTypeKey: AudioTape_Evil
+  m_EvilDisplayName: "\u0417\u043B\u0430\u044F \u043A\u0430\u0441\u0441\u0435\u0442\u0430"
 --- !u!1 &6711514041043855715
 GameObject:
   m_ObjectHideFlags: 0

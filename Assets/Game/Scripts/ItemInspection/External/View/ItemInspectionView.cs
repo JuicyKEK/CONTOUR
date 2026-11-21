@@ -1,15 +1,17 @@
 using System;
+using DG.Tweening;
+using JuicyDI.Attributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Game.Scripts.Inventory.External.View
+namespace Game.Scripts.ItemInspection.View
 {
     /// <summary>
     /// Интерфейс осмотра предмета (<see cref="Controllers.ItemInspectionController"/>): название предмета под ним,
-    /// подсказка и кнопка "Принять". Пока осмотра нет, объект выключен. Прозрачностью управляет контроллер
-    /// (появление вместе с размытием фона, исчезновение, когда предмет летит в инвентарь).
+    /// подсказка и кнопка "Принять". Пока осмотра нет, объект выключен. Появлением и исчезновением управляет контроллер.
     /// </summary>
+    [JDIMonoController]
     public class ItemInspectionView : MonoBehaviour
     {
         [Tooltip("Прозрачность и клики всего интерфейса осмотра.")]
@@ -60,6 +62,11 @@ namespace Game.Scripts.Inventory.External.View
             {
                 m_CanvasGroup.alpha = alpha;
             }
+        }
+
+        public Tween Fade(float alpha, float duration)
+        {
+            return m_CanvasGroup.DOFade(alpha, duration);
         }
 
         public void SetInteractable(bool isInteractable)

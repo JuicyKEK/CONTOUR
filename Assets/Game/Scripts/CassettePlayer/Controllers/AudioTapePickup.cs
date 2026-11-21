@@ -23,6 +23,11 @@ namespace Game.Scripts.Instructions.Controllers
 
         [Inject] private IAudioTapeFoundRegistry m_Registry;
 
+        /// <summary>
+        /// Какую кассету подбирает этот объект (например, подсветка берёт отсюда, злая ли кассета).
+        /// </summary>
+        public AudioTapeDefinitionSO TapeDefinition => m_TapeDefinition;
+
         private void Awake()
         {
             if (m_TapeDefinition == null)
