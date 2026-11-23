@@ -1,22 +1,19 @@
-﻿using System;
 using Game.Scripts.Instructions.Data;
 using Game.Scripts.Instructions.Interfaces;
-using Game.Scripts.Inventory;
+using Game.Scripts.Pickup.Controllers;
 using JuicyDI.Attributes;
 using UnityEngine;
 
 namespace Game.Scripts.Instructions.Controllers
 {
     /// <summary>
-    /// Физический объект кассеты в мире. При взаимодействии игрока (через общую систему
-    /// IInteraction/PlayerInteractiveController) отмечает кассету найденной в реестре
-    /// <see cref="IAudioTapeFoundRegistry"/> и убирает себя со сцены - после этого её
-    /// настоящее имя появится в списке кассетного плеера вместо "?????".
+    /// Физический объект кассеты в мире. При подборе отмечает кассету найденной в реестре
+    /// <see cref="IAudioTapeFoundRegistry"/> - после этого её настоящее имя появится в списке кассетного плеера вместо
+    /// "?????". Убирает объект со сцены вид на нём (PickupHideView).
     /// </summary>
     [JDIMonoController]
-    public class AudioTapePickup : MonoBehaviour, IInteraction, IPickupObject
+    public class AudioTapePickup : PickupObject
     {
-        public event Action PickedUp;
         [Header("Кассета")]
         [Tooltip("Какую кассету подбирает этот объект.")]
         [SerializeField] private AudioTapeDefinitionSO m_TapeDefinition;
@@ -36,17 +33,15 @@ namespace Game.Scripts.Instructions.Controllers
             }
         }
 
-        public void Interact()
+        protected override bool TryReceive()
         {
             if (m_TapeDefinition == null)
             {
-                return;
+                return false;
             }
 
             m_Registry?.MarkTapeFound(m_TapeDefinition.TapeId);
-            PickedUp?.Invoke();
-            gameObject.SetActive(false);
+            return true;
         }
     }
 }
-

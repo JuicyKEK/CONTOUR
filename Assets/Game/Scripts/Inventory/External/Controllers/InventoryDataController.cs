@@ -35,7 +35,7 @@ namespace Game.Scripts.Inventory.Controllers
 
         public IInventoryObject PeekInventoryObject(int indexObject)
         {
-            if (indexObject > m_InventoryDataObjects.InventoryObjects.Count)
+            if (!IsValidIndex(indexObject))
             {
                 return null;
             }
@@ -45,7 +45,7 @@ namespace Game.Scripts.Inventory.Controllers
 
         public void DeleteInventoryObject(int indexObject)
         {
-            if (indexObject > m_InventoryDataObjects.InventoryObjects.Count)
+            if (!IsValidIndex(indexObject))
             {
                 return;
             }
@@ -58,6 +58,13 @@ namespace Game.Scripts.Inventory.Controllers
             }
             
             //LogDataObjects();
+        }
+
+        private bool IsValidIndex(int indexObject)
+        {
+            return m_InventoryDataObjects.InventoryObjects != null
+                   && indexObject >= 0
+                   && indexObject < m_InventoryDataObjects.InventoryObjects.Count;
         }
 
         private void AddNewItem(IInventoryObject item)

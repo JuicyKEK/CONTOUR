@@ -43,7 +43,7 @@ namespace Game.Scripts.Inventory.Controllers
 
         public void SelectedInventoryObject(int selectedIndex)
         {    
-            if (selectedIndex > m_InventoryDataController.GetInventoryDataObjects().InventoryObjects.Count)
+            if (selectedIndex < 0 || selectedIndex >= m_InventoryDataController.GetInventoryDataObjects().InventoryObjects.Count)
             {
                 return;
             }
@@ -70,13 +70,18 @@ namespace Game.Scripts.Inventory.Controllers
         public void DeleteSelectedInventoryObject()
         {
             m_InventoryDataController.DeleteInventoryObject(m_CurrentSellectObject);
-            
-            if (m_InventoryDataController.GetInventoryDataObjects().InventoryObjects.Count > 0)
-            {
-                TrySelectedInventoryObject(1);
-            }
-            
             m_InventoryViewController.UpdateInventoryView(m_InventoryDataController.GetInventoryDataObjects());
+
+            int count = m_InventoryDataController.GetInventoryDataObjects().InventoryObjects.Count;
+
+            if (count == 0)
+            {
+                m_CurrentSellectObject = 0;
+                return;
+            }
+
+            // Ячейка выбранного предмета осталась - выбор на ней; закончилась и была последней - выбор на новой последней.
+            TrySelectedInventoryObject(Mathf.Min(m_CurrentSellectObject, count - 1));
         }
 
         public void GetItems(List<KeyValuePair<string, int>> result)

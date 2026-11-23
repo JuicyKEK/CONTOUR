@@ -1,17 +1,18 @@
 using System;
-using Game.Scripts.Inventory;
+using Game.Scripts.Pickup;
 using JuicyDI.Attributes;
+using R3;
 using UnityEngine;
 
 namespace Game.Scripts.LocationState.Runtime.Controllers
 {
     /// <summary>
     /// Сохраняет, подобран ли объект (кассета, предмет инвентаря). Вешается на объект с <see cref="IPickupObject"/>
-    /// (AudioTapePickup, InventoryInteraction) - обычно прямо в префаб предмета.
+    /// (AudioTapePickup, InventoryPickup) - обычно прямо в префаб предмета.
     ///
-    /// В момент подбора объект сообщает об этом (IPickupObject.PickedUp) до того, как удалит или выключит себя, -
-    /// состояние запоминается сразу. После загрузки локации подобранный объект удаляется со сцены: именно
-    /// удаляется, а не выключается, чтобы его снова не включил кто-то другой (например, InfectionRangeObject).
+    /// Объект подобран (IPickupObject.IsPickedUp стал true) - состояние запоминается сразу. После загрузки локации
+    /// подобранный объект удаляется со сцены: именно удаляется, а не выключается, чтобы его снова не включил кто-то
+    /// другой (например, InfectionRangeObject).
     /// </summary>
     [JDIMonoController]
     public class PickupStateSaver : LocationStateSaver
@@ -22,32 +23,30 @@ namespace Game.Scripts.LocationState.Runtime.Controllers
             public bool IsPickedUp;
         }
 
-        private IPickupObject m_Pickup;
+        private readonly CompositeDisposable m_Disposables = new();
         private bool m_IsPickedUp;
 
         public bool IsPickedUp => m_IsPickedUp;
 
         private void Awake()
         {
-            m_Pickup = GetComponent<IPickupObject>();
-
-            if (m_Pickup == null)
+            if (!TryGetComponent(out IPickupObject pickup))
             {
                 Debug.LogError($"[LocationState] PickupStateSaver '{name}': на объекте нет подбираемого компонента " +
-                               "(IPickupObject: AudioTapePickup, InventoryInteraction).", this);
+                               "(IPickupObject: AudioTapePickup, InventoryPickup).", this);
                 return;
             }
 
-            m_Pickup.PickedUp += OnPickedUp;
+            pickup.IsPickedUp
+                .Where(isPickedUp => isPickedUp)
+                .Take(1)
+                .Subscribe(_ => OnPickedUp())
+                .AddTo(m_Disposables);
         }
 
         protected override void OnDestroy()
         {
-            if (m_Pickup != null)
-            {
-                m_Pickup.PickedUp -= OnPickedUp;
-            }
-
+            m_Disposables.Dispose();
             base.OnDestroy();
         }
 

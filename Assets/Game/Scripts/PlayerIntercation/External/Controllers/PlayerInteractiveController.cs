@@ -93,9 +93,9 @@ namespace Game.Scripts.InputController
 
             var interactable = m_CurrentInteractable;
 
-            // Объект может перехватить взаимодействие: показать что-то сам (осмотр предмета при первом подборе -
-            // InspectOnFirstPickup, тогда взаимодействие выполнится, когда он закончит) или сделать другое (замок
-            // ломается молотком - BreakableLock). Первый перехвативший забирает взаимодействие.
+            // Объект может перехватить взаимодействие и показать что-то сам (осмотр предмета при первом подборе -
+            // InspectOnFirstPickup), тогда взаимодействие выполнится, когда он закончит. Первый перехвативший забирает
+            // взаимодействие.
             if (interactable is Component component && component != null)
             {
                 component.GetComponents(m_Interceptors);

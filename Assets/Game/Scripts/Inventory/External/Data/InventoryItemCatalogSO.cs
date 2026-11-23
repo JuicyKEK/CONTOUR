@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Game.Scripts.Inventory.Controllers;
 using UnityEngine;
 
 namespace Game.Scripts.Inventory.External.Data
@@ -73,7 +74,7 @@ namespace Game.Scripts.Inventory.External.Data
                     continue;
                 }
 
-                foreach (var item in prefab.GetComponentsInChildren<IInventoryObject>(true))
+                foreach (var item in prefab.GetComponentsInChildren<InventoryPickup>(true))
                 {
                     if (string.IsNullOrEmpty(item.ObjectKey) || Contains(item.ObjectKey))
                     {

@@ -17,7 +17,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         [Serializable]
         public struct SupplyItem
         {
-            [Tooltip("Подбираемый предмет (префаб с InventoryInteraction или другим IInteraction).")]
+            [Tooltip("Подбираемый предмет (префаб с InventoryPickup или другим IInteraction).")]
             public GameObject Prefab;
 
             [Tooltip("Сколько штук в полном наборе.")]

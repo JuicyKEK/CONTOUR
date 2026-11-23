@@ -11935,6 +11935,7 @@ GameObject:
   - component: {fileID: 674803515}
   - component: {fileID: 674803518}
   - component: {fileID: 674803517}
+  - component: {fileID: 674803519}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -12116,6 +12117,20 @@ MonoBehaviour:
   m_TypeKey: 
   m_DisplayName: 
   m_OnlyFirstOfType: 1
+--- !u!114 &674803519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674803509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &683193295
 GameObject:
   m_ObjectHideFlags: 0
@@ -21925,6 +21940,7 @@ GameObject:
   - component: {fileID: 1118368211}
   - component: {fileID: 1118368214}
   - component: {fileID: 1118368213}
+  - component: {fileID: 1118368215}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -22106,6 +22122,20 @@ MonoBehaviour:
   m_TypeKey: 
   m_DisplayName: 
   m_OnlyFirstOfType: 1
+--- !u!114 &1118368215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118368205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &1119099712
 GameObject:
   m_ObjectHideFlags: 0

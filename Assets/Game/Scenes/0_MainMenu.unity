@@ -12480,6 +12480,7 @@ GameObject:
   - component: {fileID: 674803513}
   - component: {fileID: 674803512}
   - component: {fileID: 674803511}
+  - component: {fileID: 674803515}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -12594,6 +12595,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 674803509}
   m_Mesh: {fileID: 4045380926720143188, guid: 93a8e78314f6c104d8e269471eded15a, type: 3}
+--- !u!114 &674803515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674803509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &683193295
 GameObject:
   m_ObjectHideFlags: 0
@@ -22995,6 +23010,7 @@ GameObject:
   - component: {fileID: 1118368209}
   - component: {fileID: 1118368208}
   - component: {fileID: 1118368207}
+  - component: {fileID: 1118368211}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -23109,6 +23125,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118368205}
   m_Mesh: {fileID: 4045380926720143188, guid: 93a8e78314f6c104d8e269471eded15a, type: 3}
+--- !u!114 &1118368211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118368205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &1119099712
 GameObject:
   m_ObjectHideFlags: 0
@@ -44655,6 +44685,7 @@ GameObject:
   - component: {fileID: 1497422213714917387}
   - component: {fileID: 5991503627840739414}
   - component: {fileID: 5991503627840739415}
+  - component: {fileID: 5991503627840739416}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -49924,6 +49955,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Controllers.AudioTapePickup
   m_TapeDefinition: {fileID: 11400000, guid: 776a466655b81f64eb723fc12341b6ea, type: 2}
+--- !u!114 &5991503627840739416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395608161948766602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!4 &5997589819571136602
 Transform:
   m_ObjectHideFlags: 0

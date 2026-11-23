@@ -3,11 +3,32 @@ using UnityEngine;
 namespace Game.Scripts.InteractionObjects
 {
     /// <summary>
-    /// Геометрия створки для открытия с разбега (IInteractionDoor.TryRushOpen): в какую сторону уходит створка
-    /// и как открыть её в обратную. Общая для видов дверей (InteractionDoorView, DefaultDoorView).
+    /// Геометрия створки: в какую сторону она уходит при открытии с разбега (IInteractionDoor.TryRushOpen), как открыть
+    /// её в обратную, где у неё лицевая сторона. Общая для дверей и их видов.
     /// </summary>
     public static class DoorSwing
     {
+        /// <summary>
+        /// Нормаль створки в мировых координатах: самая тонкая ось BoxCollider на объекте петли (нет его - ось Z петли).
+        /// </summary>
+        public static Vector3 GetLeafNormal(Transform hinge)
+        {
+            if (!hinge.TryGetComponent(out BoxCollider box))
+            {
+                return hinge.forward;
+            }
+
+            Vector3 size = Vector3.Scale(box.size, hinge.lossyScale);
+            size = new Vector3(Mathf.Abs(size.x), Mathf.Abs(size.y), Mathf.Abs(size.z));
+
+            if (size.x <= size.y && size.x <= size.z)
+            {
+                return hinge.right;
+            }
+
+            return size.y <= size.z ? hinge.up : hinge.forward;
+        }
+
         /// <summary>
         /// Тот же поворот от закрытого положения, что closed -> open, но в обратную сторону.
         /// </summary>

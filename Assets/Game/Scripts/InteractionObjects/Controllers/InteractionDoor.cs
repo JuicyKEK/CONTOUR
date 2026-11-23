@@ -88,7 +88,7 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
         }
     }
 
-    public void Interact()
+    public virtual void Interact()
     {
         _lastOpener.Value = DoorOpenerKind.Human;
 
@@ -176,6 +176,15 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
         }
 
         _isLocked.Value = !_isLocked.Value;
+    }
+
+    /// <summary>
+    /// Отпереть дверь (её открыли ключом, сломали замок). В отличие от щеколды (Lock) только отпирает.
+    /// </summary>
+    protected void Unlock()
+    {
+        EnsureState();
+        _isLocked.Value = false;
     }
 
     private bool IsLeafMoving()

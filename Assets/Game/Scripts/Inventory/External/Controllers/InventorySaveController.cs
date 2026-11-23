@@ -119,7 +119,7 @@ namespace Game.Scripts.Inventory.External.Controllers
 
                 for (int i = 0; i < entry.Amount; i++)
                 {
-                    m_Inventory.AddItem(new InventorySavedObject(entry.ItemKey, icon));
+                    m_Inventory.AddItem(new InventoryItemData(entry.ItemKey, icon));
                 }
             }
 
