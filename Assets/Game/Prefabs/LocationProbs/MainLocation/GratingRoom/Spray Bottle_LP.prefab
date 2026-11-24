@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5425348017795419341
 Transform:
   m_ObjectHideFlags: 0
@@ -234,6 +234,21 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8724800804932885809}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3882067009005525434}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1054841565676229930}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 559987261671398577}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2582793491881842710}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1147357927643226604}
   m_SourcePrefab: {fileID: 100100000, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}
 --- !u!1 &5139673942634722269 stripped
 GameObject:
@@ -274,7 +289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!114 &459066516786482070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -288,7 +303,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Audio.SoundPlayer
   m_SoundPlayerObject: {fileID: 5139673942634722269}
-  m_AudioSource: {fileID: 0}
+  m_AudioSource: {fileID: 559987261671398577}
   m_IsRandomPitchSound: 1
   m_MinPitch: 0.9
   m_MaxPitch: 1.1
@@ -311,6 +326,160 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
   m_StateId: 
+--- !u!114 &3882067009005525434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139673942634722269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9df04d5714ccfb45975014f89e7197c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Rendering.PickupHighlight
+  m_Color: {r: 0.08, g: 0.3, b: 1, a: 1}
+  m_Intensity: 0.1
+  m_OutlineColor: {r: 0.08, g: 0.3, b: 1, a: 1}
+  m_OutlineIntensity: 0.1
+--- !u!114 &1054841565676229930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139673942634722269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2433a26fa19b0d14ea68c0e3b87a923b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.ItemInspection.Controllers.InspectOnFirstPickup
+  m_TypeKey: Spray with vinegar
+  m_DisplayName: "\u0421\u043F\u0440\u0435\u0439 \u0441 \u0443\u043A\u0441\u0443\u0441\u043E\u043C"
+  m_OnlyFirstOfType: 1
+--- !u!82 &559987261671398577
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139673942634722269}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &2582793491881842710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139673942634722269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81b3c8b79526b50428acf84db5f1ff3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupSoundView
+--- !u!114 &1147357927643226604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5139673942634722269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 1
+  m_Delay: 1.2
 --- !u!4 &5483161772076738919 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5b5ab7e9074c7fd489de25e933170f7a, type: 3}

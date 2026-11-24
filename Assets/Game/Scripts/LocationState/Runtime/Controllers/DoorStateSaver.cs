@@ -21,6 +21,8 @@ namespace Game.Scripts.LocationState.Runtime.Controllers
         {
             public bool IsOpen;
             public bool IsLocked;
+            // Створку распахнули с разбега в обратную сторону. В старых сохранениях поля нет - false.
+            public bool IsOpenReversed;
         }
 
         [Tooltip("Дверь (InteractionDoor или NonInteractionDoor). Пусто - дверь на этом же объекте.")]
@@ -40,10 +42,12 @@ namespace Game.Scripts.LocationState.Runtime.Controllers
             }
 
             Door.GetState(out bool isOpen, out bool isLocked);
+            bool isOpenReversed = Door is IInteractionDoor interactionDoor && interactionDoor.IsOpenReversed;
 
-            return isOpen == m_IsOpenInScene && isLocked == m_IsLockedInScene
+            // В сцене двери стоят в обычную сторону, поэтому открытая в обратную сторону сохраняется всегда.
+            return isOpen == m_IsOpenInScene && isLocked == m_IsLockedInScene && !isOpenReversed
                 ? null
-                : JsonUtility.ToJson(new State { IsOpen = isOpen, IsLocked = isLocked });
+                : JsonUtility.ToJson(new State { IsOpen = isOpen, IsLocked = isLocked, IsOpenReversed = isOpenReversed });
         }
 
         public override void ApplySavedState(string state)
@@ -54,7 +58,15 @@ namespace Game.Scripts.LocationState.Runtime.Controllers
             }
 
             var saved = JsonUtility.FromJson<State>(state);
-            Door.RestoreState(saved.IsOpen, saved.IsLocked);
+
+            if (Door is IInteractionDoor interactionDoor)
+            {
+                interactionDoor.RestoreState(saved.IsOpen, saved.IsLocked, saved.IsOpenReversed);
+            }
+            else
+            {
+                Door.RestoreState(saved.IsOpen, saved.IsLocked);
+            }
         }
 
         protected override void RememberSceneState()

@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Showcase_Cleanse_Ash
+  m_Shader: {fileID: 4800000, guid: ff8c6e4b8cd23c24c98e74b57a9b9b93, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: b6b2019214c2ade419a9e5ed9a228d68, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: 095ab9e33c4941548b46f5a222af8ae7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _ArrivalMax: 0.52162653
+    - _AshWidth: 0.16
+    - _BumpScale: 1
+    - _CleanseProgress: 0
+    - _CrackScale: 10
+    - _CrumbleWidth: 0.14
+    - _Cull: 0
+    - _FallDistance: 0.06
+    - _FrontNoise: 0.35
+    - _GlowIntensity: 1.5
+    - _Metallic: 0
+    - _NoiseScale: 4
+    - _Smoothness: 0.55
+    - _TileMeters: 1
+    - _Triplanar: 0
+    m_Colors:
+    - _AshColor: {r: 0.41999996, g: 0.39999998, b: 0.37999994, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BoundsMax: {r: 0.52308655, g: 1.42, b: 1.3582802, a: 0}
+    - _BoundsMin: {r: -0.52308655, g: -1.42, b: -1.3582783, a: 0}
+    - _GlowColor: {r: 4, g: 1.2, b: 0.25, a: 1}
+    - _Source0: {r: 0.75, g: 0.8, b: 0.5, a: 0}
+    - _Source1: {r: 0.2, g: 0.45, b: 0.85, a: 0.12}
+    - _Source2: {r: 0.6, g: 0.2, b: 0.15, a: 0.25}
+    - _Source3: {r: 0.15, g: 0.85, b: 0.2, a: 0.4}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

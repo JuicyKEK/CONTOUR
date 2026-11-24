@@ -100,8 +100,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a8aa66485a57a742b78953870298096, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.NPC.Runtime.Controllers.NpcDoorway
-  m_Width: 1
-  m_Height: 2.1
+  m_Width: 1.1
+  m_Height: 2.51
   m_Door: {fileID: 4391274902286570811}
 --- !u!1 &6431037655553408110 stripped
 GameObject:

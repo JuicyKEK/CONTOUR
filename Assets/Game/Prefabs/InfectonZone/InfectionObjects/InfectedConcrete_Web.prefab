@@ -228,6 +228,7 @@ GameObject:
   - component: {fileID: 7665613941371650329}
   - component: {fileID: 1641523192358109713}
   - component: {fileID: 1463129552798169738}
+  - component: {fileID: 553282758199955779}
   m_Layer: 0
   m_Name: InfectedConcrete_Web
   m_TagString: Untagged
@@ -289,6 +290,27 @@ MonoBehaviour:
   m_ZoneSource: {fileID: 0}
   m_RequiredItemKey: Spray with vinegar
   m_DecreaseAmount: 10
+--- !u!114 &553282758199955779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7017169785994636288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a9ce37d4048ce940a62d20b9f1f2532, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InfectionZone.External.View.InfectionCleanupMeltView
+  m_Cleanup: {fileID: 1463129552798169738}
+  m_MeltMaterial: {fileID: 2100000, guid: fa81908ed6f07ef4092e2ba19abd7ef0, type: 2}
+  m_BubblesPrefab: {fileID: 2983601160909510901, guid: 7d829dd608ea62740908d593aafc0f05, type: 3}
+  m_Duration: 5
+  m_BubblesFrom: 0.4
+  m_BubblesTo: 0.8
+  m_BubblesPerSquareMeter: 70
+  m_MaxBubblesPerSecond: 220
+  m_FloorSearch: 4
 --- !u!1001 &933599114430868657
 PrefabInstance:
   m_ObjectHideFlags: 0

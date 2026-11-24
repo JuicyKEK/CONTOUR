@@ -46,6 +46,11 @@ namespace Game.Scripts.InfectionZone.External.Controllers
         /// </summary>
         protected abstract void OnUsed();
 
+        /// <summary>
+        /// Можно ли сейчас взаимодействовать (например, очищенная аномалия ещё исчезает - второй раз её не чистят).
+        /// </summary>
+        protected virtual bool CanInteract => true;
+
         protected virtual void Awake()
         {
             m_Zone = m_ZoneSource as IInfectionZone;
@@ -63,7 +68,7 @@ namespace Game.Scripts.InfectionZone.External.Controllers
 
         public void Interact()
         {
-            if (m_Zone == null)
+            if (m_Zone == null || !CanInteract)
             {
                 return;
             }

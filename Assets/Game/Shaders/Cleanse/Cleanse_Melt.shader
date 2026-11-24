@@ -1,0 +1,145 @@
+// Очищение кислотой: объект оседает, плавится в лужу и испаряется.
+// Управляется _CleanseProgress (0 - объект целый, 1 - его нет). Источники и габариты задаёт скрипт по мешу объекта.
+// Общий код - CleanseCommon.hlsl (эффекты) и CleansePasses.hlsl (проходы).
+Shader "Custom/Cleanse/Melt"
+{
+    Properties
+    {
+        [Header(Surface)]
+        _BaseMap ("Base Map", 2D) = "white" {}
+        _BaseColor ("Base Color", Color) = (1, 1, 1, 1)
+        [Normal] _BumpMap ("Normal Map", 2D) = "bump" {}
+        _BumpScale ("Normal Strength", Range(0, 2)) = 1
+        _Smoothness ("Smoothness", Range(0, 1)) = 0.3
+        _Metallic ("Metallic", Range(0, 1)) = 0
+        [Toggle(_CLEANSE_TRIPLANAR)] _Triplanar ("Triplanar (mesh without UV)", Float) = 0
+        _TileMeters ("Triplanar Tile, m", Float) = 1
+        [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull (Off shows the inside through holes)", Float) = 0
+
+        [Header(Cleanse)]
+        _CleanseProgress ("Progress (0 whole, 1 gone)", Range(0, 1)) = 0
+        _BoundsMin ("Bounds Min (object space, set from the mesh)", Vector) = (-0.5, -0.5, -0.5, 0)
+        _BoundsMax ("Bounds Max (object space, set from the mesh)", Vector) = (0.5, 0.5, 0.5, 0)
+        _NoiseScale ("Noise Scale", Float) = 4
+
+        [Header(Acid Melt)]
+        _AcidColor ("Acid Color", Color) = (0.28, 0.36, 0.05, 1)
+        _AcidDarkColor ("Puddle Color (almost cleaned)", Color) = (0.012, 0.026, 0.01, 1)
+        _FoamColor ("Foam Color", Color) = (0.16, 0.24, 0.09, 1)
+        _AcidGlow ("Acid Glow", Range(0, 3)) = 0.3
+        [HideInInspector] _MeltBoundsMin ("Melt Bounds Min (world, y = floor; w = 1 on; set by script)", Vector) = (0, 0, 0, 0)
+        [HideInInspector] _MeltBoundsMax ("Melt Bounds Max (world; set by script)", Vector) = (0, 0, 0, 0)
+        _MeltSag ("Sag (how flat it ends)", Range(0, 1)) = 0.96
+        _MeltSpread ("Puddle Spread", Range(0, 2)) = 0.8
+        _MeltDrips ("Uneven Melting (drips)", Range(0, 1)) = 0.45
+        _MeltWobble ("Boiling", Range(0, 0.05)) = 0.012
+    }
+
+    SubShader
+    {
+        Tags { "RenderType" = "TransparentCutout" "RenderPipeline" = "UniversalPipeline" "Queue" = "AlphaTest" }
+
+        HLSLINCLUDE
+        #define CLEANSE_MELT 1
+        #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+        #include "Assets/Game/Shaders/Cleanse/CleanseInput.hlsl"
+        #include "Assets/Game/Shaders/Cleanse/CleanseCommon.hlsl"
+        ENDHLSL
+
+        Pass
+        {
+            Name "ForwardLit"
+            Tags { "LightMode" = "UniversalForward" }
+            Cull [_Cull]
+
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma shader_feature_local _CLEANSE_TRIPLANAR
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ EVALUATE_SH_MIXED EVALUATE_SH_VERTEX
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
+            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile_fragment _ _LIGHT_COOKIES
+            #pragma multi_compile _ _LIGHT_LAYERS
+            #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
+            #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile _ DYNAMICLIGHTMAP_ON
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Fog.hlsl"
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
+            #pragma multi_compile_instancing
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #define CLEANSE_PASS_FORWARD
+            #include "Assets/Game/Shaders/Cleanse/CleansePasses.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
+            Cull [_Cull]
+
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex ShadowVert
+            #pragma fragment ShadowFrag
+            #pragma multi_compile_instancing
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
+            #define CLEANSE_PASS_SHADOW
+            #include "Assets/Game/Shaders/Cleanse/CleansePasses.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "DepthOnly"
+            Tags { "LightMode" = "DepthOnly" }
+            ZWrite On
+            ColorMask R
+            Cull [_Cull]
+
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex DepthVert
+            #pragma fragment DepthFrag
+            #pragma multi_compile_instancing
+            #define CLEANSE_PASS_DEPTH
+            #include "Assets/Game/Shaders/Cleanse/CleansePasses.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "DepthNormals"
+            Tags { "LightMode" = "DepthNormals" }
+            ZWrite On
+            Cull [_Cull]
+
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex NormalsVert
+            #pragma fragment NormalsFrag
+            #pragma multi_compile_instancing
+            #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+            #define CLEANSE_PASS_DEPTHNORMALS
+            #include "Assets/Game/Shaders/Cleanse/CleansePasses.hlsl"
+            ENDHLSL
+        }
+    }
+
+    FallBack "Hidden/Universal Render Pipeline/FallbackError"
+}

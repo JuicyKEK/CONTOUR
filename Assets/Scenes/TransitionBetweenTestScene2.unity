@@ -1093,6 +1093,8 @@ MonoBehaviour:
   _onOpenByMonster:
     m_PersistentCalls:
       m_Calls: []
+  _rushDuration: 0.2
+  _rushSwingAwayFromOpener: 1
   _lockedShakeAngle: 1
   _lockedShakeDuration: 0.07
   _lockedShakecount: 2
@@ -3174,6 +3176,7 @@ GameObject:
   - component: {fileID: 236659954}
   - component: {fileID: 236659953}
   - component: {fileID: 236659957}
+  - component: {fileID: 236659958}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -3301,6 +3304,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
   m_StateId: fe4746e648544286a73d07c5d39f8933
+--- !u!114 &236659958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 236659951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &257747192
 GameObject:
   m_ObjectHideFlags: 0
@@ -14623,6 +14640,7 @@ GameObject:
   - component: {fileID: 1588540245}
   - component: {fileID: 1588540244}
   - component: {fileID: 1588540248}
+  - component: {fileID: 1588540249}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -14750,6 +14768,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.LocationState.Runtime.Controllers.PickupStateSaver
   m_StateId: 3082ad6fabff425a9dd51468e0e74bd8
+--- !u!114 &1588540249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588540242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &1643871427
 GameObject:
   m_ObjectHideFlags: 0

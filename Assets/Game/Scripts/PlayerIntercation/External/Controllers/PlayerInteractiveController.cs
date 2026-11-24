@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Game.Scripts.Inventory;
 using Game.Scripts.Player.View;
 using Game.Scripts.Story;
@@ -31,6 +32,7 @@ namespace Game.Scripts.InputController
 
         private IInteraction m_CurrentInteractable;
         private bool m_IsControlEnabled = true;
+        private readonly List<IInteractionInterceptor> m_Interceptors = new();
 
         public void MethodInit()
         {
@@ -90,6 +92,33 @@ namespace Game.Scripts.InputController
             }
 
             var interactable = m_CurrentInteractable;
+
+            // Объект может перехватить взаимодействие и показать что-то сам (осмотр предмета при первом подборе -
+            // InspectOnFirstPickup), тогда взаимодействие выполнится, когда он закончит. Первый перехвативший забирает
+            // взаимодействие.
+            if (interactable is Component component && component != null)
+            {
+                component.GetComponents(m_Interceptors);
+
+                foreach (var interceptor in m_Interceptors)
+                {
+                    if (interceptor.TryIntercept(() => Interact(interactable)))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            Interact(interactable);
+        }
+
+        private static void Interact(IInteraction interactable)
+        {
+            // Пока шёл перехват, объект могли удалить (выгрузка сцены).
+            if (interactable == null || (interactable is Component component && component == null))
+            {
+                return;
+            }
 
             interactable.Interact();
             NotifyListeners(interactable);

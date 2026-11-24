@@ -4579,7 +4579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1 &257673833
 GameObject:
   m_ObjectHideFlags: 0
@@ -8902,7 +8902,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1001 &534491927
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10501,7 +10501,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1001 &608724359
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12480,6 +12480,7 @@ GameObject:
   - component: {fileID: 674803513}
   - component: {fileID: 674803512}
   - component: {fileID: 674803511}
+  - component: {fileID: 674803515}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -12594,6 +12595,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 674803509}
   m_Mesh: {fileID: 4045380926720143188, guid: 93a8e78314f6c104d8e269471eded15a, type: 3}
+--- !u!114 &674803515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 674803509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &683193295
 GameObject:
   m_ObjectHideFlags: 0
@@ -17228,7 +17243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1 &902330812
 GameObject:
   m_ObjectHideFlags: 0
@@ -21047,7 +21062,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1 &1016374321
 GameObject:
   m_ObjectHideFlags: 0
@@ -22111,7 +22126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1 &1047599924
 GameObject:
   m_ObjectHideFlags: 0
@@ -22477,7 +22492,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1 &1074303512
 GameObject:
   m_ObjectHideFlags: 0
@@ -22995,6 +23010,7 @@ GameObject:
   - component: {fileID: 1118368209}
   - component: {fileID: 1118368208}
   - component: {fileID: 1118368207}
+  - component: {fileID: 1118368211}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -23109,6 +23125,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1118368205}
   m_Mesh: {fileID: 4045380926720143188, guid: 93a8e78314f6c104d8e269471eded15a, type: 3}
+--- !u!114 &1118368211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118368205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!1 &1119099712
 GameObject:
   m_ObjectHideFlags: 0
@@ -35655,7 +35685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!1001 &1682106865
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40867,7 +40897,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.External.TestInteraction
   m_ObjectName: Spray with vinegar
-  m_ObjectIcon: {fileID: 21300000, guid: 23d8e2e0193ec2542a9cb1e35b21b2a2, type: 3}
+  m_IconAddress: SprayWithVinegar
 --- !u!108 &1984828875 stripped
 Light:
   m_CorrespondingSourceObject: {fileID: 4877242289650980245, guid: 93813cbeb01676941bd52fb5a0983792, type: 3}
@@ -44655,6 +44685,7 @@ GameObject:
   - component: {fileID: 1497422213714917387}
   - component: {fileID: 5991503627840739414}
   - component: {fileID: 5991503627840739415}
+  - component: {fileID: 5991503627840739416}
   m_Layer: 0
   m_Name: Tape_a
   m_TagString: Untagged
@@ -48568,6 +48599,8 @@ MonoBehaviour:
   _onOpenByMonster:
     m_PersistentCalls:
       m_Calls: []
+  _rushDuration: 0.2
+  _rushSwingAwayFromOpener: 1
   _lockedShakeAngle: 1
   _lockedShakeDuration: 0.07
   _lockedShakecount: 2
@@ -49922,6 +49955,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Instructions.Controllers.AudioTapePickup
   m_TapeDefinition: {fileID: 11400000, guid: 776a466655b81f64eb723fc12341b6ea, type: 2}
+--- !u!114 &5991503627840739416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395608161948766602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efe76898a56a8e249bee47deef37cddc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Pickup.View.PickupHideView
+  m_Destroy: 0
+  m_Delay: 0
 --- !u!4 &5997589819571136602
 Transform:
   m_ObjectHideFlags: 0
@@ -51315,6 +51362,32 @@ MonoBehaviour:
   _onOpenByMonster:
     m_PersistentCalls:
       m_Calls: []
+  _rushDuration: 0.2
+  _rushOpenCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 3
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _rushSwingAwayFromOpener: 1
   _lockedShakeAngle: 5
   _lockedShakeDuration: 0.15
   _lockedShakecount: 2
@@ -52269,6 +52342,32 @@ MonoBehaviour:
   _onOpenByMonster:
     m_PersistentCalls:
       m_Calls: []
+  _rushDuration: 0.2
+  _rushOpenCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 3
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _rushSwingAwayFromOpener: 1
   _lockedShakeAngle: 5
   _lockedShakeDuration: 0.15
   _lockedShakecount: 2
@@ -53104,6 +53203,32 @@ MonoBehaviour:
   _onOpenByMonster:
     m_PersistentCalls:
       m_Calls: []
+  _rushDuration: 0.2
+  _rushOpenCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 3
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _rushSwingAwayFromOpener: 1
   _lockedShakeAngle: 5
   _lockedShakeDuration: 0.15
   _lockedShakecount: 2
@@ -53249,6 +53374,32 @@ MonoBehaviour:
   _onOpenByMonster:
     m_PersistentCalls:
       m_Calls: []
+  _rushDuration: 0.2
+  _rushOpenCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 3
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _rushSwingAwayFromOpener: 1
   _lockedShakeAngle: 5
   _lockedShakeDuration: 0.15
   _lockedShakecount: 2

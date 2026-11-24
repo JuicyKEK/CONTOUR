@@ -103,6 +103,10 @@ namespace AZE.AdvancedFirstPerson
             _standingHeight = Controller.height;
             _crouchHeight = _standingHeight / 2f;
             TargetHeight = _standingHeight;
+            // Рост и камера сразу ставятся по росту стоя. Раньше камера до первого приседания оставалась
+            // на высоте из префаба, а после приседания вставала на TargetHeight - CameraOffset -
+            // персонаж "вырастал" после того, как присел и встал.
+            ApplyHeightImmediately(_standingHeight);
 
             _sprintRemaining = _timeToSprint;
 
@@ -204,6 +208,19 @@ namespace AZE.AdvancedFirstPerson
             finalMove.y = VerticalVelocity;
 
             Controller.Move(finalMove * Time.deltaTime);
+        }
+
+        private void ApplyHeightImmediately(float height)
+        {
+            Controller.height = height;
+            Controller.center = Vector3.up * (height * 0.5f);
+
+            if (CameraTransform != null)
+            {
+                Vector3 camPos = CameraTransform.localPosition;
+                camPos.y = height - CameraOffset;
+                CameraTransform.localPosition = camPos;
+            }
         }
 
         private void HandleHeightInterpolation()

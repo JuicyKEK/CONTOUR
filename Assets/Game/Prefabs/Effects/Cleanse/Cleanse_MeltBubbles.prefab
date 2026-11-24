@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &3540693722256981499
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: ShapeModule.m_Scale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 450
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 0.015
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: EmissionModule.rateOverTime.scalar
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: InitialModule.startLifetime.scalar
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: EmissionModule.rateOverTime.minScalar
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: InitialModule.startLifetime.minScalar
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1748790135662667022, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: EmissionModule.rateOverTime.minMaxState
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2112273042982122370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4620270504940367508, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: m_Name
+      value: Cleanse_MeltBubbles
+      objectReference: {fileID: 0}
+    - target: {fileID: 4794322167393617370, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 1ad233c3faeb08e4ca28016ab071d657, type: 2}
+    - target: {fileID: 6350995025903414691, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 450
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775032544766466050, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: db7ca10874960f44c9b27884c3afa066, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 6094339587f5b5f42a0eef85918c5065, type: 3}

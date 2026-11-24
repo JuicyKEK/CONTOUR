@@ -20,6 +20,14 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
     [SerializeField] private Vector3 _monsterOpenAngle = new Vector3(0f, 120f, 0f);
     [SerializeField] private float _monsterDuration = 0.2f;
     [SerializeField] private UnityEvent _onOpenByMonster;
+    [Header("С разбега")]
+    [Tooltip("Дверь распахивают с разбега: в неё вбегает игрок или монстр в погоне. Угол - как у обычного открытия " +
+             "(у монстра - как в Monster Open Settings), а время - это.")]
+    [SerializeField, Min(0.01f)] private float _rushDuration = 0.2f;
+    [Tooltip("Створка уходит от того, кто вбегает: если он с той стороны, куда дверь открывается, она откроется " +
+             "в обратную сторону на тот же угол. Выключите у двери, которой в обратную сторону мешает стена или мебель.")]
+    [SerializeField] private bool _rushSwingAwayFromOpener = true;
+    [Space]
     [SerializeField] private float _lockedShakeAngle = 5f;
     [SerializeField] private float _lockedShakeDuration = 0.15f;
     [SerializeField] private int _lockedShakecount = 2;
@@ -65,6 +73,10 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
 
     public async void ChangeState(bool isOpen)
     {
+        // Дверь может позвать вид напрямую ещё до его Start (восстановление стороны открытой створки).
+        _door ??= GetComponent<IInteractionDoor>();
+        _collider ??= GetComponent<Collider>();
+
         // Состояние пришло из сохранения - дверь должна просто стоять открытой/закрытой.
         if (_door != null && _door.IsRestoringState)
         {
@@ -75,11 +87,33 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
         await SetDoorStateAsync(isOpen);
     }
 
+    public bool ShouldOpenReversed(Vector3 openerPosition)
+    {
+        if (!_rushSwingAwayFromOpener)
+        {
+            return false;
+        }
+
+        _door ??= GetComponent<IInteractionDoor>();
+        bool isMonster = _useMonsterOpenAnimation
+            && _door != null
+            && _door.LastOpener.CurrentValue == DoorOpenerKind.Monster;
+
+        return Game.Scripts.InteractionObjects.DoorSwing.IsSwingTowards(
+            transform, _closedRotation, isMonster ? _monsterRotation : _openRotation, openerPosition);
+    }
+
+    private Quaternion GetOpenRotation(Quaternion openRotation, bool isReversed)
+    {
+        return isReversed ? Game.Scripts.InteractionObjects.DoorSwing.Reverse(_closedRotation, openRotation) : openRotation;
+    }
+
     private void SetDoorStateInstant(bool isOpen)
     {
         _cts?.Cancel();
         _currentTween?.Kill();
-        transform.localRotation = isOpen ? _openRotation : _closedRotation;
+        bool isReversed = _door != null && _door.IsOpenReversed;
+        transform.localRotation = isOpen ? GetOpenRotation(_openRotation, isReversed) : _closedRotation;
 
         if (_collider != null)
         {
@@ -98,10 +132,13 @@ public class DefaultDoorView : MonoBehaviour, IInteractionDoorView
             && _useMonsterOpenAnimation
             && _door.LastOpener.CurrentValue == DoorOpenerKind.Monster;
 
+        bool isRush = isOpen && _door.IsRushOpen;
+        bool isReversed = isOpen && _door.IsOpenReversed;
+
         Quaternion targetRotation = isOpen
-            ? (isMonster ? _monsterRotation : _openRotation)
+            ? GetOpenRotation(isMonster ? _monsterRotation : _openRotation, isReversed)
             : _closedRotation;
-        float duration = isMonster ? _monsterDuration : _duration;
+        float duration = isRush ? _rushDuration : isMonster ? _monsterDuration : _duration;
 
         _currentTween = transform
             .DOLocalRotateQuaternion(targetRotation, duration)

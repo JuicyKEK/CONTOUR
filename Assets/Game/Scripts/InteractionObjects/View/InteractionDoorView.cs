@@ -27,6 +27,16 @@ namespace Game.Scripts.InteractionObjects.Controllers
         [SerializeField] private float _monsterDuration = 0.2f;
         [SerializeField] private AnimationCurve _monsterOpenCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
         [SerializeField] private UnityEvent _onOpenByMonster;
+        [Header("С разбега")]
+        [Tooltip("Дверь распахивают с разбега: в неё вбегает игрок или монстр в погоне. Угол - как у обычного открытия " +
+                 "(у монстра - как в Monster Open Settings), а время - это.")]
+        [SerializeField, Min(0.01f)] private float _rushDuration = 0.2f;
+        [Tooltip("Как створка распахивается с разбега: по умолчанию резко с места и с замедлением к концу.")]
+        [SerializeField] private AnimationCurve _rushOpenCurve =
+            new AnimationCurve(new Keyframe(0f, 0f, 0f, 3f), new Keyframe(1f, 1f, 0f, 0f));
+        [Tooltip("Створка уходит от того, кто вбегает: если он с той стороны, куда дверь открывается, она откроется " +
+                 "в обратную сторону на тот же угол. Выключите у двери, которой в обратную сторону мешает стена или мебель.")]
+        [SerializeField] private bool _rushSwingAwayFromOpener = true;
         [Header("Locked Shake Settings")]
         [SerializeField] private float _lockedShakeAngle = 5f;
         [SerializeField] private float _lockedShakeDuration = 0.15f;
@@ -69,6 +79,10 @@ namespace Game.Scripts.InteractionObjects.Controllers
 
         public async void ChangeState(bool isOpen)
         {
+            // Дверь может позвать вид напрямую ещё до его Start (восстановление стороны открытой створки).
+            _door ??= GetComponent<IInteractionDoor>();
+            _collider ??= GetComponent<Collider>();
+
             // Состояние пришло из сохранения - дверь должна просто стоять открытой/закрытой.
             if (_door != null && _door.IsRestoringState)
             {
@@ -79,11 +93,34 @@ namespace Game.Scripts.InteractionObjects.Controllers
             await SetDoorStateAsync(isOpen);
         }
 
+        public bool ShouldOpenReversed(Vector3 openerPosition)
+        {
+            if (!_rushSwingAwayFromOpener)
+            {
+                return false;
+            }
+
+            _door ??= GetComponent<IInteractionDoor>();
+            bool isMonster = _useMonsterOpenAnimation
+                && _door != null
+                && _door.LastOpener.CurrentValue == DoorOpenerKind.Monster;
+            Quaternion openRotation = Quaternion.Euler(isMonster ? _monsterOpenAngle : _openAngle);
+
+            return DoorSwing.IsSwingTowards(transform, _closedRotation, openRotation, openerPosition);
+        }
+
+        private Quaternion GetOpenRotation(Vector3 openAngle, bool isReversed)
+        {
+            Quaternion openRotation = Quaternion.Euler(openAngle);
+            return isReversed ? DoorSwing.Reverse(_closedRotation, openRotation) : openRotation;
+        }
+
         private void SetDoorStateInstant(bool isOpen)
         {
             _cts?.Cancel();
             _currentTween?.Kill();
-            transform.localRotation = isOpen ? Quaternion.Euler(_openAngle) : _closedRotation;
+            bool isReversed = _door != null && _door.IsOpenReversed;
+            transform.localRotation = isOpen ? GetOpenRotation(_openAngle, isReversed) : _closedRotation;
 
             if (_collider != null)
             {
@@ -102,11 +139,14 @@ namespace Game.Scripts.InteractionObjects.Controllers
                 && _useMonsterOpenAnimation
                 && _door.LastOpener.CurrentValue == DoorOpenerKind.Monster;
 
+            bool isRush = isOpen && _door.IsRushOpen;
+            bool isReversed = isOpen && _door.IsOpenReversed;
+
             Quaternion targetRotation = isOpen
-                ? Quaternion.Euler(isMonster ? _monsterOpenAngle : _openAngle)
+                ? GetOpenRotation(isMonster ? _monsterOpenAngle : _openAngle, isReversed)
                 : _closedRotation;
-            float duration = isMonster ? _monsterDuration : _duration;
-            AnimationCurve curve = isMonster ? _monsterOpenCurve : _openCurve;
+            float duration = isRush ? _rushDuration : isMonster ? _monsterDuration : _duration;
+            AnimationCurve curve = isRush ? _rushOpenCurve : isMonster ? _monsterOpenCurve : _openCurve;
 
             _currentTween = transform
                 .DOLocalRotateQuaternion(targetRotation, duration)

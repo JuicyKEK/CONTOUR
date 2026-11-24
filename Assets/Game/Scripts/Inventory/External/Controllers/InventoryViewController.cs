@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Game.Scripts.Inventory.External.Controllers.Interfaces;
 using Game.Scripts.Inventory.Runtime.Data.Interfaces;
 using Game.Scripts.Inventory.Runtime.View;
 using JuicyDI.Attributes;
@@ -11,7 +12,9 @@ namespace Game.Scripts.Inventory.Controllers
     {
         [SerializeField] private InventoryItemView m_InventoryItemViewPrefab;
         [SerializeField] private Transform m_InventoryItemTransform;
-        
+
+        [Inject] private IInventoryIconLoader m_IconLoader;
+
         private List<InventoryItemView> m_InventoryItemViews = new List<InventoryItemView>();
         
         public void UpdateInventoryView(IInventoryData inventoryData)
@@ -21,8 +24,8 @@ namespace Game.Scripts.Inventory.Controllers
             for (int i = 0; i < inventoryData.InventoryObjects.Count; i++)
             {
                 var view = GetItemView(i);
-                view.Init(inventoryData.InventoryObjects[i].Peek().ObjectIcon, 
-                    inventoryData.InventoryObjects[i].Count);
+                view.Init(inventoryData.InventoryObjects[i].Peek().IconAddress,
+                    inventoryData.InventoryObjects[i].Count, m_IconLoader);
             }
         }
         

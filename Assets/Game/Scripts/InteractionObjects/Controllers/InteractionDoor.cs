@@ -15,7 +15,11 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
     [SerializeField] private bool _isOpenOnStart;
     
     public bool IsRestoringState => _isRestoringState;
+    public bool IsRushOpen => _isRushOpen;
+    public bool IsOpenReversed => _isOpenReversed;
 
+    private bool _isRushOpen;
+    private bool _isOpenReversed;
     private ReactiveProperty<bool> _isOpen;
     private ReactiveProperty<bool> _isLocked;
     private ReactiveProperty<DoorOpenerKind> _lastOpener;
@@ -48,13 +52,35 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
 
     public void RestoreState(bool isOpen, bool isLocked)
     {
+        RestoreState(isOpen, isLocked, false);
+    }
+
+    public void RestoreState(bool isOpen, bool isLocked, bool isOpenReversed)
+    {
         EnsureState();
         _isRestoringState = true;
 
         try
         {
+            bool sideChanged = _isOpenReversed != (isOpen && isOpenReversed);
+            _isRushOpen = false;
+            _isOpenReversed = isOpen && isOpenReversed;
             _isLocked.Value = isLocked;
-            _isOpen.Value = isOpen;
+
+            if (_isOpen.Value != isOpen)
+            {
+                _isOpen.Value = isOpen;
+            }
+            else if (sideChanged)
+            {
+                // Открыта и была, но в другую сторону: состояние не меняется, поэтому виды переставляются напрямую.
+                _views ??= GetComponents<IInteractionDoorView>();
+
+                foreach (IInteractionDoorView view in _views)
+                {
+                    view.ChangeState(isOpen);
+                }
+            }
         }
         finally
         {
@@ -62,12 +88,14 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
         }
     }
 
-    public void Interact()
+    public virtual void Interact()
     {
         _lastOpener.Value = DoorOpenerKind.Human;
 
         if (!_isLocked.Value)
         {
+            _isRushOpen = false;
+            _isOpenReversed = false;
             _isOpen.Value = !_isOpen.Value;
         }
         else
@@ -92,12 +120,50 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
 
         if (!_isOpen.Value)
         {
+            _isRushOpen = false;
+            _isOpenReversed = false;
             _isOpen.Value = true;
         }
 
         return true;
     }
-    
+
+    public bool TryRushOpen(DoorOpenerKind opener, Vector3 openerPosition)
+    {
+        EnsureState();
+        _lastOpener.Value = opener;
+
+        if (_isLocked.Value)
+        {
+            _isTryingOpenLockedDoor.OnNext(Unit.Default);
+            return false;
+        }
+
+        if (!_isOpen.Value)
+        {
+            _isRushOpen = true;
+            _isOpenReversed = ShouldOpenReversed(openerPosition);
+            _isOpen.Value = true;
+        }
+
+        return true;
+    }
+
+    private bool ShouldOpenReversed(Vector3 openerPosition)
+    {
+        _views ??= GetComponents<IInteractionDoorView>();
+
+        foreach (IInteractionDoorView view in _views)
+        {
+            if (view.ShouldOpenReversed(openerPosition))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>
     /// Щеколда: задвигает или отодвигает. Задвинуть можно только закрытую дверь - пока дверь открыта
     /// или створка ещё закрывается, нажатие ничего не меняет. Отодвинуть можно всегда.
@@ -110,6 +176,15 @@ public class InteractionDoor : MonoBehaviour, IInteractionDoor, IInteraction
         }
 
         _isLocked.Value = !_isLocked.Value;
+    }
+
+    /// <summary>
+    /// Отпереть дверь (её открыли ключом, сломали замок). В отличие от щеколды (Lock) только отпирает.
+    /// </summary>
+    protected void Unlock()
+    {
+        EnsureState();
+        _isLocked.Value = false;
     }
 
     private bool IsLeafMoving()

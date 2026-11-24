@@ -53,7 +53,16 @@ namespace Game.Scripts.NPC.Runtime.States
             {
                 if (!door.IsLocked.CurrentValue && blackboard.Definition.CanOpenDoors)
                 {
-                    door.TryOpenBy(blackboard.Controller.GetDoorOpener(blackboard.MovePace == NpcPace.Chase));
+                    if (blackboard.MovePace == NpcPace.Chase)
+                    {
+                        // Бегом - дверь распахивается с разбега, створкой от бота.
+                        door.TryRushOpen(blackboard.Controller.GetDoorOpener(true), blackboard.Self.position);
+                    }
+                    else
+                    {
+                        door.TryOpenBy(blackboard.Controller.GetDoorOpener(false));
+                    }
+
                     NpcNavigation.SetStopped(blackboard.Agent, false);
                 }
                 else
