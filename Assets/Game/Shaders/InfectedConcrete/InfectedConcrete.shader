@@ -63,6 +63,20 @@ Shader "Custom/InfectedConcrete"
         _SwayCurl ("Curl along the Tentacle", Range(0, 12)) = 4
         _ReachAmount ("Reach toward the Player, m", Range(0, 1)) = 0.6
         [HideInInspector] _ReachTarget ("Reach Target (xyz world, w strength; set by InfectionTentacleReach)", Vector) = (0, 0, 0, 0)
+
+        [Header(Blisters)]
+        [Toggle(_BLISTERS)] _BlistersEnabled ("Blisters (swell and burst; amount driven by InfectionSpreadGrowView)", Float) = 0
+        _BlisterAmount ("Blister Amount (share of cells)", Range(0, 1)) = 0
+        _BlisterScale ("Blisters per m", Range(2, 60)) = 16
+        _BlisterSpeed ("Swell-Burst Cycles per s", Range(0, 3)) = 0.45
+        _BlisterHeight ("Blister Height, m", Range(0, 0.08)) = 0.03
+        _BlisterColor ("Blister Color", Color) = (0.45, 0.3, 0.2, 1)
+
+        [Header(Growth)]
+        [Toggle(_GROWTH)] _GrowthEnabled ("Growth (UV3: xyz - root of the piece, w - its order; driven by InfectionSpreadGrowView)", Float) = 0
+        _Growth ("Growth 0-1", Range(0, 1)) = 1
+        _GrowthSpan ("Growth of one Piece, share of the whole", Range(0.05, 1)) = 0.35
+        _GrowthWrithe ("Writhing while Growing, m", Range(0, 0.3)) = 0.05
     }
 
     SubShader
@@ -109,9 +123,18 @@ Shader "Custom/InfectedConcrete"
             float _SwayCurl;
             float _ReachAmount;
             float4 _ReachTarget;
+            float _Growth;
+            float _GrowthSpan;
+            float _GrowthWrithe;
+            half _BlisterAmount;
+            float _BlisterScale;
+            float _BlisterSpeed;
+            float _BlisterHeight;
+            half4 _BlisterColor;
         CBUFFER_END
 
         #include "Assets/Game/Shaders/InfectedConcrete/InfectedConcreteCommon.hlsl"
+        #include "Assets/Game/Shaders/InfectionGrowth/InfectionGrowth.hlsl"
         ENDHLSL
 
         Pass
@@ -124,6 +147,8 @@ Shader "Custom/InfectedConcrete"
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature_local_vertex _TENTACLE_SWAY
+            #pragma shader_feature_local _GROWTH
+            #pragma shader_feature_local _BLISTERS
 
             // Глянец мокрой крови и кожи - вторым слоем освещения URP.
             #define _CLEARCOAT 1
@@ -163,6 +188,7 @@ Shader "Custom/InfectedConcrete"
                 float4 color            : COLOR;
                 float2 staticLightmapUV : TEXCOORD1;
                 float2 dynamicLightmapUV: TEXCOORD2;
+                float4 growth           : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -181,6 +207,7 @@ Shader "Custom/InfectedConcrete"
             #endif
                 float3 positionOS   : TEXCOORD6;   // до сдвига - узор вен считается по ней
                 float3 normalOS     : TEXCOORD7;   // до сдвига - веса трипланара
+                float growthFresh   : TEXCOORD8;   // рост: насколько кусок ещё свежий
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -194,6 +221,7 @@ Shader "Custom/InfectedConcrete"
 
                 float3 displacedOS, displacedNormalOS;
                 IC_DisplaceAll(input.positionOS.xyz, input.normalOS, input.color, displacedOS, displacedNormalOS);
+                displacedOS = InfectionGrow(displacedOS, input.growth, input.color.r, input.color.g, output.growthFresh);
                 VertexPositionInputs positionInputs = GetVertexPositionInputs(displacedOS);
                 output.positionCS = positionInputs.positionCS;
                 output.positionWS = positionInputs.positionWS;
@@ -281,11 +309,19 @@ Shader "Custom/InfectedConcrete"
                 smoothness = lerp(smoothness, 0.95, veins.flow);
                 clearCoat = max(clearCoat, veins.flow);
 
-                // Нормаль: сдвинутая поверхность + текстура бетона/кожи + мелкий рельеф вен в пикселе
+                // Волдыри: натянутая блестящая плёнка светлее мяса вокруг
+                float blister = IC_Blisters(input.positionOS);
+            #if defined(_BLISTERS)
+                albedo = lerp(albedo, _BlisterColor.rgb, saturate(blister * 1.4) * 0.75);
+                smoothness = lerp(smoothness, 0.97, saturate(blister * 2.0));
+                clearCoat = max(clearCoat, saturate(blister * 2.0));
+            #endif
+
+                // Нормаль: сдвинутая поверхность + текстура бетона/кожи + мелкий рельеф вен (и волдырей) в пикселе
                 float3 displacedN = normalize(input.normalWS);
                 float3 detailOS = concreteN - nOS;
                 float3 normalWS = normalize(displacedN + TransformObjectToWorldNormal(detailOS, false) * (1.0 - veins.core));
-                normalWS = IC_BumpFromHeight(input.positionWS, normalWS, veins.height, _DetailBump);
+                normalWS = IC_BumpFromHeight(input.positionWS, normalWS, veins.height + blister * _BlisterHeight, _DetailBump);
 
                 InputData inputData = (InputData)0;
                 inputData.positionWS = input.positionWS;
@@ -310,6 +346,8 @@ Shader "Custom/InfectedConcrete"
                 inputData.bakedGI = SAMPLE_GI(input.staticLightmapUV, input.vertexSH, inputData.normalWS);
                 inputData.shadowMask = SAMPLE_SHADOWMASK(input.staticLightmapUV);
             #endif
+
+                InfectionGrowthFreshSurface(input.growthFresh, albedo, smoothness);
 
                 SurfaceData surface = (SurfaceData)0;
                 surface.albedo = albedo;
@@ -344,6 +382,8 @@ Shader "Custom/InfectedConcrete"
             #pragma vertex ShadowVert
             #pragma fragment ShadowFrag
             #pragma shader_feature_local_vertex _TENTACLE_SWAY
+            #pragma shader_feature_local_vertex _GROWTH
+            #pragma shader_feature_local_vertex _BLISTERS
             #pragma multi_compile_instancing
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
@@ -356,6 +396,7 @@ Shader "Custom/InfectedConcrete"
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
                 float4 color      : COLOR;
+                float4 growth     : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -364,6 +405,8 @@ Shader "Custom/InfectedConcrete"
                 UNITY_SETUP_INSTANCE_ID(input);
                 float3 displacedOS, displacedNormalOS;
                 IC_DisplaceAll(input.positionOS.xyz, input.normalOS, input.color, displacedOS, displacedNormalOS);
+                float growthFresh;
+                displacedOS = InfectionGrow(displacedOS, input.growth, input.color.r, input.color.g, growthFresh);
                 float3 positionWS = TransformObjectToWorld(displacedOS);
                 float3 normalWS = TransformObjectToWorldNormal(displacedNormalOS);
             #if _CASTING_PUNCTUAL_LIGHT_SHADOW
@@ -394,6 +437,8 @@ Shader "Custom/InfectedConcrete"
             #pragma vertex DepthVert
             #pragma fragment DepthFrag
             #pragma shader_feature_local_vertex _TENTACLE_SWAY
+            #pragma shader_feature_local_vertex _GROWTH
+            #pragma shader_feature_local_vertex _BLISTERS
             #pragma multi_compile_instancing
 
             struct Attributes
@@ -401,6 +446,7 @@ Shader "Custom/InfectedConcrete"
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
                 float4 color      : COLOR;
+                float4 growth     : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -409,6 +455,8 @@ Shader "Custom/InfectedConcrete"
                 UNITY_SETUP_INSTANCE_ID(input);
                 float3 displacedOS, displacedNormalOS;
                 IC_DisplaceAll(input.positionOS.xyz, input.normalOS, input.color, displacedOS, displacedNormalOS);
+                float growthFresh;
+                displacedOS = InfectionGrow(displacedOS, input.growth, input.color.r, input.color.g, growthFresh);
                 return TransformObjectToHClip(displacedOS);
             }
 
@@ -430,6 +478,8 @@ Shader "Custom/InfectedConcrete"
             #pragma vertex NormalsVert
             #pragma fragment NormalsFrag
             #pragma shader_feature_local_vertex _TENTACLE_SWAY
+            #pragma shader_feature_local_vertex _GROWTH
+            #pragma shader_feature_local_vertex _BLISTERS
             #pragma multi_compile_instancing
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
 
@@ -438,6 +488,7 @@ Shader "Custom/InfectedConcrete"
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
                 float4 color      : COLOR;
+                float4 growth     : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -453,6 +504,8 @@ Shader "Custom/InfectedConcrete"
                 UNITY_SETUP_INSTANCE_ID(input);
                 float3 displacedOS, displacedNormalOS;
                 IC_DisplaceAll(input.positionOS.xyz, input.normalOS, input.color, displacedOS, displacedNormalOS);
+                float growthFresh;
+                displacedOS = InfectionGrow(displacedOS, input.growth, input.color.r, input.color.g, growthFresh);
                 output.positionCS = TransformObjectToHClip(displacedOS);
                 output.normalWS = TransformObjectToWorldNormal(displacedNormalOS);
                 return output;

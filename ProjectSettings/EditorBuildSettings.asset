@@ -60,6 +60,7 @@ EditorBuildSettings:
     path: Assets/Game/TestScenes/EffectsShowcase/EffectsShowcase.unity
     guid: a2499753f5546464db86143fe6adecf5
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: d88b6be506acc964e9f99a8dcdd330fc, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: baad02ed314ed994698079d6c595bcfc, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

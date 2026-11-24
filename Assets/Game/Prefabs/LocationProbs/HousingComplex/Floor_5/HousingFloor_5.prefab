@@ -10782,6 +10782,7 @@ GameObject:
   - component: {fileID: 2805696749371692737}
   - component: {fileID: 1635284270574274085}
   - component: {fileID: 2186539178114927192}
+  - component: {fileID: 7629950346198289118}
   m_Layer: 0
   m_Name: Infection_E2_Living
   m_TagString: Untagged
@@ -10842,6 +10843,28 @@ MonoBehaviour:
   m_ZoneSource: {fileID: 0}
   m_RequiredItemKey: Spray with vinegar
   m_DecreaseAmount: 10
+--- !u!114 &7629950346198289118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1833057217111972360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a9ce37d4048ce940a62d20b9f1f2532, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InfectionZone.External.View.InfectionCleanupMeltView
+  m_Cleanup: {fileID: 2186539178114927192}
+  m_Range: {fileID: 0}
+  m_MeltMaterial: {fileID: 2100000, guid: fa81908ed6f07ef4092e2ba19abd7ef0, type: 2}
+  m_BubblesPrefab: {fileID: 2983601160909510901, guid: 7d829dd608ea62740908d593aafc0f05, type: 3}
+  m_Duration: 5
+  m_BubblesFrom: 0.4
+  m_BubblesTo: 0.8
+  m_BubblesPerSquareMeter: 70
+  m_MaxBubblesPerSecond: 220
+  m_FloorSearch: 4
 --- !u!1 &1871120701979709693
 GameObject:
   m_ObjectHideFlags: 0
@@ -17825,6 +17848,7 @@ GameObject:
   - component: {fileID: 3841732398318548273}
   - component: {fileID: 2434837987130224960}
   - component: {fileID: 1008075244674109675}
+  - component: {fileID: 6807354819756772741}
   m_Layer: 0
   m_Name: Growth
   m_TagString: Untagged
@@ -17925,6 +17949,28 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.2, y: 0.22, z: 1.1500001}
   m_Center: {x: 0.100000024, y: -0.09, z: 36.4}
+--- !u!114 &6807354819756772741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2947311271242714164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a9ce37d4048ce940a62d20b9f1f2532, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InfectionZone.External.View.InfectionCleanupMeltView
+  m_Cleanup: {fileID: 0}
+  m_Range: {fileID: 2092125696395259887}
+  m_MeltMaterial: {fileID: 2100000, guid: fa81908ed6f07ef4092e2ba19abd7ef0, type: 2}
+  m_BubblesPrefab: {fileID: 2983601160909510901, guid: 7d829dd608ea62740908d593aafc0f05, type: 3}
+  m_Duration: 5
+  m_BubblesFrom: 0.4
+  m_BubblesTo: 0.8
+  m_BubblesPerSquareMeter: 70
+  m_MaxBubblesPerSecond: 220
+  m_FloorSearch: 4
 --- !u!1 &2951491048629194117
 GameObject:
   m_ObjectHideFlags: 0
@@ -61439,7 +61485,8 @@ MonoBehaviour:
   m_ZoneSource: {fileID: 0}
   m_MinInfectionPercent: 80
   m_MaxInfectionPercent: 100
-  m_TargetObjects:
+  m_TargetObjects: []
+  m_ViewHiddenTargets:
   - {fileID: 2947311271242714164}
 --- !u!1 &9039504860696093632
 GameObject:

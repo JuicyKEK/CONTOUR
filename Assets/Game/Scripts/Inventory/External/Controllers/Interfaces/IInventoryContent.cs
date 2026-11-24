@@ -8,9 +8,9 @@ namespace Game.Scripts.Inventory.External.Controllers.Interfaces
     public interface IInventoryContent
     {
         /// <summary>
-        /// Ячейки инвентаря по порядку: ключ предмета и сколько таких предметов в ячейке.
+        /// Ячейки инвентаря по порядку: предмет ячейки (ключ, ключ иконки) и сколько таких предметов в ячейке.
         /// </summary>
-        void GetItems(List<KeyValuePair<string, int>> result);
+        void GetItems(List<KeyValuePair<IInventoryObject, int>> result);
 
         /// <summary>
         /// Убирает из инвентаря все предметы.

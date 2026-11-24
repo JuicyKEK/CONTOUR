@@ -1,20 +1,18 @@
-using UnityEngine;
-
 namespace Game.Scripts.Inventory.External.Data
 {
     /// <summary>
-    /// Предмет в инвентаре: ключ и иконка. Создаётся при подборе (InventoryPickup) и при загрузке сохранения
-    /// (иконка - из каталога предметов). Объекта на сцене у него нет.
+    /// Предмет в инвентаре: ключ предмета и ключ его иконки в Addressables. Создаётся при подборе (InventoryPickup)
+    /// и при загрузке сохранения. Объекта на сцене у него нет; иконку по ключу грузит вид инвентаря.
     /// </summary>
     public class InventoryItemData : IInventoryObject
     {
         public string ObjectKey { get; }
-        public Sprite ObjectIcon { get; }
+        public string IconAddress { get; }
 
-        public InventoryItemData(string objectKey, Sprite objectIcon)
+        public InventoryItemData(string objectKey, string iconAddress)
         {
             ObjectKey = objectKey;
-            ObjectIcon = objectIcon;
+            IconAddress = iconAddress;
         }
 
         public void InventoryObjectAction()

@@ -12,9 +12,14 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
     ///   до нужного диапазона (например 60-70%).
     /// Объект не реализует IInteraction - игрок не может провзаимодействовать с ним напрямую,
     /// единственный способ убрать его - изменить степень заражения зоны.
+    /// Цели из m_ViewHiddenTargets контроллер только показывает; когда заражение выходит из диапазона,
+    /// их убирает их вид по <see cref="IsInRange"/> (например, стена расплавляется и выключается сама).
+    /// Состояние на старте (из сохранения) применяется ко всем целям сразу.
     /// </summary>
     public class InfectionRangeObject : MonoBehaviour, IInfectionRangeObject
     {
+        public ReadOnlyReactiveProperty<bool> IsInRange => m_IsInRange;
+
         [Header("Ссылка на зону")]
         [Tooltip("Зона, за степенью заражения которой следит этот объект.")]
         [SerializeField] private MonoBehaviour m_ZoneSource; // должен реализовывать IInfectionZone
@@ -32,8 +37,13 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         [Tooltip("Визуальные и физические объекты, которые нужно включать/выключать. По умолчанию используется сам GameObject.")]
         [SerializeField] private GameObject[] m_TargetObjects;
 
+        [Tooltip("Цели, которые при выходе из диапазона исчезают через свой вид (например, плавятся): контроллер их только показывает, выключает их вид.")]
+        [SerializeField] private GameObject[] m_ViewHiddenTargets;
+
         private readonly CompositeDisposable m_Disposables = new();
+        private readonly ReactiveProperty<bool> m_IsInRange = new(true);
         private IInfectionZone m_Zone;
+        private bool m_HasState;
 
         public float MinInfectionPercent => m_MinInfectionPercent;
         public float MaxInfectionPercent => m_MaxInfectionPercent;
@@ -47,10 +57,12 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                 Debug.LogError($"[InfectionRangeObject] {name}: m_ZoneSource должен реализовывать IInfectionZone.", this);
             }
 
-            if (m_TargetObjects == null || m_TargetObjects.Length == 0)
+            if ((m_TargetObjects == null || m_TargetObjects.Length == 0) && (m_ViewHiddenTargets == null || m_ViewHiddenTargets.Length == 0))
             {
                 m_TargetObjects = new[] { gameObject };
             }
+
+            m_TargetObjects ??= new GameObject[0];
         }
 
         private void OnEnable()
@@ -77,6 +89,9 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         private void UpdateVisibility(float infectionLevel)
         {
             bool isInRange = infectionLevel >= m_MinInfectionPercent && infectionLevel <= m_MaxInfectionPercent;
+            bool isFirst = !m_HasState;
+            m_HasState = true;
+            m_IsInRange.Value = isInRange;
 
             foreach (var target in m_TargetObjects)
             {
@@ -85,6 +100,24 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                     target.SetActive(isInRange);
                 }
             }
+
+            if (m_ViewHiddenTargets == null)
+            {
+                return;
+            }
+
+            foreach (var target in m_ViewHiddenTargets)
+            {
+                if (target != null && (isInRange || isFirst))
+                {
+                    target.SetActive(isInRange);
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            m_IsInRange.Dispose();
         }
     }
 }

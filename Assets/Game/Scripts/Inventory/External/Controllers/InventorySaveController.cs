@@ -11,13 +11,12 @@ namespace Game.Scripts.Inventory.External.Controllers
 {
     /// <summary>
     /// Сохранение инвентаря игрока в JSON-файл (Application.persistentDataPath/Saves, см. <see cref="JsonSaveFile"/>).
-    /// Пишет ячейки инвентаря по порядку: ключ предмета и количество. Лежит рядом с InventoryController
-    /// (префаб игрока).
+    /// Пишет ячейки инвентаря по порядку: ключ предмета, ключ его иконки в Addressables и количество.
     ///
     /// Сохранение вызывается общим контроллером сохранений (GameSaveController, ISaveParticipant) -
     /// в графе сюжета это действие "Save/Save Game". Загрузка - при старте сцены, в MethodInit.
-    /// Подобранный предмет на сцене уничтожается, поэтому при загрузке предметы создаются заново по
-    /// ключу, а иконку получают из каталога предметов (<see cref="InventoryItemCatalogSO"/>).
+    /// Подобранный предмет на сцене уничтожается, поэтому при загрузке предметы создаются заново по ключам
+    /// (InventoryItemData), а иконку по ключу грузит вид инвентаря.
     /// Для проверки в Play Mode методы доступны из контекстного меню компонента.
     /// </summary>
     [JDIMonoController]
@@ -28,13 +27,11 @@ namespace Game.Scripts.Inventory.External.Controllers
         [SerializeField] private string m_FileName = "inventory.json";
         [Tooltip("Загружать сохранение при старте сцены.")]
         [SerializeField] private bool m_LoadOnStart = true;
-        [Tooltip("Каталог предметов: из него восстановленные предметы получают иконки.")]
-        [SerializeField] private InventoryItemCatalogSO m_ItemCatalog;
 
         [Inject] private IInventoryContent m_Content;
         [Inject] private IInventoryAdd m_Inventory;
 
-        private readonly List<KeyValuePair<string, int>> m_ItemsBuffer = new();
+        private readonly List<KeyValuePair<IInventoryObject, int>> m_ItemsBuffer = new();
 
         public string SavePath => JsonSaveFile.GetPath(m_FileName);
         public bool HasSave => JsonSaveFile.Exists(m_FileName);
@@ -66,16 +63,8 @@ namespace Game.Scripts.Inventory.External.Controllers
 
             for (int i = 0; i < m_ItemsBuffer.Count; i++)
             {
-                string itemKey = m_ItemsBuffer[i].Key;
-
-                if (m_ItemCatalog == null || !m_ItemCatalog.Contains(itemKey))
-                {
-                    Debug.LogWarning($"[InventorySaveController] Предмета '{itemKey}' нет в каталоге предметов - после загрузки " +
-                                     "он будет в инвентаре без иконки. Добавьте его в каталог (контекстное меню каталога -> " +
-                                     "Collect From Prefabs).", this);
-                }
-
-                data.Items.Add(new InventorySaveEntry(itemKey, m_ItemsBuffer[i].Value));
+                var item = m_ItemsBuffer[i].Key;
+                data.Items.Add(new InventorySaveEntry(item.ObjectKey, item.IconAddress, m_ItemsBuffer[i].Value));
             }
 
             m_ItemsBuffer.Clear();
@@ -109,17 +98,15 @@ namespace Game.Scripts.Inventory.External.Controllers
                     continue;
                 }
 
-                Sprite icon = null;
-
-                if (m_ItemCatalog == null || !m_ItemCatalog.TryGetIcon(entry.ItemKey, out icon))
+                if (string.IsNullOrEmpty(entry.IconAddress))
                 {
-                    Debug.LogWarning($"[InventorySaveController] Предмета '{entry.ItemKey}' нет в каталоге предметов - " +
-                                     "он восстановлен без иконки.", this);
+                    Debug.LogWarning($"[InventorySaveController] У предмета '{entry.ItemKey}' в сохранении нет ключа иконки " +
+                                     $"(сохранение версии {data.Version}) - он восстановлен без иконки.", this);
                 }
 
                 for (int i = 0; i < entry.Amount; i++)
                 {
-                    m_Inventory.AddItem(new InventoryItemData(entry.ItemKey, icon));
+                    m_Inventory.AddItem(new InventoryItemData(entry.ItemKey, entry.IconAddress));
                 }
             }
 

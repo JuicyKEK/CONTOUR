@@ -29,16 +29,72 @@ IC_VeinSample IC_Veins(float3 positionOS)
     return IC_VeinsCore(positionOS, v);
 }
 
-// Сдвиг вершины по нормали на высоту вен и новая нормаль (по двум соседним точкам на поверхности).
+float3 IC_BlisterHash(float2 p)
+{
+    float3 q = float3(dot(p, float2(127.1, 311.7)), dot(p, float2(269.5, 183.3)), dot(p, float2(419.2, 371.9)));
+    return frac(sin(q) * 43758.5453);
+}
+
+// Волдыри (только с включённым Blisters, ключевое слово _BLISTERS): пузыри в ячейках шума по плоскости XY объекта
+// (стене). Каждый надувается в своё время и резко лопается, потом надувается снова. _BlisterAmount - доля ячеек с
+// пузырём (0 - пузырей нет; задаёт вид, InfectionSpreadGrowView). Возвращает высоту купола 0..1 (в метрах - на _BlisterHeight).
+float IC_Blisters(float3 positionOS)
+{
+#if defined(_BLISTERS)
+    if (_BlisterAmount <= 0.001)
+    {
+        return 0.0;
+    }
+
+    float2 q = positionOS.xy * _BlisterScale + positionOS.z * 0.37;
+    float2 cell = floor(q);
+    float2 f = q - cell;
+    float h = 0.0;
+
+    [unroll] for (int y = -1; y <= 1; y++)
+    {
+        [unroll] for (int x = -1; x <= 1; x++)
+        {
+            float2 c = float2(x, y);
+            float3 r = IC_BlisterHash(cell + c);
+
+            if (r.z > _BlisterAmount)
+            {
+                continue;
+            }
+
+            // Надувается медленно, лопается резко.
+            float life = frac(_Time.y * _BlisterSpeed * (0.6 + 0.8 * r.x) + r.y * 7.13);
+            float swell = smoothstep(0.0, 0.85, life) * (1.0 - smoothstep(0.93, 0.98, life));
+            float radius = (0.28 + 0.22 * r.x) * swell;
+            float2 d = f - (c + 0.25 + r.xy * 0.5);
+            float k = saturate(1.0 - dot(d, d) / max(radius * radius, 1e-4));
+            h = max(h, sqrt(k) * radius * 2.0);
+        }
+    }
+
+    return h;
+#else
+    return 0.0;
+#endif
+}
+
+// Высота поверхности над исходной: вены и сгустки, с Blisters - ещё волдыри.
+float IC_SurfaceHeight(float3 positionOS)
+{
+    return IC_Veins(positionOS).height + IC_Blisters(positionOS) * _BlisterHeight;
+}
+
+// Сдвиг вершины по нормали на высоту вен (и волдырей) и новая нормаль (по двум соседним точкам на поверхности).
 void IC_Displace(float3 positionOS, float3 normalOS, out float3 displacedOS, out float3 displacedNormalOS)
 {
     float3 n = normalize(normalOS);
     float3 tangent = normalize(cross(n, abs(n.y) < 0.95 ? float3(0, 1, 0) : float3(1, 0, 0)));
     float3 bitangent = cross(n, tangent);
     const float eps = 0.006;
-    float h0 = IC_Veins(positionOS).height;
-    float ht = IC_Veins(positionOS + tangent * eps).height;
-    float hb = IC_Veins(positionOS + bitangent * eps).height;
+    float h0 = IC_SurfaceHeight(positionOS);
+    float ht = IC_SurfaceHeight(positionOS + tangent * eps);
+    float hb = IC_SurfaceHeight(positionOS + bitangent * eps);
     displacedOS = positionOS + n * h0;
     float3 pt = positionOS + tangent * eps + n * ht;
     float3 pb = positionOS + bitangent * eps + n * hb;

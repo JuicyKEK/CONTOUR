@@ -562,6 +562,7 @@ GameObject:
   - component: {fileID: 7136899024558200129}
   - component: {fileID: 2502888406053738235}
   - component: {fileID: 6229965574562835673}
+  - component: {fileID: 3523102184971273943}
   m_Layer: 0
   m_Name: PlayerCanvas
   m_TagString: Untagged
@@ -678,6 +679,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_InventoryItemViewPrefab: {fileID: 144944650233460737, guid: e003632fa96bfe845a6f245ee6eee6d7, type: 3}
   m_InventoryItemTransform: {fileID: 8147269653182971531}
+--- !u!114 &3523102184971273943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3510187866896533687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 076c936b0f1c05f498003e0bc827c3e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.Inventory.Controllers.InventoryIconLoader
 --- !u!1 &3962810476147898071
 GameObject:
   m_ObjectHideFlags: 0

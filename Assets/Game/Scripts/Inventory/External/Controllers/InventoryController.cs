@@ -84,7 +84,7 @@ namespace Game.Scripts.Inventory.Controllers
             TrySelectedInventoryObject(Mathf.Min(m_CurrentSellectObject, count - 1));
         }
 
-        public void GetItems(List<KeyValuePair<string, int>> result)
+        public void GetItems(List<KeyValuePair<IInventoryObject, int>> result)
         {
             result.Clear();
 
@@ -97,7 +97,7 @@ namespace Game.Scripts.Inventory.Controllers
 
             for (int i = 0; i < inventoryObjects.Count; i++)
             {
-                result.Add(new KeyValuePair<string, int>(inventoryObjects[i].Peek().ObjectKey, inventoryObjects[i].Count));
+                result.Add(new KeyValuePair<IInventoryObject, int>(inventoryObjects[i].Peek(), inventoryObjects[i].Count));
             }
         }
 

@@ -32,6 +32,12 @@
         _DripSpeed ("Drop Speed, m/s", Range(0, 2)) = 0.35
         _DripRepeat ("Drop Repeat, m", Range(0.5, 10)) = 3.0
         _DripStain ("Stain Strength", Range(0, 1)) = 0.85
+
+        [Header(Growth)]
+        [Toggle(_GROWTH)] _GrowthEnabled ("Growth (UV3: xyz - root of the piece, w - its order; driven by InfectionSpreadGrowView)", Float) = 0
+        _Growth ("Growth 0-1", Range(0, 1)) = 1
+        _GrowthSpan ("Growth of one Piece, share of the whole", Range(0.05, 1)) = 0.3
+        _GrowthWrithe ("Writhing while Growing, m", Range(0, 0.3)) = 0.015
     }
 
     SubShader
@@ -60,7 +66,12 @@
             float _DripSpeed;
             float _DripRepeat;
             half _DripStain;
+            float _Growth;
+            float _GrowthSpan;
+            float _GrowthWrithe;
         CBUFFER_END
+
+        #include "Assets/Game/Shaders/InfectionGrowth/InfectionGrowth.hlsl"
         ENDHLSL
 
         Pass
@@ -76,6 +87,7 @@
             // Второй глянцевый слой (мокрая плёнка) - средствами освещения URP.
             #define _CLEARCOAT 1
             #pragma shader_feature_local _UV_ALBEDO
+            #pragma shader_feature_local _GROWTH
 
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -109,6 +121,7 @@
                 float2 uv               : TEXCOORD0;
                 float2 staticLightmapUV : TEXCOORD1;
                 float2 dynamicLightmapUV: TEXCOORD2;
+                float4 growth           : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -126,6 +139,7 @@
                 float4 probeOcclusion : TEXCOORD5;
             #endif
                 float2 uv           : TEXCOORD6;
+                float growthFresh   : TEXCOORD7;   // рост: насколько кусок ещё свежий
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -137,7 +151,8 @@
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
-                VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS.xyz);
+                float3 positionOS = InfectionGrow(input.positionOS.xyz, input.growth, 1.0, frac(input.growth.w * 7.31), output.growthFresh);
+                VertexPositionInputs positionInputs = GetVertexPositionInputs(positionOS);
                 VertexNormalInputs normalInputs = GetVertexNormalInputs(input.normalOS);
                 output.positionCS = positionInputs.positionCS;
                 output.positionWS = positionInputs.positionWS;
@@ -294,6 +309,7 @@
                 surface.smoothness = lerp(_Smoothness * (0.75 + 0.5 * spots), _WetSmoothness, drip);
                 surface.clearCoatMask = saturate(_WetAmount * (0.7 + 0.3 * spots) + drip);
                 surface.clearCoatSmoothness = _WetSmoothness;
+                InfectionGrowthFreshSurface(input.growthFresh, surface.albedo, surface.smoothness);
 
                 half4 color = UniversalFragmentPBR(inputData, surface);
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
@@ -318,6 +334,7 @@
             #pragma fragment ShadowFrag
             #pragma multi_compile_instancing
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+            #pragma shader_feature_local_vertex _GROWTH
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
             float3 _LightDirection;
@@ -327,13 +344,16 @@
             {
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
+                float4 growth     : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             float4 ShadowVert(Attributes input) : SV_POSITION
             {
                 UNITY_SETUP_INSTANCE_ID(input);
-                float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                float growthFresh;
+                float3 positionOS = InfectionGrow(input.positionOS.xyz, input.growth, 1.0, frac(input.growth.w * 7.31), growthFresh);
+                float3 positionWS = TransformObjectToWorld(positionOS);
                 float3 normalWS = TransformObjectToWorldNormal(input.normalOS);
             #if _CASTING_PUNCTUAL_LIGHT_SHADOW
                 float3 lightDirectionWS = normalize(_LightPosition - positionWS);
@@ -363,17 +383,20 @@
             #pragma vertex DepthVert
             #pragma fragment DepthFrag
             #pragma multi_compile_instancing
+            #pragma shader_feature_local_vertex _GROWTH
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
+                float4 growth     : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             float4 DepthVert(Attributes input) : SV_POSITION
             {
                 UNITY_SETUP_INSTANCE_ID(input);
-                return TransformObjectToHClip(input.positionOS.xyz);
+                float growthFresh;
+                return TransformObjectToHClip(InfectionGrow(input.positionOS.xyz, input.growth, 1.0, frac(input.growth.w * 7.31), growthFresh));
             }
 
             half DepthFrag() : SV_Target
@@ -395,11 +418,13 @@
             #pragma fragment NormalsFrag
             #pragma multi_compile_instancing
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+            #pragma shader_feature_local_vertex _GROWTH
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
+                float4 growth     : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -413,7 +438,8 @@
             {
                 Varyings output;
                 UNITY_SETUP_INSTANCE_ID(input);
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                float growthFresh;
+                output.positionCS = TransformObjectToHClip(InfectionGrow(input.positionOS.xyz, input.growth, 1.0, frac(input.growth.w * 7.31), growthFresh));
                 output.normalWS = TransformObjectToWorldNormal(input.normalOS);
                 return output;
             }
