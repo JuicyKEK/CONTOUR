@@ -120,5 +120,22 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  m_KillClips:
+  - AnimatorState: Kill_Tongue
+    Duration: 6
+    FadeAt: 4.9
+    Distance: 0.66
+    EndOffset: {x: 0, y: -0.79}
+  - AnimatorState: Kill_Scrape
+    Duration: 5.8
+    FadeAt: 4.8
+    Distance: 0.62
+    EndOffset: {x: -0, y: 0.83}
+  - AnimatorState: Kill_NeckBite
+    Duration: 5.4
+    FadeAt: 4.3
+    Distance: 0.64
+    EndOffset: {x: 0, y: -0.83}
+  m_KillEyeBone: PlayerEye
   m_MinDistance: 1
   m_MaxDistance: 18

@@ -138,6 +138,13 @@ namespace Game.Scripts.NPC.Runtime.Controllers
 
         // Поза на точке (SnapToPoint): модель стоит точно в точке вне NavMesh, агент - на ближайшем месте NavMesh.
         private const float PoseBlendSeconds = 0.35f;
+        // Убийство от первого лица: бот за столько секунд встаёт к игроку на расстояние из анимации.
+        private const float KillSnapSeconds = 0.2f;
+        // Проверка места под анимацию убийства: шар такого радиуса на этих высотах (м над полом) и запас по длине.
+        private const float KillSpaceRadius = 0.25f;
+        private const float KillSpaceMargin = 0.3f;
+        private static readonly float[] s_KillSpaceHeights = { 0.4f, 1.1f };
+        private float m_PoseBlendSeconds = PoseBlendSeconds;
         private bool m_IsPosed;
         private bool m_IsPoseReturning;
         private float m_PoseBlend = 1f;
@@ -145,6 +152,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         private Quaternion m_PoseFromRotation;
         private Vector3 m_PoseToPosition;
         private Quaternion m_PoseToRotation;
+        private bool m_IsKilling;                                 // играет анимацию убийства от первого лица
 
         /// <summary>Смена состояния (from, to).</summary>
         public event Action<NpcStateId, NpcStateId> StateChanged;
@@ -416,6 +424,11 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 return;
             }
 
+            SetPose(point.position, Quaternion.Euler(0f, point.eulerAngles.y, 0f), PoseBlendSeconds);
+        }
+
+        private void SetPose(Vector3 position, Quaternion rotation, float blendSeconds)
+        {
             if (m_Agent != null)
             {
                 m_Agent.updatePosition = false;
@@ -426,8 +439,9 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             m_IsPoseReturning = false;
             m_PoseFromPosition = transform.position;
             m_PoseFromRotation = transform.rotation;
-            m_PoseToPosition = point.position;
-            m_PoseToRotation = Quaternion.Euler(0f, point.eulerAngles.y, 0f);
+            m_PoseToPosition = position;
+            m_PoseToRotation = rotation;
+            m_PoseBlendSeconds = blendSeconds;
             m_PoseBlend = 0f;
         }
 
@@ -458,6 +472,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             m_PoseFromRotation = transform.rotation;
             m_PoseToPosition = target;
             m_PoseToRotation = transform.rotation;
+            m_PoseBlendSeconds = PoseBlendSeconds;
             m_PoseBlend = 0f;
         }
 
@@ -468,7 +483,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 return;
             }
 
-            m_PoseBlend = Mathf.Min(1f, m_PoseBlend + deltaTime / PoseBlendSeconds);
+            m_PoseBlend = Mathf.Min(1f, m_PoseBlend + deltaTime / Mathf.Max(0.01f, m_PoseBlendSeconds));
             float t = Mathf.SmoothStep(0f, 1f, m_PoseBlend);
             transform.SetPositionAndRotation(Vector3.Lerp(m_PoseFromPosition, m_PoseToPosition, t),
                 Quaternion.Slerp(m_PoseFromRotation, m_PoseToRotation, t));
@@ -514,8 +529,8 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             }
 
             var state = m_StateMachine.CurrentStateId;
-            bool look = m_Blackboard.CanSeePlayer && Anger >= m_Definition.HeadLookAngerThreshold ||
-                        state == NpcStateId.Threaten || state == NpcStateId.Roar;
+            bool look = !m_IsKilling && (m_Blackboard.CanSeePlayer && Anger >= m_Definition.HeadLookAngerThreshold ||
+                                         state == NpcStateId.Threaten || state == NpcStateId.Roar);
             m_HeadLook.Weight = look ? 1f : 0f;
         }
 
@@ -573,6 +588,12 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             if (from != to)
             {
                 m_Doorway.Finish(m_Blackboard);
+            }
+
+            // Анимация убийства идёт, пока бот в действии (Perform); другая команда её заканчивает.
+            if (from == NpcStateId.Perform && to != NpcStateId.Perform)
+            {
+                m_IsKilling = false;
             }
 
             m_Audio?.OnStateChanged(to);
@@ -887,6 +908,10 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             KillCount++;
             LogDebug("убил игрока");
 
+            NpcKillClip killClip = default;
+            Transform killEye = null;
+            bool hasKillClip = m_CapturePlayerOnKill && PlayerCapture != null && TryGetKillClip(out killClip, out killEye);
+
             if (m_CapturePlayerOnKill)
             {
                 if (PlayerCapture != null)
@@ -905,12 +930,25 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             m_OnPlayerKilled?.Invoke();
             PlayerKilled?.Invoke();
 
-            // Поедание: бот стоит над игроком с действием 'Kill', пока не придёт другая команда (или перезагрузка).
-            PlayAction("Kill", 0f, NpcStateId.Perform);
+            if (hasKillClip)
+            {
+                // Убийство от первого лица: бот встаёт к игроку, играет анимацию, камера игрока идёт за его глазами в ней.
+                PlayAction(killClip.AnimatorState, 0f, NpcStateId.Perform);
+                PlayAnimationSound("Kill");
+                m_IsKilling = true;
+                SnapToPlayer(killClip.Distance);
+                PlayerCapture.AttachView(killEye);
+                LogDebug($"убийство '{killClip.AnimatorState}'");
+            }
+            else
+            {
+                // Поедание: бот стоит над игроком с действием 'Kill', пока не придёт другая команда (или перезагрузка).
+                PlayAction("Kill", 0f, NpcStateId.Perform);
+            }
 
             if (m_ReturnToLastSaveOnKill)
             {
-                DeathSequenceAsync().Forget();
+                DeathSequenceAsync(hasKillClip ? killClip.FadeAt : m_ReturnToLastSaveDelay).Forget();
             }
 
             if (m_CalmDownAfterKillDelay > 0f)
@@ -924,7 +962,7 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             await UniTask.Delay(TimeSpan.FromSeconds(m_CalmDownAfterKillDelay), cancellationToken: destroyCancellationToken);
 
             // Пока бот "ел", сюжет мог дать ему другую команду - тогда её не перебиваем.
-            bool isEating = CurrentState == NpcStateId.Perform && m_Blackboard.PerformKey == "Kill";
+            bool isEating = CurrentState == NpcStateId.Perform && (m_Blackboard.PerformKey == "Kill" || m_IsKilling);
             bool isStillAfterThisKill = KillCount == killNumber
                                         && (isEating || CurrentState == NpcStateId.Idle || CurrentState == NpcStateId.Attack);
 
@@ -938,10 +976,112 @@ namespace Game.Scripts.NPC.Runtime.Controllers
         /// Смерть игрока: поедание -> затемнение экрана -> возврат к последнему сохранению
         /// (без ядра игры с сохранениями - перезагрузка сцены).
         /// </summary>
-        private async UniTaskVoid DeathSequenceAsync()
+        /// <summary>
+        /// Анимация убийства из профиля (случайная) и кость глаз игрока в скелете бота. False - анимаций нет или в
+        /// скелете нет такой кости (тогда убийство как раньше).
+        /// </summary>
+        private bool TryGetKillClip(out NpcKillClip clip, out Transform eye)
+        {
+            clip = default;
+            eye = null;
+            var profile = CurrentProfile;
+
+            if (profile == null || m_Animator == null || !profile.TryGetRandomKillClip(HasRoomForKill, out clip))
+            {
+                return false;
+            }
+
+            eye = FindChild(m_Animator.transform, profile.KillEyeBone);
+
+            if (eye == null)
+            {
+                Debug.LogWarning($"[NPC] {name}: в скелете нет кости '{profile.KillEyeBone}' - убийство без анимации от первого лица.", this);
+            }
+
+            return eye != null;
+        }
+
+        /// <summary>
+        /// Хватит ли места под анимацию убийства: путь головы игрока (NpcKillClip.EndOffset) от того места, где он стоит,
+        /// свободен - нет стены или мебели (кроме самого бота и игрока).
+        /// </summary>
+        private bool HasRoomForKill(NpcKillClip clip)
+        {
+            var player = m_Blackboard?.PlayerTransform;
+
+            if (player == null || clip.EndOffset == Vector2.zero)
+            {
+                return true;
+            }
+
+            var towardBot = transform.position - player.position;
+            towardBot.y = 0f;
+            towardBot = towardBot.sqrMagnitude > 0.0001f ? towardBot.normalized : player.forward;
+            var right = Vector3.Cross(Vector3.up, towardBot);
+            var offset = right * clip.EndOffset.x + towardBot * clip.EndOffset.y;
+            float length = offset.magnitude + KillSpaceMargin;
+            var direction = offset.normalized;
+
+            foreach (float height in s_KillSpaceHeights)
+            {
+                var hits = Physics.SphereCastAll(player.position + Vector3.up * height, KillSpaceRadius, direction, length,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+
+                foreach (var hit in hits)
+                {
+                    if (!hit.collider.transform.IsChildOf(transform) && !hit.collider.transform.IsChildOf(player))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static Transform FindChild(Transform root, string childName)
+        {
+            if (root.name == childName)
+            {
+                return root;
+            }
+
+            foreach (Transform child in root)
+            {
+                var found = FindChild(child, childName);
+
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Встать лицом к игроку на distance метров от него (по полу), за KillSnapSeconds: так начинается анимация убийства.
+        /// </summary>
+        private void SnapToPlayer(float distance)
+        {
+            var player = m_Blackboard?.PlayerTransform;
+
+            if (player == null)
+            {
+                return;
+            }
+
+            var away = transform.position - player.position;
+            away.y = 0f;
+            away = away.sqrMagnitude > 0.0001f ? away.normalized : -player.forward;
+            var position = player.position + away * distance;
+            SetPose(position, Quaternion.LookRotation(-away), KillSnapSeconds);
+        }
+
+        private async UniTaskVoid DeathSequenceAsync(float delay)
         {
             var token = destroyCancellationToken;
-            await UniTask.Delay(TimeSpan.FromSeconds(m_ReturnToLastSaveDelay), cancellationToken: token);
+            await UniTask.Delay(TimeSpan.FromSeconds(delay), cancellationToken: token);
             await NpcScreenFade.FadeOutAsync(m_KillFadeDuration, token);
 
             var checkpointService = BinController.GetContext()?.GetBean<IPlayerCheckpointService>();

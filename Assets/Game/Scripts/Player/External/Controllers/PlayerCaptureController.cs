@@ -2,6 +2,7 @@
 using Game.Scripts.Story;
 using JuicyDI;
 using JuicyDI.Attributes;
+using R3;
 using UnityEngine;
 
 namespace Game.Scripts.Player.External.Controllers
@@ -11,9 +12,12 @@ namespace Game.Scripts.Player.External.Controllers
     /// взаимодействует с предметами, а камера плавно поворачивается к монстру (тело - по горизонтали, камера - по вертикали).
     /// Дальше смерть показывает тот, кто схватил (NpcController: поедание, затемнение, возврат к сохранению).
     /// Вешается на корень игрока. Release - вернуть управление (если сцену после поимки не перезагружают).
+    /// Анимация убийства от первого лица: AttachView - камера идёт за костью глаз игрока в скелете монстра
+    /// (её показывает PlayerKillCameraView).
     /// </summary>
     [JDIMonoController]
-    public class PlayerCaptureController : MonoBehaviour, IPlayerCapture
+    [SequenceParticipant(121)]
+    public class PlayerCaptureController : MonoBehaviour, IPlayerCapture, ISequence, IUpdateSequence
     {
         [SerializeField] private PlayerMovementStateMachine m_Movement;
         [SerializeField] private PlayerCameraController m_CameraController;
@@ -22,14 +26,16 @@ namespace Game.Scripts.Player.External.Controllers
         [Tooltip("За сколько секунд камера поворачивается к схватившему.")]
         [SerializeField, Min(0.01f)] private float m_TurnDuration = 0.35f;
 
+        private readonly ReactiveProperty<Transform> m_ViewAnchor = new();
         private Transform m_Attacker;
         private float m_TurnTime;
         private Quaternion m_StartYaw;
         private Quaternion m_StartPitch;
 
         public bool IsCaptured { get; private set; }
+        public ReadOnlyReactiveProperty<Transform> ViewAnchor => m_ViewAnchor;
 
-        private void Awake()
+        public void MethodInit()
         {
             if (m_Movement == null)
             {
@@ -40,6 +46,10 @@ namespace Game.Scripts.Player.External.Controllers
             {
                 m_CameraController = GetComponent<PlayerCameraController>();
             }
+        }
+
+        public void MethodStart()
+        {
         }
 
         public void Capture(Transform attacker)
@@ -63,6 +73,14 @@ namespace Game.Scripts.Player.External.Controllers
             SetInteractionEnabled(false);
         }
 
+        public void AttachView(Transform anchor)
+        {
+            if (IsCaptured)
+            {
+                m_ViewAnchor.Value = anchor;
+            }
+        }
+
         public void Release()
         {
             if (!IsCaptured)
@@ -72,6 +90,7 @@ namespace Game.Scripts.Player.External.Controllers
 
             IsCaptured = false;
             m_Attacker = null;
+            m_ViewAnchor.Value = null;
 
             if (m_Movement != null)
             {
@@ -83,9 +102,10 @@ namespace Game.Scripts.Player.External.Controllers
 
         private Transform CameraTransform => m_CameraController != null ? m_CameraController.CameraTransform : null;
 
-        private void LateUpdate()
+        public void CustomUpdate()
         {
-            if (!IsCaptured || m_Attacker == null)
+            // Камера уже идёт за глазами игрока в анимации убийства - поворачивать к монстру не нужно.
+            if (!IsCaptured || m_Attacker == null || m_ViewAnchor.Value != null)
             {
                 return;
             }

@@ -25,6 +25,20 @@ namespace Game.TestScenes.EnemyShowcase
         private Animator m_Animator;
         private float m_Next;
 
+        /// <summary>Состояние контроллера, которое держит этот объект.</summary>
+        public string State => m_State;
+
+        /// <summary>Запустить состояние заново с начала (и отсчёт до следующего повтора).</summary>
+        public void Replay()
+        {
+            if (m_Animator == null)
+            {
+                m_Animator = GetComponent<Animator>();
+            }
+
+            Play();
+        }
+
         private void Start()
         {
             m_Animator = GetComponent<Animator>();

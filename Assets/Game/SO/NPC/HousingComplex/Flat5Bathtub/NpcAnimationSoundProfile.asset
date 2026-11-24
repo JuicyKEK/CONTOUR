@@ -156,5 +156,22 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  m_KillClips:
+  - AnimatorState: Kill_Drown
+    Duration: 5.6
+    FadeAt: 4.6
+    Distance: 0.85
+    EndOffset: {x: -0, y: -0.67}
+  - AnimatorState: Kill_Break
+    Duration: 5.6
+    FadeAt: 4.6
+    Distance: 0.75
+    EndOffset: {x: -0, y: -0.19}
+  - AnimatorState: Kill_Engulf
+    Duration: 4.8
+    FadeAt: 3.9
+    Distance: 0.7
+    EndOffset: {x: 0, y: 0.06}
+  m_KillEyeBone: PlayerEye
   m_MinDistance: 1
   m_MaxDistance: 18
