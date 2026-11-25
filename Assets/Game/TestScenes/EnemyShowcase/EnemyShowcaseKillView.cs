@@ -166,7 +166,12 @@ namespace Game.TestScenes.EnemyShowcase
                 }
             }
 
-            SetFadeAlpha(m_IsFadeOn && m_HasKill ? Mathf.Clamp01((time - m_Kill.FadeAt) / m_FadeDuration) : 0f);
+            // Как в игре: затемнение по кривой убийства (игрок задыхается) до FadeAt, с FadeAt - экран темнеет до конца.
+            float darkness = m_Kill.Darkness != null && m_Kill.Darkness.length > 0
+                ? Mathf.Clamp01(m_Kill.Darkness.Evaluate(Mathf.Min(time, m_Kill.FadeAt)))
+                : 0f;
+            float fade = Mathf.Clamp01((time - m_Kill.FadeAt) / m_FadeDuration);
+            SetFadeAlpha(m_IsFadeOn && m_HasKill ? Mathf.Lerp(darkness, 1f, fade) : 0f);
             m_Status.text = $"{time:F1} / {length:F1} c" + (m_HasKill ? $",  затемнение с {m_Kill.FadeAt:F1} c" : "") + Hint;
         }
 

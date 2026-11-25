@@ -301,7 +301,7 @@ ModelImporter:
       takeName: Flat10Scraper_Rig|Kill_Tongue
       internalID: -5786894774543951783
       firstFrame: 0
-      lastFrame: 180
+      lastFrame: 234
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -359,7 +359,7 @@ ModelImporter:
       takeName: Flat10Scraper_Rig|Kill_NeckBite
       internalID: 4104050619975175088
       firstFrame: 0
-      lastFrame: 162
+      lastFrame: 168
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

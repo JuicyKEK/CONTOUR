@@ -249,11 +249,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Kill_Spider
-      takeName: Dorm_05_BedSpringCrawler_Rig|Kill_Spider
+      name: Kill_Spikes
+      takeName: Dorm_05_BedSpringCrawler_Rig|Kill_Spikes
       internalID: -9019585996797507608
       firstFrame: 0
-      lastFrame: 168
+      lastFrame: 180
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -282,7 +282,7 @@ ModelImporter:
       takeName: Dorm_05_BedSpringCrawler_Rig|Kill_Pin
       internalID: -4160622264616222487
       firstFrame: 0
-      lastFrame: 168
+      lastFrame: 174
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

@@ -23,21 +23,69 @@ namespace Game.Scripts.NPC.Runtime.Core
             if (fader != null)
             {
                 await fader.FadeOutAsync(duration, token);
+
+                // Экран уже чёрный от fader'а - своё затемнение (PlayDarknessAsync) убираем, чтобы не осталось после возврата.
+                if (s_Overlay != null)
+                {
+                    s_Overlay.alpha = 0f;
+                }
+
                 return;
             }
 
             var overlay = EnsureOverlay();
+            float startAlpha = overlay.alpha;
             float time = 0f;
 
             while (time < duration)
             {
                 token.ThrowIfCancellationRequested();
                 time += Time.unscaledDeltaTime;
-                overlay.alpha = Mathf.Clamp01(time / duration);
+                overlay.alpha = Mathf.Lerp(startAlpha, 1f, Mathf.Clamp01(time / duration));
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
 
             overlay.alpha = 1f;
+        }
+
+        /// <summary>
+        /// Затемнение по кривой (по горизонтали - секунды от начала, по вертикали - 0..1) до момента until - своим чёрным
+        /// слоем поверх всего. Время берётся из clipTime (время анимации, под которую сделана кривая), чтобы затемнение
+        /// шло ровно с картинкой. После until слой остаётся как есть - дальше его ведёт FadeOutAsync. Если прервали -
+        /// слой убирается.
+        /// </summary>
+        public static async UniTask PlayDarknessAsync(AnimationCurve curve, float until, System.Func<float> clipTime, CancellationToken token)
+        {
+            if (curve == null || curve.length == 0 || clipTime == null)
+            {
+                return;
+            }
+
+            var overlay = EnsureOverlay();
+
+            try
+            {
+                float time = clipTime();
+
+                while (time < until)
+                {
+                    token.ThrowIfCancellationRequested();
+                    overlay.alpha = Mathf.Clamp01(curve.Evaluate(time));
+                    await UniTask.Yield(PlayerLoopTiming.Update, token);
+                    time = clipTime();
+                }
+
+                overlay.alpha = Mathf.Clamp01(curve.Evaluate(until));
+            }
+            catch (System.OperationCanceledException)
+            {
+                if (s_Overlay != null)
+                {
+                    s_Overlay.alpha = 0f;
+                }
+
+                throw;
+            }
         }
 
         /// <summary>Текущая прозрачность своего слоя затемнения (для отладки и проверок; 0 - слоя нет).</summary>

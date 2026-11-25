@@ -939,6 +939,13 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 SnapToPlayer(killClip.Distance);
                 PlayerCapture.AttachView(killEye);
                 LogDebug($"убийство '{killClip.AnimatorState}'");
+
+                if (killClip.Darkness != null && killClip.Darkness.length > 0)
+                {
+                    // Затемнение по ходу анимации (игрок задыхается) - до затемнения перед возвратом к сохранению.
+                    float until = killClip.FadeAt > 0f ? killClip.FadeAt : killClip.Duration;
+                    NpcScreenFade.PlayDarknessAsync(killClip.Darkness, until, KillClipTimer(killClip.AnimatorState), destroyCancellationToken).Forget();
+                }
             }
             else
             {
@@ -999,6 +1006,30 @@ namespace Game.Scripts.NPC.Runtime.Controllers
             }
 
             return eye != null;
+        }
+
+        /// <summary>
+        /// Время анимации убийства (с от её начала): пока аниматор в её состоянии - по нему (затемнение идёт ровно с
+        /// картинкой, даже если кадр подвис); до входа в состояние и после выхода из него - по часам с момента поимки.
+        /// </summary>
+        private Func<float> KillClipTimer(string state)
+        {
+            float startTime = Time.time;
+
+            return () =>
+            {
+                if (m_Animator != null)
+                {
+                    var info = m_Animator.GetCurrentAnimatorStateInfo(0);
+
+                    if (info.IsName(state))
+                    {
+                        return info.normalizedTime * info.length;
+                    }
+                }
+
+                return Time.time - startTime;
+            };
         }
 
         /// <summary>

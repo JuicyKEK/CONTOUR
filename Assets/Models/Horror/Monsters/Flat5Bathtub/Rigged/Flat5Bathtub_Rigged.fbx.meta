@@ -9,6 +9,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Flat5Bathtub_Material
     second: {fileID: 2100000, guid: 0631d65bb5190a944bda7a98806e4e1f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: KillSlime
+    second: {fileID: 2100000, guid: 6e8a5460a02590f42b0afcd7345266bb, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -355,11 +360,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Kill_Break
-      takeName: Flat5Bathtub_Rig|Kill_Break
+      name: Kill_Pour
+      takeName: Flat5Bathtub_Rig|Kill_Pour
       internalID: -4044106718422341889
       firstFrame: 0
-      lastFrame: 168
+      lastFrame: 198
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

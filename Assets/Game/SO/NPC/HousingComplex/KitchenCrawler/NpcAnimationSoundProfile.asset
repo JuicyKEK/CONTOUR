@@ -162,16 +162,34 @@ MonoBehaviour:
     FadeAt: 4
     Distance: 1.2
     EndOffset: {x: -0, y: -1.79}
+    Darkness:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   - AnimatorState: Kill_Soup
-    Duration: 7.6
-    FadeAt: 6.9
+    Duration: 9.1
+    FadeAt: 8.4
     Distance: 0.95
     EndOffset: {x: -0.85, y: -0.2}
+    Darkness:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   - AnimatorState: Kill_Tilt
     Duration: 4.6
     FadeAt: 3.2
     Distance: 0.85
     EndOffset: {x: -0.85, y: -0.2}
+    Darkness:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   m_KillEyeBone: PlayerEye
   m_MinDistance: 1
   m_MaxDistance: 18
