@@ -280,7 +280,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8121869330781077267}
-  - component: {fileID: 8491628974969247881}
   m_Layer: 0
   m_Name: Blocker_Wires
   m_TagString: Untagged
@@ -304,23 +303,6 @@ Transform:
   - {fileID: 3281541310002316743}
   m_Father: {fileID: 473367968017485644}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8491628974969247881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 58575405469725960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f48c0e81830465a8a05d382a78b71d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: InfectionZone::Game.Scripts.InfectionZone.Runtime.Controllers.InfectionRangeObject
-  m_ZoneSource: {fileID: 0}
-  m_MinInfectionPercent: 0
-  m_MaxInfectionPercent: 29.99
-  m_TargetObjects:
-  - {fileID: 3237893439508520068}
 --- !u!1 &75582445907428859
 GameObject:
   m_ObjectHideFlags: 0
@@ -6327,7 +6309,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4285901657269193827}
-  - component: {fileID: 8728753583671347169}
   m_Layer: 0
   m_Name: Bridge_Growth
   m_TagString: Untagged
@@ -6351,23 +6332,6 @@ Transform:
   - {fileID: 513645294296562969}
   m_Father: {fileID: 473367968017485644}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8728753583671347169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1730452993608841326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f48c0e81830465a8a05d382a78b71d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: InfectionZone::Game.Scripts.InfectionZone.Runtime.Controllers.InfectionRangeObject
-  m_ZoneSource: {fileID: 0}
-  m_MinInfectionPercent: 30
-  m_MaxInfectionPercent: 100
-  m_TargetObjects:
-  - {fileID: 3871978268959468325}
 --- !u!1 &1733021463203563344
 GameObject:
   m_ObjectHideFlags: 0

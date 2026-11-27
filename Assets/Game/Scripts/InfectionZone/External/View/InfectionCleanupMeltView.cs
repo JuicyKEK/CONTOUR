@@ -2,6 +2,7 @@
 using DG.Tweening;
 using Game.Scripts.InfectionZone.External.Controllers;
 using Game.Scripts.InfectionZone.Runtime.Controllers;
+using Game.Scripts.InfectionZone.Runtime.Interfaces;
 using R3;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -14,10 +15,11 @@ namespace Game.Scripts.InfectionZone.External.View
     /// темнеет и пузырится (пузыри - эффект Cleanse_MeltBubbles), испаряется, и объект выключается. Коллайдеры
     /// выключаются сразу - сквозь лужу можно пройти. Выключенный объект возвращается к своим материалам: снова
     /// появившаяся аномалия - целая. Стоит на корне аномалии рядом с <see cref="InfectionCleanupObject"/>.
-    /// Так же исчезает цель <see cref="InfectionRangeObject"/> из его списка целей, исчезающих через вид, когда
-    /// заражение выходит из диапазона.
+    /// Так же исчезает объект из списка <see cref="InfectionRangeObject"/>, когда заражение выходит из его диапазона
+    /// (<see cref="IInfectionObjectAnimation"/>); вернулось в диапазон, пока объект плавился, - плавление прерывается,
+    /// объект снова целый.
     /// </summary>
-    public class InfectionCleanupMeltView : MonoBehaviour
+    public class InfectionCleanupMeltView : MonoBehaviour, IInfectionObjectAnimation
     {
         private static readonly int s_Progress = Shader.PropertyToID("_CleanseProgress");
         private static readonly int s_BaseMap = Shader.PropertyToID("_BaseMap");
@@ -37,9 +39,6 @@ namespace Game.Scripts.InfectionZone.External.View
 
         [Tooltip("Аномалия: когда она очищена, объект плавится. Пусто - плавление запускают вызовом Melt() (сцена эффектов).")]
         [SerializeField] private InfectionCleanupObject m_Cleanup;
-
-        [Tooltip("Объект диапазона заражения, у которого этот объект в списке целей, исчезающих через вид: заражение вышло из диапазона - объект плавится.")]
-        [SerializeField] private InfectionRangeObject m_Range;
 
         [Tooltip("Материал плавления (шейдер Custom/Cleanse/Melt): цвета и сила плавления - из него, текстуры и цвет - из материалов объекта.")]
         [SerializeField] private Material m_MeltMaterial;
@@ -69,6 +68,7 @@ namespace Game.Scripts.InfectionZone.External.View
         private readonly List<(Renderer renderer, Material[] materials)> m_Originals = new();
         private readonly List<Material> m_MeltMaterials = new();
         private readonly List<Collider> m_DisabledColliders = new();
+        private readonly List<ParticleSystem> m_StoppedParticles = new();
         private readonly List<Vector3> m_BubblePoints = new();
 
         private Bounds m_Bounds;
@@ -85,11 +85,39 @@ namespace Game.Scripts.InfectionZone.External.View
             {
                 m_Cleanup.IsCleaned.Skip(1).Subscribe(OnCleanedChanged).AddTo(m_Disposables);
             }
+        }
 
-            if (m_Range != null)
+        /// <summary>
+        /// Объект снова в диапазоне заражения (его уже включили). Если он как раз плавился - плавление прерывается.
+        /// </summary>
+        public void PlayAppear()
+        {
+            if (m_Tween == null)
             {
-                m_Range.IsInRange.Skip(1).Subscribe(OnInRangeChanged).AddTo(m_Disposables);
+                return;
             }
+
+            m_Tween.Kill();
+            m_Tween = null;
+            StopBubbles();
+
+            foreach (ParticleSystem particles in m_StoppedParticles)
+            {
+                if (particles != null)
+                {
+                    particles.Play(false);
+                }
+            }
+
+            Restore();
+        }
+
+        /// <summary>
+        /// Объект вышел из диапазона заражения: плавится и в конце выключается.
+        /// </summary>
+        public void PlayDisappear()
+        {
+            Melt();
         }
 
         private void OnDisable()
@@ -109,14 +137,6 @@ namespace Game.Scripts.InfectionZone.External.View
         private void OnCleanedChanged(bool isCleaned)
         {
             if (isCleaned)
-            {
-                Melt();
-            }
-        }
-
-        private void OnInRangeChanged(bool isInRange)
-        {
-            if (!isInRange && gameObject.activeInHierarchy)
             {
                 Melt();
             }
@@ -144,9 +164,18 @@ namespace Game.Scripts.InfectionZone.External.View
                 }
             }
 
+            // запоминаем, какие эффекты шли, - если плавление прервут (объект снова в диапазоне), они запустятся опять
             foreach (ParticleSystem particles in GetComponentsInChildren<ParticleSystem>())
             {
-                particles.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+                if (particles.isPlaying)
+                {
+                    m_StoppedParticles.Add(particles);
+                }
+            }
+
+            foreach (ParticleSystem particles in m_StoppedParticles)
+            {
+                particles.Stop(false, ParticleSystemStopBehavior.StopEmitting);
             }
 
             m_FloorY = FindFloor();
@@ -435,6 +464,7 @@ namespace Game.Scripts.InfectionZone.External.View
             }
 
             m_DisabledColliders.Clear();
+            m_StoppedParticles.Clear();
         }
     }
 }

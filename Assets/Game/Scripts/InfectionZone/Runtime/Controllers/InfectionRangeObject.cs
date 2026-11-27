@@ -5,21 +5,22 @@ using UnityEngine;
 namespace Game.Scripts.InfectionZone.Runtime.Controllers
 {
     /// <summary>
-    /// Объект, который появляется/исчезает в зависимости от степени заражения зоны.
+    /// Объекты, которые появляются/исчезают в зависимости от степени заражения зоны.
     /// Используется для:
     /// - неинтерактивных аномалий, блокирующих проход игроку по сюжету (например 30-50%);
     /// - секретных аномалий/дверей, которые открываются, если игрок сам заразит зону
     ///   до нужного диапазона (например 60-70%).
-    /// Объект не реализует IInteraction - игрок не может провзаимодействовать с ним напрямую,
-    /// единственный способ убрать его - изменить степень заражения зоны.
-    /// Цели из m_ViewHiddenTargets контроллер только показывает; когда заражение выходит из диапазона,
-    /// их убирает их вид по <see cref="IsInRange"/> (например, стена расплавляется и выключается сама).
-    /// Состояние на старте (из сохранения) применяется ко всем целям сразу.
+    /// Лежит в контроллере сцены: один компонент - один диапазон заражения, в его списке - все объекты локации
+    /// с этим диапазоном. Сами объекты ничего не знают о заражении.
+    ///
+    /// Заражение вошло в диапазон - объект включается; если у него есть анимация появления
+    /// (<see cref="IInfectionObjectAnimation"/>), она запускается. Вышло из диапазона - если у включённого объекта есть
+    /// такая анимация, объект исчезает через неё (например, плавится) и она сама его выключает; нет - объект просто
+    /// выключается. Состояние на старте (из сохранения) применяется ко всем объектам сразу, без анимаций.
+    /// Пока заражение меняется внутри диапазона (или вне его), объекты не трогаются.
     /// </summary>
     public class InfectionRangeObject : MonoBehaviour, IInfectionRangeObject
     {
-        public ReadOnlyReactiveProperty<bool> IsInRange => m_IsInRange;
-
         [Header("Ссылка на зону")]
         [Tooltip("Зона, за степенью заражения которой следит этот объект.")]
         [SerializeField] private MonoBehaviour m_ZoneSource; // должен реализовывать IInfectionZone
@@ -34,16 +35,15 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         [SerializeField] private float m_MaxInfectionPercent = 50f;
 
         [Header("Что скрывать/показывать")]
-        [Tooltip("Визуальные и физические объекты, которые нужно включать/выключать. По умолчанию используется сам GameObject.")]
+        [Tooltip("Объекты, которые появляются в диапазоне и исчезают вне его. Есть у объекта анимация появления и " +
+                 "исчезновения (IInfectionObjectAnimation, например InfectionCleanupMeltView) - запускается она. " +
+                 "По умолчанию используется сам GameObject.")]
         [SerializeField] private GameObject[] m_TargetObjects;
 
-        [Tooltip("Цели, которые при выходе из диапазона исчезают через свой вид (например, плавятся): контроллер их только показывает, выключает их вид.")]
-        [SerializeField] private GameObject[] m_ViewHiddenTargets;
-
         private readonly CompositeDisposable m_Disposables = new();
-        private readonly ReactiveProperty<bool> m_IsInRange = new(true);
         private IInfectionZone m_Zone;
         private bool m_HasState;
+        private bool m_IsInRange;
 
         public float MinInfectionPercent => m_MinInfectionPercent;
         public float MaxInfectionPercent => m_MaxInfectionPercent;
@@ -57,12 +57,10 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
                 Debug.LogError($"[InfectionRangeObject] {name}: m_ZoneSource должен реализовывать IInfectionZone.", this);
             }
 
-            if ((m_TargetObjects == null || m_TargetObjects.Length == 0) && (m_ViewHiddenTargets == null || m_ViewHiddenTargets.Length == 0))
+            if (m_TargetObjects == null || m_TargetObjects.Length == 0)
             {
                 m_TargetObjects = new[] { gameObject };
             }
-
-            m_TargetObjects ??= new GameObject[0];
         }
 
         private void OnEnable()
@@ -83,41 +81,62 @@ namespace Game.Scripts.InfectionZone.Runtime.Controllers
         }
 
         /// <summary>
-        /// Включает/выключает целевые объекты в зависимости от того, попадает ли
-        /// текущая степень заражения в заданный диапазон.
+        /// Включает/выключает целевые объекты, когда степень заражения входит в заданный диапазон или выходит из него.
         /// </summary>
         private void UpdateVisibility(float infectionLevel)
         {
             bool isInRange = infectionLevel >= m_MinInfectionPercent && infectionLevel <= m_MaxInfectionPercent;
-            bool isFirst = !m_HasState;
-            m_HasState = true;
-            m_IsInRange.Value = isInRange;
 
-            foreach (var target in m_TargetObjects)
-            {
-                if (target != null)
-                {
-                    target.SetActive(isInRange);
-                }
-            }
-
-            if (m_ViewHiddenTargets == null)
+            if (m_HasState && isInRange == m_IsInRange)
             {
                 return;
             }
 
-            foreach (var target in m_ViewHiddenTargets)
+            bool isFirst = !m_HasState;
+            m_HasState = true;
+            m_IsInRange = isInRange;
+
+            foreach (var target in m_TargetObjects)
             {
-                if (target != null && (isInRange || isFirst))
+                if (target == null)
+                {
+                    continue;
+                }
+
+                if (isFirst)
                 {
                     target.SetActive(isInRange);
+                }
+                else if (isInRange)
+                {
+                    Appear(target);
+                }
+                else
+                {
+                    Disappear(target);
                 }
             }
         }
 
-        private void OnDestroy()
+        private static void Appear(GameObject target)
         {
-            m_IsInRange.Dispose();
+            target.SetActive(true);
+
+            if (target.TryGetComponent(out IInfectionObjectAnimation animation))
+            {
+                animation.PlayAppear();
+            }
+        }
+
+        private static void Disappear(GameObject target)
+        {
+            if (target.activeInHierarchy && target.TryGetComponent(out IInfectionObjectAnimation animation))
+            {
+                animation.PlayDisappear();
+                return;
+            }
+
+            target.SetActive(false);
         }
     }
 }

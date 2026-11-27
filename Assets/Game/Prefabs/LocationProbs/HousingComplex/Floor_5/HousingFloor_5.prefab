@@ -10856,7 +10856,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InfectionZone.External.View.InfectionCleanupMeltView
   m_Cleanup: {fileID: 2186539178114927192}
-  m_Range: {fileID: 0}
   m_MeltMaterial: {fileID: 2100000, guid: fa81908ed6f07ef4092e2ba19abd7ef0, type: 2}
   m_BubblesPrefab: {fileID: 2983601160909510901, guid: 7d829dd608ea62740908d593aafc0f05, type: 3}
   m_Duration: 5
@@ -17962,7 +17961,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Scripts.InfectionZone.External.View.InfectionCleanupMeltView
   m_Cleanup: {fileID: 0}
-  m_Range: {fileID: 2092125696395259887}
   m_MeltMaterial: {fileID: 2100000, guid: fa81908ed6f07ef4092e2ba19abd7ef0, type: 2}
   m_BubblesPrefab: {fileID: 2983601160909510901, guid: 7d829dd608ea62740908d593aafc0f05, type: 3}
   m_Duration: 5
@@ -61446,7 +61444,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7360625107684754713}
-  - component: {fileID: 2092125696395259887}
   m_Layer: 0
   m_Name: Bridge_Growth
   m_TagString: Untagged
@@ -61470,24 +61467,6 @@ Transform:
   - {fileID: 933615991235476714}
   m_Father: {fileID: 6331815030451762315}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2092125696395259887
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9033238217286042630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f48c0e81830465a8a05d382a78b71d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: InfectionZone::Game.Scripts.InfectionZone.Runtime.Controllers.InfectionRangeObject
-  m_ZoneSource: {fileID: 0}
-  m_MinInfectionPercent: 80
-  m_MaxInfectionPercent: 100
-  m_TargetObjects: []
-  m_ViewHiddenTargets:
-  - {fileID: 2947311271242714164}
 --- !u!1 &9039504860696093632
 GameObject:
   m_ObjectHideFlags: 0
