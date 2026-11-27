@@ -75,6 +75,35 @@ namespace Game.Scripts.NPC.Runtime.Data
         public AnimationCurve Progress;
     }
 
+    [Serializable]
+    public struct NpcKillClip
+    {
+        [Tooltip("Состояние аниматора с анимацией убийства (например 'Kill_Pounce').")]
+        public string AnimatorState;
+
+        [Tooltip("Длительность анимации (с).")]
+        [Min(0f)] public float Duration;
+
+        [Tooltip("Через сколько секунд от начала анимации экран начинает темнеть (дальше - возврат к сохранению).")]
+        [Min(0f)] public float FadeAt;
+
+        [Tooltip("На каком расстоянии от игрока (м, по полу) бот встаёт к нему лицом в начале анимации - так она сделана.")]
+        [Min(0f)] public float Distance;
+
+        [Tooltip("Куда за анимацию уходит голова игрока от того места, где он стоял (м; x - вправо от него, y - вперёд, " +
+                 "к боту; падает назад - y меньше 0). Если на этом пути стена или мебель, анимация не выбирается - " +
+                 "иначе камера окажется в стене или за ней. Ноль - не проверять.")]
+        public Vector2 EndOffset;
+
+        [Tooltip("Затемнение экрана по ходу анимации до FadeAt (например, игрок задыхается): по горизонтали - секунды от " +
+                 "начала анимации, по вертикали - 0 нет, 1 чёрный экран. Пустая кривая - не темнеет.")]
+        public AnimationCurve Darkness;
+
+        [Tooltip("Виньетка при удушье до FadeAt: чёрное кольцо сужается от краёв экрана к центру (по горизонтали - секунды " +
+                 "от начала анимации, по вертикали - 0 нет, 1 сомкнулась: экран чёрный). Пустая кривая - без виньетки.")]
+        public AnimationCurve Vignette;
+    }
+
     /// <summary>
     /// Анимации и звуки одного типа бота (или одного его облика - см. NpcAppearance):
     ///  - действия по логическому ключу ("Chase", "Attack", "Transform"...) - триггер аниматора и звук;
@@ -111,6 +140,13 @@ namespace Game.Scripts.NPC.Runtime.Data
         [Tooltip("Анимации прохода в проём: шагом и бегом. Пусто - бот идёт через проём обычной походкой.")]
         [SerializeField] private NpcDoorwayClip[] m_DoorwayClips = Array.Empty<NpcDoorwayClip>();
 
+        [Header("Убийство от первого лица")]
+        [Tooltip("Анимации убийства: при поимке берётся случайная, камера игрока идёт за костью глаз игрока в скелете бота. " +
+                 "Пусто - бот играет действие 'Kill', как раньше.")]
+        [SerializeField] private NpcKillClip[] m_KillClips = Array.Empty<NpcKillClip>();
+        [Tooltip("Кость в скелете бота, где в анимациях убийства глаза игрока (ось Y - вверх, Z - куда он смотрит).")]
+        [SerializeField] private string m_KillEyeBone = "PlayerEye";
+
         [Header("Звук в пространстве")]
         [Tooltip("Для источников шагов и голоса, которые бот создаёт сам: ближе этого расстояния звук на полной громкости...")]
         [SerializeField, Min(0.1f)] private float m_MinDistance = 1f;
@@ -130,6 +166,39 @@ namespace Game.Scripts.NPC.Runtime.Data
         public float MaxDistance => Mathf.Max(m_MaxDistance, m_MinDistance + 0.1f);
 
         public bool HasDoorwayClips => m_DoorwayClips != null && m_DoorwayClips.Length > 0;
+        public bool HasKillClips => m_KillClips != null && m_KillClips.Length > 0;
+        public string KillEyeBone => m_KillEyeBone;
+
+        /// <summary>
+        /// Случайная анимация убийства из тех, для которых fits вернул true (fits null - из всех). False - таких нет.
+        /// </summary>
+        public bool TryGetRandomKillClip(Predicate<NpcKillClip> fits, out NpcKillClip clip)
+        {
+            clip = default;
+
+            if (!HasKillClips)
+            {
+                return false;
+            }
+
+            var candidates = new List<NpcKillClip>();
+
+            foreach (var c in m_KillClips)
+            {
+                if (!string.IsNullOrEmpty(c.AnimatorState) && (fits == null || fits(c)))
+                {
+                    candidates.Add(c);
+                }
+            }
+
+            if (candidates.Count == 0)
+            {
+                return false;
+            }
+
+            clip = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            return true;
+        }
 
         /// <summary>
         /// Анимация прохода в проём для бега (run) или шага; нет такой - любая из заданных.
