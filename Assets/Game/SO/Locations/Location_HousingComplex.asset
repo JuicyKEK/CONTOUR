@@ -18,4 +18,7 @@ MonoBehaviour:
     m_ScenePath: Assets/Game/Scenes/2_HousingComplex.unity
   m_DefaultCheckpointId: HousingComplex/Start
   m_CheckpointIds:
-  - HousingComplex/Start
+  - 2_HousingComplex/after_run
+  - 2_HousingComplex/flor_4_after_run
+  - 2_HousingComplex/flor_4_end
+  - 2_HousingComplex/flor_5
