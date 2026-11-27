@@ -9,7 +9,8 @@ namespace Game.Scripts.ItemInspection
     /// в префабе игрока.
     ///
     /// Модуль ничего не знает о том, что за предмет и что с ним будет дальше: его можно звать откуда угодно.
-    /// При подборе его зовёт InspectOnFirstPickup (только первый предмет каждого типа).
+    /// При подборе его зовёт InspectOnFirstPickup (только первый предмет каждого типа), документы бота -
+    /// NpcDocumentCheckBehaviour (при каждой проверке).
     /// </summary>
     public interface IItemInspection
     {
@@ -30,5 +31,12 @@ namespace Game.Scripts.ItemInspection
         /// куда по умолчанию (панель инвентаря).</param>
         /// <param name="onFinished">Предмет долетел - осмотр закончен.</param>
         bool TryInspect(GameObject source, string displayName, Transform flyTarget, Action onFinished);
+
+        /// <summary>
+        /// Как <see cref="TryInspect"/>, но предмет никуда не улетает: после осмотра он возвращается туда, откуда его
+        /// взяли (например, документы в руке бота), - копия летит обратно к объекту source и встаёт точно на него.
+        /// Модуль ничего не запоминает: каждый вызов - новый осмотр.
+        /// </summary>
+        bool TryInspectAndReturn(GameObject source, string displayName, Action onFinished);
     }
 }

@@ -32,6 +32,8 @@ namespace Game.Scripts.ItemInspection.Controllers
     /// 4. Снизу - название предмета, подсказка и кнопка "Принять". Зажав ЛКМ и двигая мышь, предмет крутят.
     /// 5. По Esc или кнопке "Принять" предмет уменьшается и улетает (к панели инвентаря, см. Fly Target); когда
     ///    долетел - объект на сцене снова виден, вызывается onFinished, всё возвращается как было.
+    ///    Осмотр через <see cref="TryInspectAndReturn"/> (документы в руке бота) - предмет не улетает, а возвращается
+    ///    туда, откуда его взяли: копия летит обратно к объекту и встаёт точно на него.
     ///
     /// На время осмотра: курсор виден, движение и поворот камеры выключены, клавиши E/F/R/TAB/цифры не действуют,
     /// игра по желанию на паузе (Time.timeScale = 0, сам осмотр анимируется по реальному времени).
@@ -91,7 +93,7 @@ namespace Game.Scripts.ItemInspection.Controllers
         [Header("Анимация")]
         [Tooltip("Сколько секунд предмет летит к камере (размытие и подпись появляются за то же время).")]
         [SerializeField, Min(0.01f)] private float m_FlyInDuration = 0.45f;
-        [Tooltip("Сколько секунд предмет летит в инвентарь.")]
+        [Tooltip("Сколько секунд предмет летит в инвентарь (или обратно на место).")]
         [SerializeField, Min(0.01f)] private float m_FlyOutDuration = 0.45f;
         [Tooltip("Размер предмета в конце полёта в инвентарь - доля от размера при осмотре.")]
         [SerializeField, Range(0.01f, 1f)] private float m_EndScale = 0.12f;
@@ -124,6 +126,9 @@ namespace Game.Scripts.ItemInspection.Controllers
         private Action m_OnFinished;
         // Куда улетает этот предмет (null - m_FlyTarget).
         private Transform m_ItemFlyTarget;
+        // Предмет возвращается на место (TryInspectAndReturn): сам объект и центр копии в его координатах. null - улетает.
+        private Transform m_ReturnTarget;
+        private Vector3 m_ReturnLocalCenter;
 
         private Camera m_BaseCamera;
         private int m_BaseCullingMask;
@@ -161,6 +166,17 @@ namespace Game.Scripts.ItemInspection.Controllers
         }
 
         public bool TryInspect(GameObject source, string displayName, Transform flyTarget, Action onFinished)
+        {
+            return StartInspection(source, displayName, flyTarget, false, onFinished);
+        }
+
+        public bool TryInspectAndReturn(GameObject source, string displayName, Action onFinished)
+        {
+            return StartInspection(source, displayName, null, true, onFinished);
+        }
+
+        private bool StartInspection(GameObject source, string displayName, Transform flyTarget, bool returnToSource,
+            Action onFinished)
         {
             if (m_Phase != Phase.None || source == null)
             {
@@ -203,6 +219,8 @@ namespace Game.Scripts.ItemInspection.Controllers
             m_ItemRadius = radius;
             m_OnFinished = onFinished;
             m_ItemFlyTarget = flyTarget;
+            m_ReturnTarget = returnToSource ? source.transform : null;
+            m_ReturnLocalCenter = source.transform.InverseTransformPoint(copy.position);
 
             HideSource(source);
             SetupCameras(baseCamera, layer);
@@ -274,9 +292,33 @@ namespace Game.Scripts.ItemInspection.Controllers
         {
             m_Phase = Phase.FlyOut;
             m_Sequence?.Kill();
+
+            // Объект, к которому предмет возвращается, могли удалить за время осмотра - тогда предмет просто улетает.
+            if (m_ReturnTarget != null)
+            {
+                PlayReturn();
+                return;
+            }
+
             m_Sequence = DOTween.Sequence()
                 .Join(m_Item.DOMove(GetFlyTargetWorldPoint(), m_FlyOutDuration).SetEase(Ease.InQuad))
                 .Join(m_Item.DOScale(m_Item.localScale.x * m_EndScale, m_FlyOutDuration).SetEase(Ease.InQuad))
+                .Join(DOTween.To(() => m_BlurWeight, SetBlur, 0f, m_FlyOutDuration).SetEase(Ease.Linear))
+                .Join(m_View.Fade(0f, m_FlyOutDuration * 0.3f))
+                .SetUpdate(true)
+                .OnComplete(Finish);
+        }
+
+        /// <summary>
+        /// Предмет возвращается на место (<see cref="TryInspectAndReturn"/>): летит обратно к объекту - туда, где объект
+        /// сейчас, его поворотом и в его настоящем размере, - и там подменяется им самим. Размытие и подпись гаснут.
+        /// </summary>
+        private void PlayReturn()
+        {
+            m_Sequence = DOTween.Sequence()
+                .Join(m_Item.DOMove(m_ReturnTarget.TransformPoint(m_ReturnLocalCenter), m_FlyOutDuration).SetEase(Ease.InOutSine))
+                .Join(m_Item.DORotateQuaternion(m_ReturnTarget.rotation, m_FlyOutDuration).SetEase(Ease.InOutSine))
+                .Join(m_Item.DOScale(1f, m_FlyOutDuration).SetEase(Ease.InOutSine))
                 .Join(DOTween.To(() => m_BlurWeight, SetBlur, 0f, m_FlyOutDuration).SetEase(Ease.Linear))
                 .Join(m_View.Fade(0f, m_FlyOutDuration * 0.3f))
                 .SetUpdate(true)
@@ -344,6 +386,7 @@ namespace Game.Scripts.ItemInspection.Controllers
             m_Phase = Phase.None;
             m_IsDragging = false;
             m_ItemFlyTarget = null;
+            m_ReturnTarget = null;
             m_Sequence?.Kill();
             m_Sequence = null;
 

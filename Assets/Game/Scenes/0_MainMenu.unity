@@ -3589,6 +3589,11 @@ MonoBehaviour:
   m_HasForgedDocuments: 0
   m_DocumentsValidSignal: 
   m_DocumentsForgedSignal: 
+  m_Documents: {fileID: 0}
+  m_DocumentsName: "\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B"
+  m_ShowAnimationKey: Docs_Show
+  m_ShowDuration: 2
+  m_PutAwayAnimationKey: Docs_PutAway
   m_OnDocumentsValidChannel: {fileID: 11400000, guid: c74a6b01b6edbe7418ca48c2cb585e31, type: 2}
   m_OnDocumentsForgedChannel: {fileID: 0}
 --- !u!4 &195185701

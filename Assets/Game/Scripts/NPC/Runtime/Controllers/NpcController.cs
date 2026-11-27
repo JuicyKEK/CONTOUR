@@ -940,11 +940,12 @@ namespace Game.Scripts.NPC.Runtime.Controllers
                 PlayerCapture.AttachView(killEye);
                 LogDebug($"убийство '{killClip.AnimatorState}'");
 
-                if (killClip.Darkness != null && killClip.Darkness.length > 0)
+                if ((killClip.Darkness != null && killClip.Darkness.length > 0) || (killClip.Vignette != null && killClip.Vignette.length > 0))
                 {
-                    // Затемнение по ходу анимации (игрок задыхается) - до затемнения перед возвратом к сохранению.
+                    // Затемнение и виньетка по ходу анимации (игрок задыхается) - до затемнения перед возвратом к сохранению.
                     float until = killClip.FadeAt > 0f ? killClip.FadeAt : killClip.Duration;
-                    NpcScreenFade.PlayDarknessAsync(killClip.Darkness, until, KillClipTimer(killClip.AnimatorState), destroyCancellationToken).Forget();
+                    NpcScreenFade.PlayDarknessAsync(killClip.Darkness, killClip.Vignette, until, KillClipTimer(killClip.AnimatorState),
+                        destroyCancellationToken).Forget();
                 }
             }
             else

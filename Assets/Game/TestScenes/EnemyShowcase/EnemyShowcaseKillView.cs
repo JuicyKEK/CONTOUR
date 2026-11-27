@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Game.Scripts.NPC.Runtime.Core;
 using Game.Scripts.NPC.Runtime.Data;
 using TMPro;
 using UnityEngine;
@@ -57,6 +58,7 @@ namespace Game.TestScenes.EnemyShowcase
         private bool m_IsFadeOn = true;
         private bool m_HasKill;
         private NpcKillClip m_Kill;
+        private UnityEngine.UI.RawImage m_Vignette;
         private Vector3 m_HomePosition;
         private Quaternion m_HomeRotation;
         private float m_HomeFieldOfView;
@@ -94,6 +96,7 @@ namespace Game.TestScenes.EnemyShowcase
             m_PlayButton.onClick.AddListener(Play);
             m_FadeButton.onClick.AddListener(ToggleFade);
             m_BackButton.onClick.AddListener(Back);
+            m_Vignette = CreateVignette();
             SetFadeAlpha(0f);
             Refresh();
         }
@@ -172,6 +175,10 @@ namespace Game.TestScenes.EnemyShowcase
                 : 0f;
             float fade = Mathf.Clamp01((time - m_Kill.FadeAt) / m_FadeDuration);
             SetFadeAlpha(m_IsFadeOn && m_HasKill ? Mathf.Lerp(darkness, 1f, fade) : 0f);
+            float vignette = m_Kill.Vignette != null && m_Kill.Vignette.length > 0
+                ? m_Kill.Vignette.Evaluate(Mathf.Min(time, m_Kill.FadeAt))
+                : 0f;
+            NpcScreenFade.SetVignette(m_Vignette, m_IsFadeOn && m_HasKill ? vignette : 0f);
             m_Status.text = $"{time:F1} / {length:F1} c" + (m_HasKill ? $",  затемнение с {m_Kill.FadeAt:F1} c" : "") + Hint;
         }
 
@@ -362,6 +369,30 @@ namespace Game.TestScenes.EnemyShowcase
             var color = m_Fade.color;
             color.a = alpha;
             m_Fade.color = color;
+
+            if (alpha <= 0f)
+            {
+                NpcScreenFade.SetVignette(m_Vignette, 0f);
+            }
+        }
+
+        /// <summary>Виньетка удушья (как в игре, NpcScreenFade) - под чёрным экраном, того же размера.</summary>
+        private UnityEngine.UI.RawImage CreateVignette()
+        {
+            var go = new GameObject("Vignette", typeof(RectTransform), typeof(UnityEngine.UI.RawImage));
+            var rect = (RectTransform)go.transform;
+            var fadeRect = m_Fade.rectTransform;
+            rect.SetParent(fadeRect.parent, false);
+            rect.SetSiblingIndex(fadeRect.GetSiblingIndex());
+            rect.anchorMin = fadeRect.anchorMin;
+            rect.anchorMax = fadeRect.anchorMax;
+            rect.pivot = fadeRect.pivot;
+            rect.offsetMin = fadeRect.offsetMin;
+            rect.offsetMax = fadeRect.offsetMax;
+            var image = go.GetComponent<UnityEngine.UI.RawImage>();
+            image.raycastTarget = false;
+            image.enabled = false;
+            return image;
         }
     }
 }
